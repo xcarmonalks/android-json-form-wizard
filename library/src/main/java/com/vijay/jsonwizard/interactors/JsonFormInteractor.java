@@ -1,14 +1,5 @@
 package com.vijay.jsonwizard.interactors;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
@@ -22,6 +13,15 @@ import com.vijay.jsonwizard.widgets.ImagePickerFactory;
 import com.vijay.jsonwizard.widgets.LabelFactory;
 import com.vijay.jsonwizard.widgets.RadioButtonFactory;
 import com.vijay.jsonwizard.widgets.SpinnerFactory;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by vijay on 5/19/15.
@@ -43,6 +43,10 @@ public class JsonFormInteractor {
         map.put(JsonFormConstants.RADIO_BUTTON, new RadioButtonFactory());
         map.put(JsonFormConstants.CHOOSE_IMAGE, new ImagePickerFactory());
         map.put(JsonFormConstants.SPINNER, new SpinnerFactory());
+    }
+
+    public static void registerWidget(String key, FormWidgetFactory factory) {
+        map.put(key, factory);
     }
 
     public List<View> fetchFormElements(String stepName, Context context, JSONObject parentJson, CommonListener listener) {
