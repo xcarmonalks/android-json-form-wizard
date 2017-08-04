@@ -8,17 +8,21 @@ import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
 
-import static com.vijay.jsonwizard.utils.FormUtils.*;
-
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.vijay.jsonwizard.utils.FormUtils.FONT_BOLD_PATH;
+import static com.vijay.jsonwizard.utils.FormUtils.WRAP_CONTENT;
+import static com.vijay.jsonwizard.utils.FormUtils.getLayoutParams;
+import static com.vijay.jsonwizard.utils.FormUtils.getTextViewWith;
+
 /**
  * Created by vijay on 24-05-2015.
  */
 public class LabelFactory implements FormWidgetFactory {
+
     @Override
     public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener) throws Exception {
         List<View> views = new ArrayList<>(1);

@@ -1,15 +1,14 @@
 package com.vijay.jsonwizard.customviews;
 
-import org.json.JSONException;
-
-import android.support.v7.internal.widget.TintContextWrapper;
+import android.support.v7.widget.TintContextWrapper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 
 import com.vijay.jsonwizard.R;
-import com.vijay.jsonwizard.activities.JsonFormActivity;
 import com.vijay.jsonwizard.interfaces.JsonApi;
+
+import org.json.JSONException;
 
 public class GenericTextWatcher implements TextWatcher {
 
