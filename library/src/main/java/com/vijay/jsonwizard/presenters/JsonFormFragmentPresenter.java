@@ -74,6 +74,10 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         } else {
             getView().updateVisibilityOfNextAndSave(false, true);
         }
+        setUpToolBarTitleColor();
+    }
+
+    public void setUpToolBarTitleColor() {
         getView().setToolbarTitleColor(R.color.white);
     }
 
