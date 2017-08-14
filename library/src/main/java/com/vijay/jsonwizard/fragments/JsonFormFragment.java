@@ -46,9 +46,14 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
     private Menu                mMenu;
     private JsonApi             mJsonApi;
 
+    public void setJsonApi(JsonApi jsonApi) {
+        this.mJsonApi = jsonApi;
+    }
+
     @Override
     public void onAttach(Activity activity) {
-        mJsonApi = (JsonApi) activity;
+        if (activity instanceof JsonApi)
+            mJsonApi = (JsonApi) activity;
         super.onAttach(activity);
     }
 
