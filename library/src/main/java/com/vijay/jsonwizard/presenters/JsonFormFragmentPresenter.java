@@ -218,4 +218,8 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
     public String getCurrentKey() {
         return mCurrentKey;
     }
+
+    public String getStepName() {
+        return mStepName;
+    }
 }

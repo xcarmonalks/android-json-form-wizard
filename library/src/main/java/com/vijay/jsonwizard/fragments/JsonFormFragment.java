@@ -50,6 +50,10 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
         this.mJsonApi = jsonApi;
     }
 
+    public JsonApi getJsonApi() {
+        return mJsonApi;
+    }
+
     @Override
     public void onAttach(Activity activity) {
         if (activity instanceof JsonApi)
@@ -301,5 +305,9 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
     @Override
     public void onCheckedChanged(Switch view, boolean checked) {
         presenter.onSwitchOnOrOff(view, checked);
+    }
+
+    public LinearLayout getMainView() {
+        return mMainView;
     }
 }
