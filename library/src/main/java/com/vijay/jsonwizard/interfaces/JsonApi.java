@@ -17,4 +17,6 @@ public interface JsonApi {
     String currentJsonState();
 
     String getCount();
+
+    boolean isEditable();
 }

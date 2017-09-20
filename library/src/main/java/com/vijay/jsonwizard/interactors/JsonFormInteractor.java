@@ -49,7 +49,7 @@ public class JsonFormInteractor {
         map.put(key, factory);
     }
 
-    public List<View> fetchFormElements(String stepName, Context context, JSONObject parentJson, CommonListener listener) {
+    public List<View> fetchFormElements(String stepName, Context context, JSONObject parentJson, CommonListener listener, boolean editable) {
         Log.d(TAG, "fetchFormElements called");
         List<View> viewsFromJson = new ArrayList<>(5);
         try {
@@ -57,7 +57,7 @@ public class JsonFormInteractor {
             for (int i = 0; i < fields.length(); i++) {
                 JSONObject childJson = fields.getJSONObject(i);
                 try {
-                    List<View> views =  map.get(childJson.getString("type")).getViewsFromJson(stepName, context, childJson, listener);
+                    List<View> views =  map.get(childJson.getString("type")).getViewsFromJson(stepName, context, childJson, listener, editable);
                     if (views.size() > 0) {
                         viewsFromJson.addAll(views);
                     }

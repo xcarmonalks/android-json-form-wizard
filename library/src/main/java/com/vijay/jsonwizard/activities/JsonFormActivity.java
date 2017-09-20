@@ -129,4 +129,8 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
         outState.putString("jsonState", mJSONObject.toString());
     }
 
+    @Override
+    public boolean isEditable() {
+        return true;
+    }
 }

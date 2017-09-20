@@ -28,7 +28,7 @@ import static com.vijay.jsonwizard.utils.FormUtils.getLayoutParams;
 public class ImagePickerFactory implements FormWidgetFactory {
 
     @Override
-    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener) throws Exception {
+    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener, boolean editable) throws Exception {
         List<View> views = new ArrayList<>(1);
         ImageView imageView = new ImageView(context);
         imageView.setImageDrawable(context.getResources().getDrawable(R.mipmap.grey_bg));
