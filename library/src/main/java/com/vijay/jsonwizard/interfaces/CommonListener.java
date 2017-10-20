@@ -12,6 +12,6 @@ import com.rey.material.widget.Switch;
 public interface CommonListener extends View.OnClickListener,
         CompoundButton.OnCheckedChangeListener,
         Spinner.OnItemSelectedListener,
-        Switch.OnCheckedChangeListener {
+        Switch.OnCheckedChangeListener, OnValueChangeListener {
 
 }

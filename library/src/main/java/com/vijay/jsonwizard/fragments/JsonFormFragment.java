@@ -310,4 +310,14 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
     public LinearLayout getMainView() {
         return mMainView;
     }
+
+    @Override
+    public void onInitialValueSet(String parentKey, String childKey, String value) {
+        // no ops
+    }
+
+    @Override
+    public void onValueChange(String parentKey, String childKey, String value) {
+        // no ops
+    }
 }
