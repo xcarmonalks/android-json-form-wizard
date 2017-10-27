@@ -320,4 +320,9 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
     public void onValueChange(String parentKey, String childKey, String value) {
         // no ops
     }
+
+    @Override
+    public void onVisibilityChange(String key, String o, boolean b) {
+        // no ops
+    }
 }
