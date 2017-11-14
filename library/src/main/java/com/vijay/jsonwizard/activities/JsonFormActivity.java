@@ -1,11 +1,6 @@
 package com.vijay.jsonwizard.activities;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -14,6 +9,10 @@ import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.fragments.JsonFormFragment;
 import com.vijay.jsonwizard.interfaces.JsonApi;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class JsonFormActivity extends AppCompatActivity implements JsonApi {
 
@@ -34,9 +33,17 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initialize();
+        createFragments(savedInstanceState);
+    }
+
+    protected void initialize() {
         setContentView(R.layout.activity_json_form);
         mToolbar = (Toolbar) findViewById(R.id.tb_top);
         setSupportActionBar(mToolbar);
+    }
+
+    protected void createFragments(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
             init(getIntent().getStringExtra("json"));
             getSupportFragmentManager().beginTransaction()
@@ -122,4 +129,8 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
         outState.putString("jsonState", mJSONObject.toString());
     }
 
+    @Override
+    public boolean isEditable() {
+        return true;
+    }
 }

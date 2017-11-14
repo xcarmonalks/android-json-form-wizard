@@ -1,10 +1,5 @@
 package com.vijay.jsonwizard.fragments;
 
-import java.util.List;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -13,7 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.rey.material.widget.Switch;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.activities.JsonFormActivity;
 import com.vijay.jsonwizard.customviews.RadioButton;
@@ -35,6 +30,11 @@ import com.vijay.jsonwizard.mvp.MvpFragment;
 import com.vijay.jsonwizard.presenters.JsonFormFragmentPresenter;
 import com.vijay.jsonwizard.views.JsonFormFragmentView;
 import com.vijay.jsonwizard.viewstates.JsonFormFragmentViewState;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.List;
 
 /**
  * Created by vijay on 5/7/15.
@@ -46,9 +46,18 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
     private Menu                mMenu;
     private JsonApi             mJsonApi;
 
+    public void setJsonApi(JsonApi jsonApi) {
+        this.mJsonApi = jsonApi;
+    }
+
+    public JsonApi getJsonApi() {
+        return mJsonApi;
+    }
+
     @Override
     public void onAttach(Activity activity) {
-        mJsonApi = (JsonApi) activity;
+        if (activity instanceof JsonApi)
+            mJsonApi = (JsonApi) activity;
         super.onAttach(activity);
     }
 
@@ -68,7 +77,7 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        presenter.addFormElements();
+        presenter.addFormElements(mJsonApi.isEditable());
     }
 
     @Override
@@ -291,5 +300,29 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
+    }
+
+    @Override
+    public void onCheckedChanged(Switch view, boolean checked) {
+        presenter.onSwitchOnOrOff(view, checked);
+    }
+
+    public LinearLayout getMainView() {
+        return mMainView;
+    }
+
+    @Override
+    public void onInitialValueSet(String parentKey, String childKey, String value) {
+        // no ops
+    }
+
+    @Override
+    public void onValueChange(String parentKey, String childKey, String value) {
+        // no ops
+    }
+
+    @Override
+    public void onVisibilityChange(String key, String o, boolean b) {
+        // no ops
     }
 }

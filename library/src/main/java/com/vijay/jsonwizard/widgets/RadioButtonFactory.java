@@ -26,7 +26,7 @@ import static com.vijay.jsonwizard.utils.FormUtils.*;
  */
 public class RadioButtonFactory implements FormWidgetFactory {
     @Override
-    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener) throws Exception {
+    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener, boolean editable) throws Exception {
         List<View> views = new ArrayList<>(1);
         views.add(getTextViewWith(context, 16, jsonObject.getString("label"), jsonObject.getString("key"),
                 jsonObject.getString("type"), getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0, 0),

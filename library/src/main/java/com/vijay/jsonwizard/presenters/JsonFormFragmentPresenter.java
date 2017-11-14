@@ -14,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.rengwuxian.materialedittext.MaterialEditText;
+import com.rey.material.widget.Switch;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.customviews.CheckBox;
@@ -49,7 +50,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
     private String mCurrentKey;
     private JsonFormInteractor mJsonFormInteractor = JsonFormInteractor.getInstance();
 
-    public void addFormElements() {
+    public void addFormElements(boolean editable) {
         mStepName = getView().getArguments().getString("stepName");
         JSONObject step = getView().getStep(mStepName);
         try {
@@ -58,7 +59,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
             e.printStackTrace();
         }
         List<View> views = mJsonFormInteractor.fetchFormElements(mStepName, getView().getContext(), mStepDetails,
-                getView().getCommonListener());
+                getView().getCommonListener(), editable);
         getView().addFormElements(views);
     }
 
@@ -73,6 +74,10 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         } else {
             getView().updateVisibilityOfNextAndSave(false, true);
         }
+        setUpToolBarTitleColor();
+    }
+
+    public void setUpToolBarTitleColor() {
         getView().setToolbarTitleColor(R.color.white);
     }
 
@@ -199,5 +204,22 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
             String value = (String) parent.getItemAtPosition(position + 1);
             getView().writeValue(mStepName, parentKey, value);
         }
+    }
+
+    public void onSwitchOnOrOff(Switch v, boolean checked) {
+        String key = (String) v.getTag(R.id.key);
+        getView().writeValue(mStepName, key, String.valueOf(checked));
+    }
+
+    public void setCurrentKey(String key) {
+        this.mCurrentKey = key;
+    }
+
+    public String getCurrentKey() {
+        return mCurrentKey;
+    }
+
+    public String getStepName() {
+        return mStepName;
     }
 }
