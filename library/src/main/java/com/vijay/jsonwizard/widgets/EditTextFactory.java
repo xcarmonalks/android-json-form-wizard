@@ -48,6 +48,11 @@ public class EditTextFactory implements FormWidgetFactory {
             editText.setText(jsonObject.optString("value"));
         }
 
+        if (!TextUtils.isEmpty(jsonObject.optString("lines"))) {
+            editText.setSingleLine(false);
+            editText.setLines(jsonObject.optInt("lines"));
+        }
+
         //add validators
         JSONObject requiredObject = jsonObject.optJSONObject("v_required");
         if(requiredObject != null) {
