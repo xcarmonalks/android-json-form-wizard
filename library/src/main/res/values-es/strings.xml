@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">jsonwizard</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="library_name">jsonwizard</string>
     <string name="action_settings">Settings</string>
-
     <string name="next">Siguiente</string>
     <string name="save">Guardar</string>
 </resources>
