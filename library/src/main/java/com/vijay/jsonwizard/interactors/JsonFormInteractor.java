@@ -8,6 +8,7 @@ import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
 import com.vijay.jsonwizard.widgets.CheckBoxFactory;
+import com.vijay.jsonwizard.widgets.DatePickerFactory;
 import com.vijay.jsonwizard.widgets.EditTextFactory;
 import com.vijay.jsonwizard.widgets.ImagePickerFactory;
 import com.vijay.jsonwizard.widgets.LabelFactory;
@@ -43,6 +44,7 @@ public class JsonFormInteractor {
         map.put(JsonFormConstants.RADIO_BUTTON, new RadioButtonFactory());
         map.put(JsonFormConstants.CHOOSE_IMAGE, new ImagePickerFactory());
         map.put(JsonFormConstants.SPINNER, new SpinnerFactory());
+        map.put(JsonFormConstants.DATE_PICKER, new DatePickerFactory());
     }
 
     public static void registerWidget(String key, FormWidgetFactory factory) {

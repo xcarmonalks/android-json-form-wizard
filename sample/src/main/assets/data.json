@@ -22,6 +22,18 @@
                 }
             },
             {
+                "key":"multi",
+                "type":"edit_text",
+                "hint":"Enter Multi Line Data",
+                "lines":"3"
+            },
+            {
+                "key":"date",
+                "type":"date_picker",
+                "pattern":"dd/MM/yyyy",
+                "hint":"Enter date"
+            },
+            {
                 "key":"labelBackgroundImage",
                 "type":"label",
                 "text":"Choose Background Image"
