@@ -69,6 +69,8 @@ type - must be edit_text for EditText.
 
 hint - hint for EditText.
 
+lines - number of lines shown by the EditText
+
 value - will be the value present in the editText after completion of wizard
 
 ##### EditText Required Validation
@@ -267,6 +269,25 @@ text(in options) - text fot the RadioButton.
 ##### RadioButton Required Validation
 
 Not supported yet.
+
+#### DatePicker
+```json
+{
+     "key":"selectDate",
+     "type":"date_picker",
+     "pattern":"dd/MM/yyyy",
+     "hint":"Enter date" 
+}
+```
+key - must be unique in that particular step.
+
+type - must be edit_text for EditText.
+
+hint - hint for EditText.
+
+pattern - Pattern used to format the selected date
+
+value - will be the value present in the date picker after completion of wizard
 
 ## Demo Input Json (Complete)
 
