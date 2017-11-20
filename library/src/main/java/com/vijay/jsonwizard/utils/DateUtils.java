@@ -16,6 +16,9 @@ public class DateUtils {
     private static final DateFormat jsonDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS'Z'");
 
     public static String toJSONDateFormat(Date date) {
+        if(date == null){
+            return null;
+        }
         return jsonDateFormat.format(date);
     }
 

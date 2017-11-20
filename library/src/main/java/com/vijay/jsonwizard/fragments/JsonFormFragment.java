@@ -18,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.rey.material.widget.Switch;
@@ -242,12 +243,15 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
         int childCount = mMainView.getChildCount();
         for (int i = 0; i < childCount; i++) {
             View view = mMainView.getChildAt(i);
-            if (view instanceof RadioButton) {
-                RadioButton radio = (RadioButton) view;
-                String parentKeyAtIndex = (String) radio.getTag(R.id.key);
-                String childKeyAtIndex = (String) radio.getTag(R.id.childKey);
-                if (parentKeyAtIndex.equals(parentKey) && !childKeyAtIndex.equals(childKey)) {
-                    radio.setChecked(false);
+            if (view instanceof RadioGroup) {
+                RadioGroup rg = (RadioGroup) view;
+                for (int j = 0; j < rg.getChildCount(); j++) {
+                    RadioButton child = (RadioButton) rg.getChildAt(j);
+                    String parentKeyAtIndex = (String) child.getTag(R.id.key);
+                    String childKeyAtIndex = (String) child.getTag(R.id.childKey);
+                    if (parentKeyAtIndex.equals(parentKey) && !childKeyAtIndex.equals(childKey)) {
+                        child.setChecked(false);
+                    }
                 }
             }
         }

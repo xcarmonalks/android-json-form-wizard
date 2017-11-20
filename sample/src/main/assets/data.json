@@ -14,6 +14,48 @@
                 }
             },
             {
+                "key":"radioData",
+                "type":"radio",
+                "label":"Select one item from below",
+                "orientation":"vertical",
+                "options":[
+                    {
+                        "key":"areYouPro",
+                        "text":"Are you pro?"
+                    },
+                    {
+                        "key":"areYouAmature",
+                        "text":"Are you amature?"
+                    },
+                    {
+                        "key":"areYouNovice",
+                        "text":"Are you novice?"
+                    }
+                ],
+                "value":"areYouNovice"
+            },
+            {
+                "key":"radioDataH",
+                "type":"radio",
+                "label":"Select one item from below",
+                "orientation":"horizontal",
+                "options":[
+                    {
+                        "key":"areYouProH",
+                        "text":"Are you pro?"
+                    },
+                    {
+                        "key":"areYouAmatureH",
+                        "text":"Are you amature?"
+                    },
+                    {
+                        "key":"areYouNoviceH",
+                        "text":"Are you novice?"
+                    }
+                ],
+                "value":"areYouNoviceH"
+            },
+            {
                 "key":"email",
                 "type":"edit_text",
                 "hint":"Enter Your Email",
@@ -42,7 +84,7 @@
                 "key":"chooseImage",
                 "type":"choose_image",
                 "uploadButtonText":"Choose",
-                "v_required":{  "value" : "true",
+                "v_required":{  "value" : "false",
                     "err" : "Please choose an image to proceed."
                 }
             },
@@ -82,26 +124,6 @@
                         "value":"false"
                     }
                 ]
-            },
-            {
-                "key":"radioData",
-                "type":"radio",
-                "label":"Select one item from below",
-                "options":[
-                    {
-                        "key":"areYouPro",
-                        "text":"Are you pro?"
-                    },
-                    {
-                        "key":"areYouAmature",
-                        "text":"Are you amature?"
-                    },
-                    {
-                        "key":"areYouNovice",
-                        "text":"Are you novice?"
-                    }
-                ],
-                "value":"areYouNovice"
             }
         ],
         "title":"Step 2 of 3",
