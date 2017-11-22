@@ -1,13 +1,14 @@
 package com.vijay.jsonwizard.demo.activities;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
 
-import com.vijay.jsonwizard.demo.R;
 import com.vijay.jsonwizard.activities.JsonFormActivity;
+import com.vijay.jsonwizard.demo.R;
 import com.vijay.jsonwizard.demo.utils.CommonUtils;
 
 /**
@@ -29,6 +30,7 @@ public class MainActivity extends ActionBarActivity {
                 Intent intent = new Intent(MainActivity.this, JsonFormActivity.class);
                 String json = CommonUtils.loadJSONFromAsset(getApplicationContext(), DATA_JSON_PATH);
                 intent.putExtra("json", json);
+                intent.putExtra("screen_orientation", Configuration.ORIENTATION_LANDSCAPE);
                 startActivityForResult(intent, REQUEST_CODE_GET_JSON);
             }
         });

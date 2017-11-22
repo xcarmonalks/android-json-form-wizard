@@ -1,5 +1,7 @@
 package com.vijay.jsonwizard.activities;
 
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -33,8 +35,18 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initialize();
-        createFragments(savedInstanceState);
+        int currentOrientation = getResources().getConfiguration().orientation;
+        int orientation = getIntent().getIntExtra("screen_orientation", currentOrientation);
+        if(currentOrientation != orientation){
+            if(Configuration.ORIENTATION_LANDSCAPE == orientation){
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            } else if(Configuration.ORIENTATION_PORTRAIT == orientation){
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            }
+        } else {
+            initialize();
+            createFragments(null);
+        }
     }
 
     protected void initialize() {
@@ -126,7 +138,9 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString("jsonState", mJSONObject.toString());
+        if(mJSONObject != null){
+            outState.putString("jsonState", mJSONObject.toString());
+        }
     }
 
     @Override
