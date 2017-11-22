@@ -6,8 +6,10 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import com.vijay.jsonwizard.activities.JsonFormActivity;
+import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.demo.R;
 import com.vijay.jsonwizard.demo.utils.CommonUtils;
 
@@ -30,7 +32,8 @@ public class MainActivity extends ActionBarActivity {
                 Intent intent = new Intent(MainActivity.this, JsonFormActivity.class);
                 String json = CommonUtils.loadJSONFromAsset(getApplicationContext(), DATA_JSON_PATH);
                 intent.putExtra("json", json);
-                intent.putExtra("screen_orientation", Configuration.ORIENTATION_LANDSCAPE);
+                intent.putExtra(JsonFormConstants.ORIENTATION_EXTRA, JsonFormConstants.ORIENTATION_LANDSCAPE);
+                intent.putExtra(JsonFormConstants.INPUT_METHOD_EXTRA, JsonFormConstants.INPUT_METHOD_HIDDEN);
                 startActivityForResult(intent, REQUEST_CODE_GET_JSON);
             }
         });
