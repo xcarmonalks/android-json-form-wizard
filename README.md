@@ -316,6 +316,12 @@ value - will be the value present in the date picker after completion of wizard
                 }
             },
             {
+                 "key":"date",
+                 "type":"date_picker",
+                 "pattern":"dd/MM/yyyy",
+                 "hint":"Enter date"
+            },
+            {
                 "key":"labelBackgroundImage",
                 "type":"label",
                 "text":"Choose Background Image"
@@ -408,6 +414,9 @@ value - will be the value present in the date picker after completion of wizard
     Intent intent = new Intent(context, JsonFormActivity.class);
     String json = "Your complete JSON";
     intent.putExtra("json", json);
+    //Optional -- Configure screen orientation & inputMethod
+    intent.putExtra(JsonFormConstants.ORIENTATION_EXTRA, JsonFormConstants.ORIENTATION_LANDSCAPE);
+    intent.putExtra(JsonFormConstants.INPUT_METHOD_EXTRA, JsonFormConstants.INPUT_METHOD_HIDDEN);
     startActivityForResult(intent, REQUEST_CODE_GET_JSON);
 ```
 
