@@ -281,13 +281,50 @@ Not supported yet.
 ```
 key - must be unique in that particular step.
 
-type - must be edit_text for EditText.
+type - must be date_picker for DatePicker.
 
-hint - hint for EditText.
+hint - hint for DatePicker.
 
 pattern - Pattern used to format the selected date
 
 value - will be the value present in the date picker after completion of wizard
+
+#### EditGroup
+```json
+{
+    "key":"editGroup",
+    "type":"edit_group",
+    "optNumber":"3",
+    "title":"Group title",
+    "options":[
+        {
+            "key":"editText1",
+            "type":"edit_text",
+            "hint":"Enter value 1"
+        },
+        {
+            "key":"editText2",
+            "type":"edit_text",
+            "hint":"Enter value 2"
+        },
+        {
+            "key":"editText3",
+            "type":"edit_text",
+            "hint":"Enter value 3"
+        }
+    ]
+}
+```
+
+key - must be unique in that particular step.
+
+type - must be edit_group for EditGroup.
+
+label - text for header of EditGroup (optional).
+
+optNumber - number of childs of the group that will be processed
+
+options - EditText included in the EditGroup.
 
 ## Demo Input Json (Complete)
 

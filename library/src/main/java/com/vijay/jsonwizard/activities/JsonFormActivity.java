@@ -107,7 +107,9 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
                         JSONObject innerItem = jsonArray.getJSONObject(j);
                         String anotherKeyAtIndex = innerItem.getString("key");
                         if (childKey.equals(anotherKeyAtIndex)) {
-                            innerItem.put("value", value);
+                            if(value != null && !"".equals(value)){
+                                innerItem.put("value", value);
+                            }
                             return;
                         }
                     }

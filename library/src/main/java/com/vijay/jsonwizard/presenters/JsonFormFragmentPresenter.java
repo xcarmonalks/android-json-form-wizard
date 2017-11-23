@@ -35,7 +35,6 @@ import com.vijay.jsonwizard.widgets.SpinnerFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -102,6 +101,8 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
     }
 
     public ValidationStatus writeValuesAndValidate(LinearLayout mainView) {
+        String type = (String) mainView.getTag(R.id.type);
+
         int childCount = mainView.getChildCount();
         for (int i = 0; i < childCount; i++) {
             View childAt = mainView.getChildAt(i);
@@ -113,14 +114,28 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                     if (!validationStatus.isValid()) {
                         return validationStatus;
                     }
-                    getView().writeValue(mStepName, key, editText.getText().toString());
+                    if(JsonFormConstants.EDIT_GROUP.equals(type)){
+                        String parentKey = (String) mainView.getTag(R.id.key);
+                        String childKey = (String) childAt.getTag(R.id.key);
+                        getView().writeValue(mStepName, parentKey, JsonFormConstants.OPTIONS_FIELD_NAME,
+                                childKey, editText.getText().toString());
+                    } else {
+                        getView().writeValue(mStepName, key, editText.getText().toString());
+                    }
                 }else if(editText.getTag(R.id.type).equals(JsonFormConstants.DATE_PICKER)){
                     ValidationStatus validationStatus = DatePickerFactory.validate(editText);
                     if (!validationStatus.isValid()) {
                         return validationStatus;
                     }
                     Date date = DateUtils.parseDate(editText.getText().toString(), (String) editText.getTag(R.id.v_pattern));
-                    getView().writeValue(mStepName, key, DateUtils.toJSONDateFormat(date));
+                    if(JsonFormConstants.EDIT_GROUP.equals(type)){
+                        String parentKey = (String) childAt.getTag(R.id.key);
+                        String childKey = (String) childAt.getTag(R.id.childKey);
+                        getView().writeValue(mStepName, parentKey, JsonFormConstants.OPTIONS_FIELD_NAME,
+                                childKey, DateUtils.toJSONDateFormat(date));
+                    } else {
+                        getView().writeValue(mStepName, key, DateUtils.toJSONDateFormat(date));
+                    }
                 }
             } else if (childAt instanceof ImageView) {
                 ValidationStatus validationStatus = ImagePickerFactory.validate((ImageView) childAt);
@@ -151,6 +166,8 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                 } else {
                     spinner.setError(null);
                 }
+            } else if (childAt instanceof LinearLayout) {
+                writeValuesAndValidate((LinearLayout) childAt);
             }
         }
         return new ValidationStatus(true, null);

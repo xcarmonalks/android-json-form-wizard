@@ -14,6 +14,29 @@
                 }
             },
             {
+                "key":"editGroup",
+                "type":"edit_group",
+                "optNumber":"3",
+                "title":"Group title",
+                "options":[
+                    {
+                        "key":"editText1",
+                        "type":"edit_text",
+                        "hint":"Enter value 1"
+                    },
+                    {
+                        "key":"editText2",
+                        "type":"edit_text",
+                        "hint":"Enter value 2"
+                    },
+                    {
+                        "key":"editText3",
+                        "type":"edit_text",
+                        "hint":"Enter value 3"
+                    }
+                ]
+            },
+            {
                 "key":"radioData",
                 "type":"radio",
                 "label":"Select one item from below",
