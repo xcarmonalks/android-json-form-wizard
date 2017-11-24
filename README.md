@@ -326,7 +326,7 @@ optNumber - number of childs of the group that will be processed
 
 options - EditText included in the EditGroup.
 
-#### EditGroup
+#### Separator
 ```json
 {
     "type":"separator"
