@@ -58,6 +58,9 @@
                 "value":"areYouNovice"
             },
             {
+                "type":"separator"
+            },
+            {
                 "key":"radioDataH",
                 "type":"radio",
                 "label":"Select one item from below",

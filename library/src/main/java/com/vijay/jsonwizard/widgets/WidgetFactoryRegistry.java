@@ -23,6 +23,7 @@ public class WidgetFactoryRegistry {
         map.put(JsonFormConstants.SPINNER, new SpinnerFactory());
         map.put(JsonFormConstants.DATE_PICKER, new DatePickerFactory());
         map.put(JsonFormConstants.EDIT_GROUP, new EditGroupFactory());
+        map.put(JsonFormConstants.SEPARATOR, new SeparatorFactory());
     }
 
     public static FormWidgetFactory getWidgetFactory(String type) {
