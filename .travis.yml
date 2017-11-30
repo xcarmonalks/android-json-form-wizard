@@ -19,4 +19,4 @@ android:
     #- addon-google_apis-google-19
     
     # Device emulator images
-    - sys-img-armeabi-v7a-android-22
+    - sys-img-armeabi-v7a-android-21
