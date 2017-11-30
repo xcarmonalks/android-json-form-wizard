@@ -32,7 +32,7 @@ public class EditTextFactory implements FormWidgetFactory {
     public static final int MIN_LENGTH = 0;
     public static final int MAX_LENGTH = 100;
     @Override
-    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener) throws Exception {
+    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener, boolean editable) throws Exception {
         int minLength = MIN_LENGTH;
         int maxLength= MAX_LENGTH;
         List<View> views = new ArrayList<>(1);
@@ -46,6 +46,11 @@ public class EditTextFactory implements FormWidgetFactory {
 
         if (!TextUtils.isEmpty(jsonObject.optString("value"))) {
             editText.setText(jsonObject.optString("value"));
+        }
+
+        if (!TextUtils.isEmpty(jsonObject.optString("lines"))) {
+            editText.setSingleLine(false);
+            editText.setLines(jsonObject.optInt("lines"));
         }
 
         //add validators

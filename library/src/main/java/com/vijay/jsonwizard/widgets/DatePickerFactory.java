@@ -1,0 +1,125 @@
+package com.vijay.jsonwizard.widgets;
+
+import android.content.Context;
+import android.text.InputType;
+import android.text.TextUtils;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+
+import com.rengwuxian.materialedittext.MaterialEditText;
+import com.rey.material.app.DatePickerDialog;
+import com.rey.material.app.Dialog;
+import com.rey.material.util.ViewUtil;
+import com.vijay.jsonwizard.R;
+import com.vijay.jsonwizard.interfaces.CommonListener;
+import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
+import com.vijay.jsonwizard.utils.DateUtils;
+import com.vijay.jsonwizard.utils.ValidationStatus;
+
+import org.json.JSONObject;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * Created by jurkiri on 16/11/17.
+ */
+
+public class DatePickerFactory implements FormWidgetFactory {
+
+    private static final String TAG = "DatePickerFactory";
+
+    @Override
+    public List<View> getViewsFromJson(String stepName, final Context context, JSONObject jsonObject, final CommonListener listener, boolean editable) throws Exception {
+        List<View> views = new ArrayList<>(1);
+        final MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(
+                R.layout.item_edit_text, null);
+        editText.setHint(jsonObject.getString("hint"));
+        editText.setFloatingLabelText(jsonObject.getString("hint"));
+        editText.setId(ViewUtil.generateViewId());
+        editText.setTag(R.id.key, jsonObject.getString("key"));
+        editText.setTag(R.id.type, jsonObject.getString("type"));
+        editText.setTag(R.id.v_pattern, jsonObject.getString("pattern"));
+
+        if (!TextUtils.isEmpty(jsonObject.optString("value"))) {
+            Date date = DateUtils.parseJSONDate(jsonObject.optString("value"));
+            editText.setText(SimpleDateFormat.getInstance().format(date));
+        }
+
+        DatePickerListener datePickerListener = new DatePickerListener(editText);
+        editText.setOnFocusChangeListener(datePickerListener);
+        editText.setOnClickListener(datePickerListener);
+        editText.setInputType(InputType.TYPE_NULL);
+
+        views.add(editText);
+        return views;
+    }
+
+    public static ValidationStatus validate(MaterialEditText editText) {
+        boolean validate = editText.validate();
+        if(!validate) {
+            return new ValidationStatus(false, editText.getError().toString());
+        }
+        return new ValidationStatus(true, null);
+    }
+
+    private class DatePickerListener implements View.OnFocusChangeListener, View.OnClickListener {
+
+        public Dialog d;
+        private MaterialEditText dateText;
+
+        public DatePickerListener(MaterialEditText editText){
+            this.dateText = editText;
+        }
+
+        @Override
+        public void onFocusChange(View view, boolean focus) {
+            if(focus){
+                openDatePicker(view);
+            }
+        }
+
+        @Override
+        public void onClick(View view) {
+            openDatePicker(view);
+        }
+
+        private void openDatePicker(View view) {
+            Date date = new Date();
+            String dateStr = dateText.getText().toString();
+            if(dateStr != null && !"".equals(dateStr)){
+                try {
+                    date = SimpleDateFormat.getDateInstance().parse(dateStr);
+                } catch (ParseException e){
+                    Log.e(TAG, "Error parsing " + dateStr + ": " + e.getMessage());
+                }
+            }
+
+            Dialog.Builder builder = new DatePickerDialog.Builder(R.style.Material_App_Dialog_DatePicker).date(date.getTime());
+            d = builder.build(view.getContext());
+
+            d.positiveActionClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Date date = new Date(((DatePickerDialog)d).getDate());
+                    dateText.setText(DateUtils.formatDate(date, (String) dateText.getTag(R.id.v_pattern)));
+                    d.hide();
+                }
+            });
+
+            d.negativeActionClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    d.hide();
+                }
+            });
+
+            d.positiveAction("OK").negativeAction("CANCEL");
+            d.show();
+        }
+    }
+}

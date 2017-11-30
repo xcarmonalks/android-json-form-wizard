@@ -69,6 +69,8 @@ type - must be edit_text for EditText.
 
 hint - hint for EditText.
 
+lines - number of lines shown by the EditText
+
 value - will be the value present in the editText after completion of wizard
 
 ##### EditText Required Validation
@@ -268,6 +270,70 @@ text(in options) - text fot the RadioButton.
 
 Not supported yet.
 
+#### DatePicker
+```json
+{
+     "key":"selectDate",
+     "type":"date_picker",
+     "pattern":"dd/MM/yyyy",
+     "hint":"Enter date" 
+}
+```
+key - must be unique in that particular step.
+
+type - must be date_picker for DatePicker.
+
+hint - hint for DatePicker.
+
+pattern - Pattern used to format the selected date
+
+value - will be the value present in the date picker after completion of wizard
+
+#### EditGroup
+```json
+{
+    "key":"editGroup",
+    "type":"edit_group",
+    "optNumber":"3",
+    "title":"Group title",
+    "options":[
+        {
+            "key":"editText1",
+            "type":"edit_text",
+            "hint":"Enter value 1"
+        },
+        {
+            "key":"editText2",
+            "type":"edit_text",
+            "hint":"Enter value 2"
+        },
+        {
+            "key":"editText3",
+            "type":"edit_text",
+            "hint":"Enter value 3"
+        }
+    ]
+}
+```
+
+key - must be unique in that particular step.
+
+type - must be edit_group for EditGroup.
+
+label - text for header of EditGroup (optional).
+
+optNumber - number of childs of the group that will be processed
+
+options - EditText included in the EditGroup.
+
+#### Separator
+```json
+{
+    "type":"separator"
+}
+
+```
+
 ## Demo Input Json (Complete)
 
 ```json
@@ -293,6 +359,12 @@ Not supported yet.
                 "v_email":{  "value" : "true",
                     "err" : "Not an email."
                 }
+            },
+            {
+                 "key":"date",
+                 "type":"date_picker",
+                 "pattern":"dd/MM/yyyy",
+                 "hint":"Enter date"
             },
             {
                 "key":"labelBackgroundImage",
@@ -387,6 +459,9 @@ Not supported yet.
     Intent intent = new Intent(context, JsonFormActivity.class);
     String json = "Your complete JSON";
     intent.putExtra("json", json);
+    //Optional -- Configure screen orientation & inputMethod
+    intent.putExtra(JsonFormConstants.ORIENTATION_EXTRA, JsonFormConstants.ORIENTATION_LANDSCAPE);
+    intent.putExtra(JsonFormConstants.INPUT_METHOD_EXTRA, JsonFormConstants.INPUT_METHOD_HIDDEN);
     startActivityForResult(intent, REQUEST_CODE_GET_JSON);
 ```
 

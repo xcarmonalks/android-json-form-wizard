@@ -14,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.rengwuxian.materialedittext.MaterialEditText;
+import com.rey.material.widget.Switch;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.customviews.CheckBox;
@@ -21,10 +22,12 @@ import com.vijay.jsonwizard.customviews.RadioButton;
 import com.vijay.jsonwizard.fragments.JsonFormFragment;
 import com.vijay.jsonwizard.interactors.JsonFormInteractor;
 import com.vijay.jsonwizard.mvp.MvpBasePresenter;
+import com.vijay.jsonwizard.utils.DateUtils;
 import com.vijay.jsonwizard.utils.ImageUtils;
 import com.vijay.jsonwizard.utils.ValidationStatus;
 import com.vijay.jsonwizard.views.JsonFormFragmentView;
 import com.vijay.jsonwizard.viewstates.JsonFormFragmentViewState;
+import com.vijay.jsonwizard.widgets.DatePickerFactory;
 import com.vijay.jsonwizard.widgets.EditTextFactory;
 import com.vijay.jsonwizard.widgets.ImagePickerFactory;
 import com.vijay.jsonwizard.widgets.SpinnerFactory;
@@ -32,6 +35,7 @@ import com.vijay.jsonwizard.widgets.SpinnerFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Date;
 import java.util.List;
 
 import fr.ganfra.materialspinner.MaterialSpinner;
@@ -49,7 +53,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
     private String mCurrentKey;
     private JsonFormInteractor mJsonFormInteractor = JsonFormInteractor.getInstance();
 
-    public void addFormElements() {
+    public void addFormElements(boolean editable) {
         mStepName = getView().getArguments().getString("stepName");
         JSONObject step = getView().getStep(mStepName);
         try {
@@ -58,7 +62,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
             e.printStackTrace();
         }
         List<View> views = mJsonFormInteractor.fetchFormElements(mStepName, getView().getContext(), mStepDetails,
-                getView().getCommonListener());
+                getView().getCommonListener(), editable);
         getView().addFormElements(views);
     }
 
@@ -73,6 +77,10 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         } else {
             getView().updateVisibilityOfNextAndSave(false, true);
         }
+        setUpToolBarTitleColor();
+    }
+
+    public void setUpToolBarTitleColor() {
         getView().setToolbarTitleColor(R.color.white);
     }
 
@@ -93,17 +101,42 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
     }
 
     public ValidationStatus writeValuesAndValidate(LinearLayout mainView) {
+        String type = (String) mainView.getTag(R.id.type);
+
         int childCount = mainView.getChildCount();
         for (int i = 0; i < childCount; i++) {
             View childAt = mainView.getChildAt(i);
             String key = (String) childAt.getTag(R.id.key);
             if (childAt instanceof MaterialEditText) {
                 MaterialEditText editText = (MaterialEditText) childAt;
-                ValidationStatus validationStatus = EditTextFactory.validate(editText);
-                if (!validationStatus.isValid()) {
-                    return validationStatus;
+                if(editText.getTag(R.id.type).equals(JsonFormConstants.EDIT_TEXT)){
+                    ValidationStatus validationStatus = EditTextFactory.validate(editText);
+                    if (!validationStatus.isValid()) {
+                        return validationStatus;
+                    }
+                    if(JsonFormConstants.EDIT_GROUP.equals(type)){
+                        String parentKey = (String) mainView.getTag(R.id.key);
+                        String childKey = (String) childAt.getTag(R.id.key);
+                        getView().writeValue(mStepName, parentKey, JsonFormConstants.OPTIONS_FIELD_NAME,
+                                childKey, editText.getText().toString());
+                    } else {
+                        getView().writeValue(mStepName, key, editText.getText().toString());
+                    }
+                }else if(editText.getTag(R.id.type).equals(JsonFormConstants.DATE_PICKER)){
+                    ValidationStatus validationStatus = DatePickerFactory.validate(editText);
+                    if (!validationStatus.isValid()) {
+                        return validationStatus;
+                    }
+                    Date date = DateUtils.parseDate(editText.getText().toString(), (String) editText.getTag(R.id.v_pattern));
+                    if(JsonFormConstants.EDIT_GROUP.equals(type)){
+                        String parentKey = (String) childAt.getTag(R.id.key);
+                        String childKey = (String) childAt.getTag(R.id.childKey);
+                        getView().writeValue(mStepName, parentKey, JsonFormConstants.OPTIONS_FIELD_NAME,
+                                childKey, DateUtils.toJSONDateFormat(date));
+                    } else {
+                        getView().writeValue(mStepName, key, DateUtils.toJSONDateFormat(date));
+                    }
                 }
-                getView().writeValue(mStepName, key, editText.getText().toString());
             } else if (childAt instanceof ImageView) {
                 ValidationStatus validationStatus = ImagePickerFactory.validate((ImageView) childAt);
                 if (!validationStatus.isValid()) {
@@ -133,6 +166,8 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                 } else {
                     spinner.setError(null);
                 }
+            } else if (childAt instanceof LinearLayout) {
+                writeValuesAndValidate((LinearLayout) childAt);
             }
         }
         return new ValidationStatus(true, null);
@@ -199,5 +234,22 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
             String value = (String) parent.getItemAtPosition(position + 1);
             getView().writeValue(mStepName, parentKey, value);
         }
+    }
+
+    public void onSwitchOnOrOff(Switch v, boolean checked) {
+        String key = (String) v.getTag(R.id.key);
+        getView().writeValue(mStepName, key, String.valueOf(checked));
+    }
+
+    public void setCurrentKey(String key) {
+        this.mCurrentKey = key;
+    }
+
+    public String getCurrentKey() {
+        return mCurrentKey;
+    }
+
+    public String getStepName() {
+        return mStepName;
     }
 }

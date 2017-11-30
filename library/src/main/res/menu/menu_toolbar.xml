@@ -4,13 +4,13 @@
       tools:context=".MainActivity">
     <item
         android:id="@+id/action_next"
-        android:title="Next"
+        android:title="@string/next"
         android:orderInCategory="100"
         app:showAsAction="always"
         />
     <item
         android:id="@+id/action_save"
-        android:title="Save"
+        android:title="@string/save"
         android:orderInCategory="100"
         app:showAsAction="always"
         />
