@@ -43,6 +43,7 @@ public class EditGroupFactory implements FormWidgetFactory {
         linearLayout.setTag(R.id.type, JsonFormConstants.EDIT_GROUP);
 
 
+
         String groupTitle = parentJson.optString("title");
         if (groupTitle != null) {
             viewsFromJson.add(getTextViewWith(context, 16, groupTitle, parentJson.getString("key"),
@@ -53,13 +54,16 @@ public class EditGroupFactory implements FormWidgetFactory {
         try {
             JSONArray options = parentJson.getJSONArray("options");
             long optNumber = parentJson.getLong("optNumber");
-
+            linearLayout.setWeightSum(optNumber);
             for (int i = 0; i < optNumber; i++) {
                 JSONObject childJson = options.getJSONObject(i);
                 try {
                     List<View> views = WidgetFactoryRegistry.getWidgetFactory(childJson.getString("type")).getViewsFromJson(stepName, context, childJson, listener, editable);
                     for (View v : views) {
-                        linearLayout.addView(v, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1));
+                        LinearLayout.LayoutParams layoutParams=new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+                        layoutParams.setMargins(0,0,10,0);
+                        v.setLayoutParams(layoutParams);
+                        linearLayout.addView(v);
                     }
                 } catch (Exception e) {
                     Log.e(TAG,
