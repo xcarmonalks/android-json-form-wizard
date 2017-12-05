@@ -18,7 +18,7 @@
                 "type":"edit_group",
                 "optNumber":"3",
                 "title":"Group title",
-                "options":[
+                "fields":[
                     {
                         "key":"editText1",
                         "type":"edit_text",

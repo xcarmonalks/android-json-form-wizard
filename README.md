@@ -296,7 +296,7 @@ value - will be the value present in the date picker after completion of wizard
     "type":"edit_group",
     "optNumber":"3",
     "title":"Group title",
-    "options":[
+    "fields":[
         {
             "key":"editText1",
             "type":"edit_text",

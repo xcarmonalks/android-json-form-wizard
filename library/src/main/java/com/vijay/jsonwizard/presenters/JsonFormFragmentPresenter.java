@@ -117,7 +117,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                     if(JsonFormConstants.EDIT_GROUP.equals(type)){
                         String parentKey = (String) mainView.getTag(R.id.key);
                         String childKey = (String) childAt.getTag(R.id.key);
-                        getView().writeValue(mStepName, parentKey, JsonFormConstants.OPTIONS_FIELD_NAME,
+                        getView().writeValue(mStepName, parentKey, JsonFormConstants.FIELDS_FIELD_NAME,
                                 childKey, editText.getText().toString());
                     } else {
                         getView().writeValue(mStepName, key, editText.getText().toString());
@@ -131,7 +131,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                     if(JsonFormConstants.EDIT_GROUP.equals(type)){
                         String parentKey = (String) childAt.getTag(R.id.key);
                         String childKey = (String) childAt.getTag(R.id.childKey);
-                        getView().writeValue(mStepName, parentKey, JsonFormConstants.OPTIONS_FIELD_NAME,
+                        getView().writeValue(mStepName, parentKey, JsonFormConstants.FIELDS_FIELD_NAME,
                                 childKey, DateUtils.toJSONDateFormat(date));
                     } else {
                         getView().writeValue(mStepName, key, DateUtils.toJSONDateFormat(date));

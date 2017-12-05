@@ -52,11 +52,11 @@ public class EditGroupFactory implements FormWidgetFactory {
         }
 
         try {
-            JSONArray options = parentJson.getJSONArray("options");
+            JSONArray fields = parentJson.getJSONArray(JsonFormConstants.FIELDS_FIELD_NAME);
             long optNumber = parentJson.getLong("optNumber");
             linearLayout.setWeightSum(optNumber);
             for (int i = 0; i < optNumber; i++) {
-                JSONObject childJson = options.getJSONObject(i);
+                JSONObject childJson = fields.getJSONObject(i);
                 try {
                     List<View> views = WidgetFactoryRegistry.getWidgetFactory(childJson.getString("type")).getViewsFromJson(stepName, context, childJson, listener, editable);
                     for (View v : views) {
