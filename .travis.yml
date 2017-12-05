@@ -19,7 +19,7 @@ android:
     #- addon-google_apis-google-19
     
     # Device emulator images
-    - sys-img-armeabi-v7a-android-23
+    - sys-img-armeabi-v7a-google_apis-23
 env:
  global:
   # install timeout in minutes (2 minutes by default)
