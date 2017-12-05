@@ -1,7 +1,9 @@
 package com.vijay.jsonwizard.activities;
 
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -29,7 +31,11 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
         try {
             mJSONObject = new JSONObject(json);
         } catch (JSONException e) {
-            Log.d(TAG, "Initialization error. Json passed is invalid : " + e.getMessage());
+            Log.d(TAG, "Initialization error. JSON form definition is invalid : " + e.getMessage());
+            Intent data = new Intent();
+            data.setData(Uri.parse("Initialization error. JSON form definition is invalid"));
+            setResult(JsonFormConstants.RESULT_JSON_PARSE_ERROR, data);
+            finish();
         }
     }
 
@@ -53,8 +59,10 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
     protected void createFragments(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
             init(getIntent().getStringExtra("json"));
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, JsonFormFragment.getFormFragment(JsonFormConstants.FIRST_STEP_NAME)).commit();
+            if(mJSONObject != null){
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.container, JsonFormFragment.getFormFragment(JsonFormConstants.FIRST_STEP_NAME)).commit();
+            }
         } else {
             init(savedInstanceState.getString("jsonState"));
         }

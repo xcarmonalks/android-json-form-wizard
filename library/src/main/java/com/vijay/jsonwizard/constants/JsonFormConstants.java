@@ -26,4 +26,7 @@ public class JsonFormConstants {
     public static final String INPUT_METHOD_EXTRA  = "input_method";
     public static final int INPUT_METHOD_HIDDEN    = 1;
     public static final int INPUT_METHOD_VISIBLE   = 2;
+
+    public static final int RESULT_JSON_PARSE_ERROR = -2;
+
 }
