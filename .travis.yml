@@ -1,4 +1,9 @@
 language: android
+addons:
+  sonarcloud:
+    organization: "indaba"
+    branches:
+      - master
 android:
   components:
     # Uncomment the lines below if you want to
