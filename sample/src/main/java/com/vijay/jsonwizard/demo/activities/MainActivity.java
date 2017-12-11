@@ -24,6 +24,7 @@ public class MainActivity extends ActionBarActivity {
 
     private static final String TAG                   = "MainActivity";
     private static final String DATA_JSON_PATH        = "data.json";
+    private static final String COMPLETE_JSON_PATH        = "complete.json";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -37,6 +38,16 @@ public class MainActivity extends ActionBarActivity {
                 intent.putExtra("json", json);
                 //intent.putExtra(JsonFormConstants.ORIENTATION_EXTRA, JsonFormConstants.ORIENTATION_LANDSCAPE);
                 //intent.putExtra(JsonFormConstants.INPUT_METHOD_EXTRA, JsonFormConstants.INPUT_METHOD_HIDDEN);
+                startActivityForResult(intent, REQUEST_CODE_GET_JSON);
+            }
+        });
+        findViewById(R.id.button_start_ro).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, JsonFormActivity.class);
+                String json = CommonUtils.loadJSONFromAsset(getApplicationContext(), COMPLETE_JSON_PATH);
+                intent.putExtra("json", json);
+                intent.putExtra(JsonFormConstants.VISUALIZATION_MODE_EXTRA, JsonFormConstants.VISUALIZATION_MODE_READ_ONLY);
                 startActivityForResult(intent, REQUEST_CODE_GET_JSON);
             }
         });

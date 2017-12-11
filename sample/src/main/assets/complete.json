@@ -1,0 +1,145 @@
+{
+  "count": "2",
+  "step1": {
+    "fields": [
+      {
+        "key": "name",
+        "type": "edit_text",
+        "hint": "Enter Your Name",
+        "v_min_length": {
+          "value": "3",
+          "err": "Min length should be at least 3"
+        },
+        "v_max_length": {
+          "value": "10",
+          "err": "Max length can be at most 10."
+        },
+        "value":"name_val"
+      },
+      {
+        "key": "editGroup",
+        "type": "edit_group",
+        "optNumber": "3",
+        "title": "Group title",
+        "fields": [
+          {
+            "key": "editText1",
+            "type": "edit_text",
+            "hint": "Enter value 1",
+            "value":"editText1_val"
+          },
+          {
+            "key": "editText2",
+            "type": "edit_text",
+            "hint": "Enter value 2",
+            "value":"editText2_val"
+          },
+          {
+            "key": "editText3",
+            "type": "edit_text",
+            "hint": "Enter value 3",
+            "value": "editText3_val"
+          }
+        ]
+      },
+      {
+        "key": "radioData",
+        "type": "radio",
+        "label": "Select one item from below",
+        "orientation": "vertical",
+        "options": [
+          {
+            "key": "areYouPro",
+            "text": "Are you pro?"
+          },
+          {
+            "key": "areYouAmature",
+            "text": "Are you amature?"
+          },
+          {
+            "key": "areYouNovice",
+            "text": "Are you novice?"
+          }
+        ],
+        "value": "areYouPro"
+      },
+      {
+        "type": "separator"
+      },
+      {
+        "key": "email",
+        "type": "edit_text",
+        "hint": "Enter Your Email",
+        "v_email": {
+          "value": "true",
+          "err": "Not an email."
+        },
+        "value": "email_val"
+      },
+      {
+        "key": "multi",
+        "type": "edit_text",
+        "hint": "Enter Multi Line Data",
+        "lines": "3",
+        "value":"multi_val"
+      },
+      {
+        "key": "date",
+        "type": "date_picker",
+        "pattern": "dd/MM/yyyy",
+        "hint": "Enter date",
+        "value": "2017-12-11T10:15:43.511Z"
+      },
+      {
+        "key": "house",
+        "type": "spinner",
+        "hint": "Name Thy House",
+        "values": [
+          "Stark",
+          "Targeriyan",
+          "Lannister"
+        ],
+        "v_required": {
+          "value": "true",
+          "err": "Please choose a value to proceed."
+        },
+        "value":"Lannister"
+      }
+    ],
+    "title": "Step 1 of 2",
+    "next": "step2"
+  },
+  "step2": {
+    "fields": [
+      {
+        "key": "name2",
+        "type": "edit_text",
+        "hint": "Enter Country",
+        "value": "name2_val"
+      },
+      {
+        "key": "checkData",
+        "type": "check_box",
+        "label": "Select multiple preferences",
+        "options": [
+          {
+            "key": "awesomeness",
+            "text": "Are you willing for some awesomeness?",
+            "value": "true"
+          },
+          {
+            "key": "newsletter",
+            "text": "Do you really want to opt out from my newsletter?",
+            "value": "true"
+          },
+          {
+            "key": "thirdval",
+            "text": "Do you really like third value?",
+            "value": "false"
+          }
+        ]
+      }
+    ],
+    "title": "Step 2 of 2"
+  }
+}
