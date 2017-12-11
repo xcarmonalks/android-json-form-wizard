@@ -39,6 +39,6 @@ sonarqube {
     properties {
         property "sonar.projectName", "Android JSON FORM Wizard"
         property "sonar.projectKey", "es.indaba.android-json-form-wizard"
-        property "sonar.java.test.binaries", "./library/build/intermediates/androidTest/debug"
+        property "sonar.java.test.binaries", "$projectDir/build/intermediates/classes/androidTest/debug"
     }
 }
