@@ -26,10 +26,12 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
     private Toolbar             mToolbar;
 
     private JSONObject          mJSONObject;
+    private int                 mVisualizationMode;
 
-    public void init(String json) {
+    public void init(String json, Integer visualizationMode) {
         try {
             mJSONObject = new JSONObject(json);
+            mVisualizationMode = visualizationMode;
         } catch (JSONException e) {
             Log.d(TAG, "Initialization error. JSON form definition is invalid : " + e.getMessage());
             Intent data = new Intent();
@@ -58,13 +60,13 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
 
     protected void createFragments(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
-            init(getIntent().getStringExtra("json"));
+            init(getIntent().getStringExtra("json"), getIntent().getIntExtra(JsonFormConstants.VISUALIZATION_MODE_EXTRA, JsonFormConstants.VISUALIZATION_MODE_EDIT));
             if(mJSONObject != null){
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.container, JsonFormFragment.getFormFragment(JsonFormConstants.FIRST_STEP_NAME)).commit();
             }
         } else {
-            init(savedInstanceState.getString("jsonState"));
+            init(savedInstanceState.getString("jsonState"), savedInstanceState.getInt(JsonFormConstants.VISUALIZATION_MODE_EXTRA));
         }
     }
 
@@ -145,12 +147,13 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
         super.onSaveInstanceState(outState);
         if(mJSONObject != null){
             outState.putString("jsonState", mJSONObject.toString());
+            outState.putInt(JsonFormConstants.VISUALIZATION_MODE_EXTRA, mVisualizationMode);
         }
     }
 
     @Override
-    public boolean isEditable() {
-        return true;
+    public int getVisualizationMode() {
+        return mVisualizationMode;
     }
 
     private void configureInputMethod() {
@@ -161,6 +164,9 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
             }else if(inputMethod == JsonFormConstants.INPUT_METHOD_HIDDEN){
                 getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
             }
+        }
+        if(JsonFormConstants.VISUALIZATION_MODE_EDIT != mVisualizationMode){
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         }
     }
 

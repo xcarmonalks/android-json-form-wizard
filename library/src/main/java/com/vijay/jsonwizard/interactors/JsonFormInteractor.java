@@ -37,7 +37,7 @@ public class JsonFormInteractor {
     private JsonFormInteractor() {
     }
 
-    public List<View> fetchFormElements(String stepName, Context context, JSONObject parentJson, CommonListener listener, boolean editable) {
+    public List<View> fetchFormElements(String stepName, Context context, JSONObject parentJson, CommonListener listener, int visualizationMode) {
         Log.d(TAG, "fetchFormElements called");
         List<View> viewsFromJson = new ArrayList<>(5);
         try {
@@ -46,7 +46,7 @@ public class JsonFormInteractor {
                 JSONObject childJson = fields.getJSONObject(i);
                 try {
                     List<View> views = WidgetFactoryRegistry.getWidgetFactory(childJson.getString("type")).
-                            getViewsFromJson(stepName, context, childJson, listener, editable);
+                            getViewsFromJson(stepName, context, childJson, listener, visualizationMode);
                     if (views.size() > 0) {
                         viewsFromJson.addAll(views);
                     }

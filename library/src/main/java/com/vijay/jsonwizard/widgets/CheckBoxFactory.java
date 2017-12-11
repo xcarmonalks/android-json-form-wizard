@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
@@ -14,6 +15,7 @@ import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -26,7 +28,19 @@ import static com.vijay.jsonwizard.utils.FormUtils.*;
  */
 public class CheckBoxFactory implements FormWidgetFactory {
     @Override
-    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener, boolean editable) throws Exception {
+    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener, int visualizationMode) throws JSONException {
+        List<View> views = null;
+        switch (visualizationMode){
+            case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY :
+                views = getReadOnlyViewsFromJson(context, jsonObject);
+                break;
+            default:
+                views = getEditableViewsFromJson(context, jsonObject, listener);
+        }
+        return views;
+    }
+
+    private List<View> getEditableViewsFromJson(Context context, JSONObject jsonObject, CommonListener listener) throws JSONException {
         List<View> views = new ArrayList<>(1);
         views.add(getTextViewWith(context, 16, jsonObject.getString("label"), jsonObject.getString("key"),
                 jsonObject.getString("type"), getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0, 0),
@@ -51,6 +65,24 @@ public class CheckBoxFactory implements FormWidgetFactory {
                         .getResources().getDimension(R.dimen.extra_bottom_margin)));
             }
             views.add(checkBox);
+        }
+        return views;
+    }
+
+    private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject) throws JSONException {
+        List<View> views = new ArrayList<>(1);
+        views.add(getTextViewWith(context, 16, jsonObject.getString("label"), jsonObject.getString("key"),
+                jsonObject.getString("type"), getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0, (int) context
+                        .getResources().getDimension(R.dimen.extra_bottom_margin)),
+                FONT_BOLD_PATH));
+        JSONArray options = jsonObject.getJSONArray(JsonFormConstants.OPTIONS_FIELD_NAME);
+        for (int i = 0; i < options.length(); i++) {
+            JSONObject item = options.getJSONObject(i);
+            if (!TextUtils.isEmpty(item.optString("value")) && Boolean.valueOf(item.optString("value"))) {
+                views.add(getTextViewWith(context, 16, item.getString("text"), item.getString("key"),
+                        null, getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0, (int) context
+                                .getResources().getDimension(R.dimen.default_bottom_margin)), FONT_REGULAR_PATH));
+            }
         }
         return views;
     }

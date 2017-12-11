@@ -12,11 +12,13 @@ import com.rey.material.app.DatePickerDialog;
 import com.rey.material.app.Dialog;
 import com.rey.material.util.ViewUtil;
 import com.vijay.jsonwizard.R;
+import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
 import com.vijay.jsonwizard.utils.DateUtils;
 import com.vijay.jsonwizard.utils.ValidationStatus;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.ParseException;
@@ -34,7 +36,19 @@ public class DatePickerFactory implements FormWidgetFactory {
     private static final String TAG = "DatePickerFactory";
 
     @Override
-    public List<View> getViewsFromJson(String stepName, final Context context, JSONObject jsonObject, final CommonListener listener, boolean editable) throws Exception {
+    public List<View> getViewsFromJson(String stepName, final Context context, JSONObject jsonObject, final CommonListener listener, int visualizationMode) throws Exception {
+        List<View> views = null;
+        switch (visualizationMode){
+            case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY :
+                views = getReadOnlyViewsFromJson(context, jsonObject);
+                break;
+            default:
+                views = getEditableViewsFromJson(context, jsonObject);
+        }
+        return views;
+    }
+
+    private List<View> getEditableViewsFromJson(Context context, JSONObject jsonObject) throws JSONException {
         List<View> views = new ArrayList<>(1);
         final MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(
                 R.layout.item_edit_text, null);
@@ -55,6 +69,29 @@ public class DatePickerFactory implements FormWidgetFactory {
         editText.setOnClickListener(datePickerListener);
         editText.setInputType(InputType.TYPE_NULL);
 
+        views.add(editText);
+        return views;
+    }
+
+    private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject) throws JSONException {
+        List<View> views = new ArrayList<>(1);
+        final MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(
+                R.layout.item_edit_text, null);
+        editText.setHint(jsonObject.getString("hint"));
+        editText.setFloatingLabelText(jsonObject.getString("hint"));
+        editText.setId(ViewUtil.generateViewId());
+        editText.setTag(R.id.key, jsonObject.getString("key"));
+        editText.setTag(R.id.type, jsonObject.getString("type"));
+        String widgetPattern = jsonObject.getString("pattern");
+        editText.setTag(R.id.v_pattern, widgetPattern);
+
+        if (!TextUtils.isEmpty(jsonObject.optString("value"))) {
+            Date date = DateUtils.parseJSONDate(jsonObject.optString("value"));
+            SimpleDateFormat widgetDateFormat = new SimpleDateFormat(widgetPattern);
+            editText.setText(widgetDateFormat.format(date));
+        }
+
+        editText.setEnabled(false);
         views.add(editText);
         return views;
     }

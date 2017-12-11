@@ -11,6 +11,7 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rengwuxian.materialedittext.validation.RegexpValidator;
 import com.rey.material.util.ViewUtil;
 import com.vijay.jsonwizard.R;
+import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.customviews.GenericTextWatcher;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
@@ -19,6 +20,7 @@ import com.vijay.jsonwizard.validators.edittext.MaxLengthValidator;
 import com.vijay.jsonwizard.validators.edittext.MinLengthValidator;
 import com.vijay.jsonwizard.validators.edittext.RequiredValidator;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -32,7 +34,19 @@ public class EditTextFactory implements FormWidgetFactory {
     public static final int MIN_LENGTH = 0;
     public static final int MAX_LENGTH = 100;
     @Override
-    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener, boolean editable) throws Exception {
+    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener, int visualizationMode) throws Exception {
+        List<View> views = null;
+        switch (visualizationMode){
+            case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY :
+                views = getReadOnlyViewsFromJson(context, jsonObject);
+                break;
+            default:
+                views = getEditableViewsFromJson(stepName, context, jsonObject);
+        }
+        return views;
+    }
+
+    private List<View> getEditableViewsFromJson(String stepName, Context context, JSONObject jsonObject) throws Exception{
         int minLength = MIN_LENGTH;
         int maxLength= MAX_LENGTH;
         List<View> views = new ArrayList<>(1);
@@ -136,6 +150,26 @@ public class EditTextFactory implements FormWidgetFactory {
         return views;
     }
 
+    private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject) throws JSONException {
+        List<View> views = new ArrayList<>(1);
+        MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(
+                R.layout.item_edit_text, null);
+        editText.setId(ViewUtil.generateViewId());
+        editText.setHint(jsonObject.getString("hint"));
+        editText.setFloatingLabelText(jsonObject.getString("hint"));
+        editText.setTag(R.id.key, jsonObject.getString("key"));
+        editText.setTag(R.id.type, jsonObject.getString("type"));
+        editText.setText(jsonObject.optString("value"));
+
+        if (!TextUtils.isEmpty(jsonObject.optString("lines"))) {
+            editText.setSingleLine(false);
+            editText.setLines(jsonObject.optInt("lines"));
+        }
+        editText.setEnabled(false);
+        views.add(editText);
+        return views;
+    }
+
     public static ValidationStatus validate(MaterialEditText editText) {
         boolean validate = editText.validate();
         if(!validate) {
@@ -143,5 +177,4 @@ public class EditTextFactory implements FormWidgetFactory {
         }
         return new ValidationStatus(true, null);
     }
-
 }

@@ -6,8 +6,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 
+import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rey.material.util.ViewUtil;
 import com.vijay.jsonwizard.R;
+import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
 import com.vijay.jsonwizard.utils.ValidationStatus;
@@ -26,7 +28,19 @@ import fr.ganfra.materialspinner.MaterialSpinner;
 public class SpinnerFactory implements FormWidgetFactory {
 
     @Override
-    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener, boolean editable) throws Exception {
+    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener, int visualizationMode) throws Exception {
+        List<View> views = null;
+        switch (visualizationMode){
+            case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY :
+                views = getReadOnlyViewsFromJson(context, jsonObject);
+                break;
+            default:
+                views = getEditableViewsFromJson(context, jsonObject, listener);
+        }
+        return views;
+    }
+
+    private List<View> getEditableViewsFromJson(Context context, JSONObject jsonObject, CommonListener listener) throws Exception {
         List<View> views = new ArrayList<>(1);
         MaterialSpinner spinner = (MaterialSpinner) LayoutInflater.from(context).inflate(R.layout.item_spinner, null);
 
@@ -74,6 +88,22 @@ public class SpinnerFactory implements FormWidgetFactory {
             spinner.setOnItemSelectedListener(listener);
         }
         views.add(spinner);
+        return views;
+    }
+
+    private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject) throws Exception {
+        List<View> views = new ArrayList<>(1);
+        MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(
+                R.layout.item_edit_text, null);
+        editText.setId(ViewUtil.generateViewId());
+        editText.setHint(jsonObject.getString("hint"));
+        editText.setFloatingLabelText(jsonObject.getString("hint"));
+        editText.setTag(R.id.key, jsonObject.getString("key"));
+        editText.setTag(R.id.type, jsonObject.getString("type"));
+
+        editText.setText(jsonObject.optString("value"));
+        editText.setEnabled(false);
+        views.add(editText);
         return views;
     }
 

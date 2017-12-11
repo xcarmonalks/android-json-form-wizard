@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
@@ -35,6 +36,7 @@ import com.vijay.jsonwizard.widgets.SpinnerFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -51,9 +53,20 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
     private String mStepName;
     private JSONObject mStepDetails;
     private String mCurrentKey;
+    private int mVisualizationMode;
     private JsonFormInteractor mJsonFormInteractor = JsonFormInteractor.getInstance();
 
-    public void addFormElements(boolean editable) {
+    public void addFormElements() {
+        switch (mVisualizationMode){
+            case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY :
+                addFormReadOnlylements();
+                break;
+            default:
+                addFormEditionElements();
+        }
+    }
+
+    private void addFormEditionElements() {
         mStepName = getView().getArguments().getString("stepName");
         JSONObject step = getView().getStep(mStepName);
         try {
@@ -61,21 +74,48 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        List<View> views = mJsonFormInteractor.fetchFormElements(mStepName, getView().getContext(), mStepDetails,
-                getView().getCommonListener(), editable);
+        List<View> views = getStepFormElements(mStepName, mStepDetails);
         getView().addFormElements(views);
+    }
+
+    private void addFormReadOnlylements() {
+        String stepName = getView().getArguments().getString("stepName");
+        JSONObject step = getView().getStep(stepName);
+        List<View> views = getStepFormElements(stepName, step);
+        if(step.has("next")){
+            try{
+                stepName = step.getString("next");
+                step = getView().getStep(stepName);
+                views.addAll(getStepFormElements(stepName, step));
+            } catch (JSONException e) {
+                Log.e(TAG, e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        getView().addFormElements(views);
+    }
+
+    private List<View> getStepFormElements(String stepName, JSONObject stepDetails){
+        List<View> views = mJsonFormInteractor.fetchFormElements(stepName, getView().getContext(), stepDetails,
+                getView().getCommonListener(), mVisualizationMode);
+        return views;
     }
 
     @SuppressLint("ResourceAsColor")
     public void setUpToolBar() {
-        if (!mStepName.equals(JsonFormConstants.FIRST_STEP_NAME)) {
-            getView().setUpBackButton();
-        }
-        getView().setActionBarTitle(mStepDetails.optString("title"));
-        if (mStepDetails.has("next")) {
-            getView().updateVisibilityOfNextAndSave(true, false);
+        if(mVisualizationMode == JsonFormConstants.VISUALIZATION_MODE_EDIT){
+            if (!mStepName.equals(JsonFormConstants.FIRST_STEP_NAME)) {
+                getView().setUpBackButton();
+            }
+            getView().setActionBarTitle(mStepDetails.optString("title"));
+            if (mStepDetails.has("next")) {
+                getView().updateVisibilityOfNextAndSave(true, false);
+            } else {
+                getView().updateVisibilityOfNextAndSave(false, true);
+            }
         } else {
-            getView().updateVisibilityOfNextAndSave(false, true);
+            getView().setActionBarTitle(getView().getContext().getResources().getString(R.string.summary));
+            getView().updateVisibilityOfNextAndSave(false, false);
         }
         setUpToolBarTitleColor();
     }
@@ -251,5 +291,9 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
 
     public String getStepName() {
         return mStepName;
+    }
+
+    public void setVisualizationMode(int visualizationMode){
+        this.mVisualizationMode = visualizationMode;
     }
 }

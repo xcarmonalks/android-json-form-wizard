@@ -33,7 +33,7 @@ public class EditGroupFactory implements FormWidgetFactory {
     private static final String TAG = "EditGroupFactory";
 
     @Override
-    public List<View> getViewsFromJson(String stepName, Context context, JSONObject parentJson, CommonListener listener, boolean editable) throws Exception {
+    public List<View> getViewsFromJson(String stepName, Context context, JSONObject parentJson, CommonListener listener, int visualizationMode) throws Exception {
         List<View> viewsFromJson = new ArrayList<>();
 
         LinearLayout linearLayout = new LinearLayout(context);
@@ -58,7 +58,7 @@ public class EditGroupFactory implements FormWidgetFactory {
             for (int i = 0; i < optNumber; i++) {
                 JSONObject childJson = fields.getJSONObject(i);
                 try {
-                    List<View> views = WidgetFactoryRegistry.getWidgetFactory(childJson.getString("type")).getViewsFromJson(stepName, context, childJson, listener, editable);
+                    List<View> views = WidgetFactoryRegistry.getWidgetFactory(childJson.getString("type")).getViewsFromJson(stepName, context, childJson, listener, visualizationMode);
                     for (View v : views) {
                         LinearLayout.LayoutParams layoutParams=new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
                         layoutParams.setMargins(0,0,10,0);

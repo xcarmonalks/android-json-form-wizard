@@ -25,6 +25,7 @@ import android.widget.Toast;
 import com.rey.material.widget.Switch;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.activities.JsonFormActivity;
+import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.customviews.RadioButton;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.JsonApi;
@@ -79,7 +80,7 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        presenter.addFormElements(mJsonApi.isEditable());
+        presenter.addFormElements();
     }
 
     @Override
@@ -182,7 +183,9 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
 
     @Override
     protected JsonFormFragmentPresenter createPresenter() {
-        return new JsonFormFragmentPresenter();
+        JsonFormFragmentPresenter presenter = new JsonFormFragmentPresenter();
+        presenter.setVisualizationMode(mJsonApi.getVisualizationMode());
+        return presenter;
     }
 
     @Override

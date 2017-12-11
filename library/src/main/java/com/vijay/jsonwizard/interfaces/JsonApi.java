@@ -18,5 +18,5 @@ public interface JsonApi {
 
     String getCount();
 
-    boolean isEditable();
+    int getVisualizationMode();
 }
