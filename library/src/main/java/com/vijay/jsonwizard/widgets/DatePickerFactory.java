@@ -60,8 +60,9 @@ public class DatePickerFactory implements FormWidgetFactory {
         editText.setTag(R.id.type, jsonObject.getString("type"));
         editText.setTag(R.id.v_pattern, jsonObject.getString("pattern"));
 
-        if (!TextUtils.isEmpty(jsonObject.optString("value"))) {
-            Date date = DateUtils.parseJSONDate(jsonObject.optString("value"));
+        final String value = jsonObject.optString("value");
+        if (!TextUtils.isEmpty(value)) {
+            Date date = DateUtils.parseJSONDate(value);
             editText.setText(SimpleDateFormat.getInstance().format(date));
         }
 
