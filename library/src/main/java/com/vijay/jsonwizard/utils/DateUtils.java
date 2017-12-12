@@ -1,5 +1,7 @@
 package com.vijay.jsonwizard.utils;
 
+import android.util.Log;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -11,23 +13,25 @@ import java.util.Date;
 
 public class DateUtils {
 
-    private static final String DEFAULT_DATE_PATTERN = "dd/MM/yyyy";
+    private static final String TAG = "DateUtils";
 
-    private static final DateFormat jsonDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS'Z'");
+    private static final String DEFAULT_DATE_PATTERN = "dd/MM/yyyy";
+    private static final String JSON_DATE_PATTERN = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'";
 
     public static String toJSONDateFormat(Date date) {
         if(date == null){
             return null;
         }
-        return jsonDateFormat.format(date);
+        final DateFormat jsonSdf = new SimpleDateFormat(JSON_DATE_PATTERN);
+        return jsonSdf.format(date);
     }
 
     public static Date parseJSONDate(String date) {
         try {
-            return jsonDateFormat.parse(date);
+            final DateFormat jsonSdf = new SimpleDateFormat(JSON_DATE_PATTERN);
+            return jsonSdf.parse(date);
         } catch (ParseException e) {
-            //TODO - revisar
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage(), e);
         }
         return null;
     }
@@ -42,8 +46,7 @@ public class DateUtils {
             }
             return sdf.parse(date);
         } catch (ParseException e) {
-            //TODO - revisar
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage(), e);
         }
         return null;
     }

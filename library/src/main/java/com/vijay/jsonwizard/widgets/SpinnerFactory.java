@@ -44,10 +44,10 @@ public class SpinnerFactory implements FormWidgetFactory {
         List<View> views = new ArrayList<>(1);
         MaterialSpinner spinner = (MaterialSpinner) LayoutInflater.from(context).inflate(R.layout.item_spinner, null);
 
-        String hint = jsonObject.optString("hint");
+        final String hint = jsonObject.optString("hint");
         if (!TextUtils.isEmpty(hint)) {
-            spinner.setHint(jsonObject.getString("hint"));
-            spinner.setFloatingLabelText(jsonObject.getString("hint"));
+            spinner.setHint(hint);
+            spinner.setFloatingLabelText(hint);
         }
 
         spinner.setId(ViewUtil.generateViewId());
@@ -66,18 +66,21 @@ public class SpinnerFactory implements FormWidgetFactory {
 
         String valueToSelect = "";
         int indexToSelect = -1;
-        if (!TextUtils.isEmpty(jsonObject.optString("value"))) {
-            valueToSelect = jsonObject.optString("value");
+        final String value = jsonObject.optString("value");
+        if (!TextUtils.isEmpty(value)) {
+            valueToSelect = value;
         }
 
         JSONArray valuesJson = jsonObject.optJSONArray("values");
+        final int valuesJsonLength = valuesJson.length();
         String[] values = null;
-        if (valuesJson != null && valuesJson.length() > 0) {
-            values = new String[valuesJson.length()];
-            for (int i = 0; i < valuesJson.length(); i++) {
+        if (valuesJson != null && valuesJsonLength > 0) {
+            values = new String[valuesJsonLength];
+            for (int i = 0; i < valuesJsonLength; i++) {
                 values[i] = valuesJson.optString(i);
                 if (valueToSelect.equals(values[i])) {
                     indexToSelect = i;
+                    break;
                 }
             }
         }
@@ -96,8 +99,9 @@ public class SpinnerFactory implements FormWidgetFactory {
         MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(
                 R.layout.item_edit_text, null);
         editText.setId(ViewUtil.generateViewId());
-        editText.setHint(jsonObject.getString("hint"));
-        editText.setFloatingLabelText(jsonObject.getString("hint"));
+        final String hint = jsonObject.getString("hint");
+        editText.setHint(hint);
+        editText.setFloatingLabelText(hint);
         editText.setTag(R.id.key, jsonObject.getString("key"));
         editText.setTag(R.id.type, jsonObject.getString("type"));
 

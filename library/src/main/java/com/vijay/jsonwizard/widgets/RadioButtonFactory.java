@@ -56,10 +56,11 @@ public class RadioButtonFactory implements FormWidgetFactory {
         int layoutOrientation = horizontal ? RadioGroup.HORIZONTAL : RadioGroup.VERTICAL;
         int layoutWidth = horizontal ? WRAP_CONTENT : MATCH_PARENT;
         JSONArray options = jsonObject.getJSONArray(JsonFormConstants.OPTIONS_FIELD_NAME);
-        if(options.length() > 0) {
+        int optionsLength = options.length();
+        if(optionsLength > 0) {
             RadioGroup rg = new RadioGroup(context);
             rg.setOrientation(layoutOrientation);
-            for (int i = 0; i < options.length(); i++) {
+            for (int i = 0; i < optionsLength; i++) {
                 JSONObject item = options.getJSONObject(i);
                 RadioButton radioButton = (RadioButton) LayoutInflater.from(context).inflate(R.layout.item_radiobutton,
                         null);
@@ -90,8 +91,9 @@ public class RadioButtonFactory implements FormWidgetFactory {
         MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(
                 R.layout.item_edit_text, null);
         editText.setId(ViewUtil.generateViewId());
-        editText.setHint(jsonObject.getString("label"));
-        editText.setFloatingLabelText(jsonObject.getString("label"));
+        final String label = jsonObject.getString("label");
+        editText.setHint(label);
+        editText.setFloatingLabelText(label);
         editText.setTag(R.id.key, jsonObject.getString("key"));
         editText.setTag(R.id.type, jsonObject.getString("type"));
 

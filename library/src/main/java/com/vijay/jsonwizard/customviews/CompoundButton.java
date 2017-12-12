@@ -48,8 +48,9 @@ public class CompoundButton extends android.widget.CompoundButton {
             TypedArray a = context.obtainStyledAttributes(attrs, new int[] { android.R.attr.padding,
                     android.R.attr.paddingLeft }, defStyleAttr, defStyleRes);
 
-            if (!a.hasValue(0) && !a.hasValue(1))
+            if (!a.hasValue(0) && !a.hasValue(1)) {
                 setPadding(0, getPaddingTop(), getPaddingRight(), getPaddingBottom());
+            }
 
             a.recycle();
         }
@@ -69,17 +70,18 @@ public class CompoundButton extends android.widget.CompoundButton {
     @Override
     public void setBackgroundDrawable(Drawable drawable) {
         Drawable background = getBackground();
-        if (background instanceof RippleDrawable && !(drawable instanceof RippleDrawable))
+        if (background instanceof RippleDrawable && !(drawable instanceof RippleDrawable)) {
             ((RippleDrawable) background).setBackgroundDrawable(drawable);
-        else
+        } else {
             super.setBackgroundDrawable(drawable);
+        }
     }
 
     @Override
     public void setOnClickListener(OnClickListener l) {
-        if (l == mRippleManager)
+        if (l == mRippleManager) {
             super.setOnClickListener(l);
-        else {
+        } else {
             mRippleManager.setOnClickListener(l);
             setOnClickListener(mRippleManager);
         }
@@ -100,11 +102,13 @@ public class CompoundButton extends android.widget.CompoundButton {
     @Override
     public int getCompoundPaddingLeft() {
         int padding = super.getCompoundPaddingLeft();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             return padding;
+        }
 
-        if (mButtonDrawable != null)
+        if (mButtonDrawable != null) {
             padding += mButtonDrawable.getIntrinsicWidth();
+        }
 
         return padding;
     }

@@ -37,7 +37,7 @@ public class FormUtils {
     }
 
     public static int dpToPixels(Context context, float dps) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (dps * scale + 0.5f);
+        final double scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dps * scale + 0.5d);
     }
 }

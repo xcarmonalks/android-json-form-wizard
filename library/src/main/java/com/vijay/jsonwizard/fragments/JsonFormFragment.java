@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -59,8 +60,9 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
 
     @Override
     public void onAttach(Activity activity) {
-        if (activity instanceof JsonApi)
+        if (activity instanceof JsonApi) {
             mJsonApi = (JsonApi) activity;
+        }
         super.onAttach(activity);
     }
 
@@ -156,8 +158,7 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
         try {
             mJsonApi.writeValue(stepName, key, s);
         } catch (JSONException e) {
-            // TODO - handle
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage(), e);
         }
     }
 
@@ -166,8 +167,7 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
         try {
             mJsonApi.writeValue(stepName, prentKey, childObjectKey, childKey, value);
         } catch (JSONException e) {
-            // TODO - handle
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage(), e);
         }
     }
 
@@ -307,7 +307,7 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-
+        // Not implementation needed
     }
 
     @Override

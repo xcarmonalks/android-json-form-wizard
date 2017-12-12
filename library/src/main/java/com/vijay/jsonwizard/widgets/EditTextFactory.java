@@ -52,14 +52,16 @@ public class EditTextFactory implements FormWidgetFactory {
         List<View> views = new ArrayList<>(1);
         MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(
                 R.layout.item_edit_text, null);
-        editText.setHint(jsonObject.getString("hint"));
-        editText.setFloatingLabelText(jsonObject.getString("hint"));
+        final String hint = jsonObject.getString("hint");
+        editText.setHint(hint);
+        editText.setFloatingLabelText(hint);
         editText.setId(ViewUtil.generateViewId());
         editText.setTag(R.id.key, jsonObject.getString("key"));
         editText.setTag(R.id.type, jsonObject.getString("type"));
 
-        if (!TextUtils.isEmpty(jsonObject.optString("value"))) {
-            editText.setText(jsonObject.optString("value"));
+        final String value = jsonObject.optString("value");
+        if (!TextUtils.isEmpty(value)) {
+            editText.setText(value);
         }
 
         if (!TextUtils.isEmpty(jsonObject.optString("lines"))) {
@@ -155,8 +157,9 @@ public class EditTextFactory implements FormWidgetFactory {
         MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(
                 R.layout.item_edit_text, null);
         editText.setId(ViewUtil.generateViewId());
-        editText.setHint(jsonObject.getString("hint"));
-        editText.setFloatingLabelText(jsonObject.getString("hint"));
+        final String hint = jsonObject.getString("hint");
+        editText.setHint(hint);
+        editText.setFloatingLabelText(hint);
         editText.setTag(R.id.key, jsonObject.getString("key"));
         editText.setTag(R.id.type, jsonObject.getString("type"));
         editText.setText(jsonObject.optString("value"));

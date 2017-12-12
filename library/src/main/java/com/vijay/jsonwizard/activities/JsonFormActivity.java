@@ -80,7 +80,7 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
             try {
                 return mJSONObject.getJSONObject(name);
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e(TAG, e.getMessage(), e);
             }
         }
         return null;

@@ -72,7 +72,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         try {
             mStepDetails = new JSONObject(step.toString());
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage(), e);
         }
         List<View> views = getStepFormElements(mStepName, mStepDetails);
         getView().addFormElements(views);
@@ -88,8 +88,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                 step = getView().getStep(stepName);
                 views.addAll(getStepFormElements(stepName, step));
             } catch (JSONException e) {
-                Log.e(TAG, e.getMessage());
-                e.printStackTrace();
+                Log.e(TAG, e.getMessage(), e);
             }
         }
         getView().addFormElements(views);

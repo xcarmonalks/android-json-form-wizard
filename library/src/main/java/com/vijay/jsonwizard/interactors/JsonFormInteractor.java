@@ -53,13 +53,11 @@ public class JsonFormInteractor {
                 } catch (Exception e) {
                     Log.e(TAG,
                             "Exception occurred in making child view at index : " + i + " : Exception is : "
-                                    + e.getMessage());
-                    e.printStackTrace();
+                                    + e.getMessage(), e);
                 }
             }
         } catch (JSONException e) {
-            Log.e(TAG, "Json exception occurred : " + e.getMessage());
-            e.printStackTrace();
+            Log.e(TAG, "Json exception occurred : " + e.getMessage(), e);
         }
         return viewsFromJson;
     }

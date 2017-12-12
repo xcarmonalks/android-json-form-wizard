@@ -52,8 +52,9 @@ public class DatePickerFactory implements FormWidgetFactory {
         List<View> views = new ArrayList<>(1);
         final MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(
                 R.layout.item_edit_text, null);
-        editText.setHint(jsonObject.getString("hint"));
-        editText.setFloatingLabelText(jsonObject.getString("hint"));
+        final String hint = jsonObject.getString("hint");
+        editText.setHint(hint);
+        editText.setFloatingLabelText(hint);
         editText.setId(ViewUtil.generateViewId());
         editText.setTag(R.id.key, jsonObject.getString("key"));
         editText.setTag(R.id.type, jsonObject.getString("type"));
@@ -77,8 +78,9 @@ public class DatePickerFactory implements FormWidgetFactory {
         List<View> views = new ArrayList<>(1);
         final MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(
                 R.layout.item_edit_text, null);
-        editText.setHint(jsonObject.getString("hint"));
-        editText.setFloatingLabelText(jsonObject.getString("hint"));
+        final String hint = jsonObject.getString("hint");
+        editText.setHint(hint);
+        editText.setFloatingLabelText(hint);
         editText.setId(ViewUtil.generateViewId());
         editText.setTag(R.id.key, jsonObject.getString("key"));
         editText.setTag(R.id.type, jsonObject.getString("type"));
@@ -106,7 +108,7 @@ public class DatePickerFactory implements FormWidgetFactory {
 
     private class DatePickerListener implements View.OnFocusChangeListener, View.OnClickListener {
 
-        public Dialog d;
+        private Dialog d;
         private MaterialEditText dateText;
 
         public DatePickerListener(MaterialEditText editText){
