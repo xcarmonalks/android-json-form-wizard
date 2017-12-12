@@ -459,9 +459,10 @@ options - EditText included in the EditGroup.
     Intent intent = new Intent(context, JsonFormActivity.class);
     String json = "Your complete JSON";
     intent.putExtra("json", json);
-    //Optional -- Configure screen orientation & inputMethod
+    //Optional -- Configure screen orientation, inputMethod and visualizationMode
     intent.putExtra(JsonFormConstants.ORIENTATION_EXTRA, JsonFormConstants.ORIENTATION_LANDSCAPE);
     intent.putExtra(JsonFormConstants.INPUT_METHOD_EXTRA, JsonFormConstants.INPUT_METHOD_HIDDEN);
+    intent.putExtra(JsonFormConstants.VISUALIZATION_MODE_EXTRA, JsonFormConstants.VISUALIZATION_MODE_READ_ONLY);
     startActivityForResult(intent, REQUEST_CODE_GET_JSON);
 ```
 
