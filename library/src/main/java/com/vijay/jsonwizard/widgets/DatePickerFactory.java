@@ -13,6 +13,7 @@ import com.rey.material.app.Dialog;
 import com.rey.material.util.ViewUtil;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
+import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
 import com.vijay.jsonwizard.utils.DateUtils;
@@ -36,29 +37,29 @@ public class DatePickerFactory implements FormWidgetFactory {
     private static final String TAG = "DatePickerFactory";
 
     @Override
-    public List<View> getViewsFromJson(String stepName, final Context context, JSONObject jsonObject, final CommonListener listener, int visualizationMode) throws Exception {
+    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener, JsonFormBundle bundle, int visualizationMode) throws JSONException {
         List<View> views = null;
         switch (visualizationMode){
             case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY :
-                views = getReadOnlyViewsFromJson(context, jsonObject);
+                views = getReadOnlyViewsFromJson(context, jsonObject, bundle);
                 break;
             default:
-                views = getEditableViewsFromJson(context, jsonObject);
+                views = getEditableViewsFromJson(context, jsonObject, bundle);
         }
         return views;
     }
 
-    private List<View> getEditableViewsFromJson(Context context, JSONObject jsonObject) throws JSONException {
+    private List<View> getEditableViewsFromJson(Context context, JSONObject jsonObject, JsonFormBundle bundle) throws JSONException {
         List<View> views = new ArrayList<>(1);
         final MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(
                 R.layout.item_edit_text, null);
-        final String hint = jsonObject.getString("hint");
+        final String hint = bundle.resolveKey(jsonObject.getString("hint"));
         editText.setHint(hint);
         editText.setFloatingLabelText(hint);
         editText.setId(ViewUtil.generateViewId());
         editText.setTag(R.id.key, jsonObject.getString("key"));
         editText.setTag(R.id.type, jsonObject.getString("type"));
-        editText.setTag(R.id.v_pattern, jsonObject.getString("pattern"));
+        editText.setTag(R.id.v_pattern, bundle.resolveKey(jsonObject.getString("pattern")));
 
         final String value = jsonObject.optString("value");
         if (!TextUtils.isEmpty(value)) {
@@ -75,17 +76,17 @@ public class DatePickerFactory implements FormWidgetFactory {
         return views;
     }
 
-    private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject) throws JSONException {
+    private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject, JsonFormBundle bundle) throws JSONException {
         List<View> views = new ArrayList<>(1);
         final MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(
                 R.layout.item_edit_text, null);
-        final String hint = jsonObject.getString("hint");
+        final String hint = bundle.resolveKey(jsonObject.getString("hint"));
         editText.setHint(hint);
         editText.setFloatingLabelText(hint);
         editText.setId(ViewUtil.generateViewId());
         editText.setTag(R.id.key, jsonObject.getString("key"));
         editText.setTag(R.id.type, jsonObject.getString("type"));
-        String widgetPattern = jsonObject.getString("pattern");
+        String widgetPattern = bundle.resolveKey(jsonObject.getString("pattern"));
         editText.setTag(R.id.v_pattern, widgetPattern);
 
         final String value = jsonObject.optString("value");

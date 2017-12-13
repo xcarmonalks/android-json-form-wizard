@@ -13,20 +13,24 @@ import android.view.WindowManager;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.fragments.JsonFormFragment;
+import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.JsonApi;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Locale;
+
 public class JsonFormActivity extends AppCompatActivity implements JsonApi {
 
     private static final String TAG = "JsonFormActivity";
 
-    private Toolbar             mToolbar;
+    private Toolbar mToolbar;
 
-    private JSONObject          mJSONObject;
-    private int                 mVisualizationMode;
+    private JSONObject mJSONObject;
+    private int mVisualizationMode;
+    private JsonFormBundle mJsonBundle;
 
     public void init(String json, Integer visualizationMode) {
         try {
@@ -154,6 +158,18 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
     @Override
     public int getVisualizationMode() {
         return mVisualizationMode;
+    }
+
+    @Override
+    public JsonFormBundle getBundle(Locale locale) {
+        if(mJsonBundle == null){
+            try {
+                mJsonBundle = new JsonFormBundle(mJSONObject, locale);
+            } catch (JSONException e) {
+                Log.e(TAG, e.getMessage(), e);
+            }
+        }
+        return mJsonBundle;
     }
 
     private void configureInputMethod() {

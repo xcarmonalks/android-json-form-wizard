@@ -1,6 +1,7 @@
 package com.vijay.jsonwizard.views;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.json.JSONObject;
 
@@ -13,6 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import com.vijay.jsonwizard.fragments.JsonFormFragment;
+import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.mvp.MvpView;
 import com.vijay.jsonwizard.mvp.ViewState;
@@ -66,4 +68,6 @@ public interface JsonFormFragmentView<VS extends ViewState> extends MvpView {
     void unCheckAllExcept(String parentKey, String childKey);
 
     String getCount();
+
+    JsonFormBundle getBundle(Locale locale);
 }

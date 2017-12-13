@@ -13,6 +13,7 @@ import com.rey.material.util.ViewUtil;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.customviews.RadioButton;
+import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
 
@@ -33,21 +34,21 @@ public class RadioButtonFactory implements FormWidgetFactory {
     private final String H_ORIENTATION_VALUE = "horizontal";
 
     @Override
-    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener, int visualizationMode) throws Exception {
+    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener, JsonFormBundle bundle, int visualizationMode) throws JSONException {
         List<View> views = null;
         switch (visualizationMode){
             case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY :
-                views = getReadOnlyViewsFromJson(context, jsonObject);
+                views = getReadOnlyViewsFromJson(context, jsonObject, bundle);
                 break;
             default:
-                views = getEditableViewsFromJson(context, jsonObject, listener);
+                views = getEditableViewsFromJson(context, jsonObject, listener, bundle);
         }
         return views;
     }
 
-    private List<View> getEditableViewsFromJson(Context context, JSONObject jsonObject, CommonListener listener) throws JSONException {
+    private List<View> getEditableViewsFromJson(Context context, JSONObject jsonObject, CommonListener listener, JsonFormBundle bundle) throws JSONException {
         List<View> views = new ArrayList<>(1);
-        views.add(getTextViewWith(context, 16, jsonObject.getString("label"), jsonObject.getString("key"),
+        views.add(getTextViewWith(context, 16, bundle.resolveKey(jsonObject.getString("label")), jsonObject.getString("key"),
                 jsonObject.getString("type"), getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0, 0),
                 FONT_BOLD_PATH));
 
@@ -65,7 +66,7 @@ public class RadioButtonFactory implements FormWidgetFactory {
                 RadioButton radioButton = (RadioButton) LayoutInflater.from(context).inflate(R.layout.item_radiobutton,
                         null);
                 radioButton.setId(i);
-                radioButton.setText(item.getString("text"));
+                radioButton.setText(bundle.resolveKey(item.getString("text")));
                 radioButton.setTag(R.id.key, jsonObject.getString("key"));
                 radioButton.setTag(R.id.type, jsonObject.getString("type"));
                 radioButton.setTag(R.id.childKey, item.getString("key"));
@@ -86,32 +87,32 @@ public class RadioButtonFactory implements FormWidgetFactory {
         return views;
     }
 
-    private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject)  throws JSONException {
+    private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject, JsonFormBundle bundle)  throws JSONException {
         List<View> views = new ArrayList<>(1);
         MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(
                 R.layout.item_edit_text, null);
         editText.setId(ViewUtil.generateViewId());
-        final String label = jsonObject.getString("label");
+        final String label = bundle.resolveKey(jsonObject.getString("label"));
         editText.setHint(label);
         editText.setFloatingLabelText(label);
         editText.setTag(R.id.key, jsonObject.getString("key"));
         editText.setTag(R.id.type, jsonObject.getString("type"));
 
         String value = jsonObject.optString("value");
-        editText.setText(resolveValueText(value, jsonObject));
+        editText.setText(resolveValueText(value, jsonObject, bundle));
         editText.setEnabled(false);
         views.add(editText);
         return views;
     }
 
-    private String resolveValueText(String value, JSONObject jsonObject) throws JSONException {
+    private String resolveValueText(String value, JSONObject jsonObject, JsonFormBundle bundle) throws JSONException {
         String valueText = "";
         if (value != null && !"".equals(value)){
             JSONArray options = jsonObject.getJSONArray(JsonFormConstants.OPTIONS_FIELD_NAME);
             for (int i = 0; i < options.length(); i++) {
                 JSONObject item = options.getJSONObject(i);
                 if (value.equals(item.optString("key"))) {
-                    valueText = item.optString("text");
+                    valueText = bundle.resolveKey(item.optString("text"));
                     break;
                 }
             }

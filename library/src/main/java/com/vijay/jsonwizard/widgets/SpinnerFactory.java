@@ -10,11 +10,13 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rey.material.util.ViewUtil;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
+import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
 import com.vijay.jsonwizard.utils.ValidationStatus;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -28,23 +30,23 @@ import fr.ganfra.materialspinner.MaterialSpinner;
 public class SpinnerFactory implements FormWidgetFactory {
 
     @Override
-    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener, int visualizationMode) throws Exception {
+    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener, JsonFormBundle bundle, int visualizationMode) throws JSONException {
         List<View> views = null;
         switch (visualizationMode){
             case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY :
-                views = getReadOnlyViewsFromJson(context, jsonObject);
+                views = getReadOnlyViewsFromJson(context, jsonObject, bundle);
                 break;
             default:
-                views = getEditableViewsFromJson(context, jsonObject, listener);
+                views = getEditableViewsFromJson(context, jsonObject, listener, bundle);
         }
         return views;
     }
 
-    private List<View> getEditableViewsFromJson(Context context, JSONObject jsonObject, CommonListener listener) throws Exception {
+    private List<View> getEditableViewsFromJson(Context context, JSONObject jsonObject, CommonListener listener, JsonFormBundle bundle) throws JSONException {
         List<View> views = new ArrayList<>(1);
         MaterialSpinner spinner = (MaterialSpinner) LayoutInflater.from(context).inflate(R.layout.item_spinner, null);
 
-        final String hint = jsonObject.optString("hint");
+        final String hint = bundle.resolveKey(jsonObject.optString("hint"));
         if (!TextUtils.isEmpty(hint)) {
             spinner.setHint(hint);
             spinner.setFloatingLabelText(hint);
@@ -60,7 +62,7 @@ public class SpinnerFactory implements FormWidgetFactory {
             String requiredValue = requiredObject.getString("value");
             if (!TextUtils.isEmpty(requiredValue)) {
                 spinner.setTag(R.id.v_required, requiredValue);
-                spinner.setTag(R.id.error, requiredObject.optString("err"));
+                spinner.setTag(R.id.error, bundle.resolveKey(requiredObject.optString("err")));
             }
         }
 
@@ -94,7 +96,7 @@ public class SpinnerFactory implements FormWidgetFactory {
         return views;
     }
 
-    private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject) throws Exception {
+    private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject, JsonFormBundle bundle) throws JSONException {
         List<View> views = new ArrayList<>(1);
         MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(
                 R.layout.item_edit_text, null);

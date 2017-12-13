@@ -28,6 +28,7 @@ import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.activities.JsonFormActivity;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.customviews.RadioButton;
+import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.JsonApi;
 import com.vijay.jsonwizard.mvp.MvpFragment;
@@ -39,6 +40,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by vijay on 5/7/15.
@@ -332,5 +334,10 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
     @Override
     public void onVisibilityChange(String key, String o, boolean b) {
         // no ops
+    }
+
+    @Override
+    public JsonFormBundle getBundle(Locale locale) {
+        return mJsonApi.getBundle(locale);
     }
 }

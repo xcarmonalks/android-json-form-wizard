@@ -5,7 +5,7 @@
             {
                 "key":"name",
                 "type":"edit_text",
-                "hint":"Enter Your Name",
+                "hint": "${step1.name}",
                 "v_min_length":{  "value" : "3",
                                     "err" : "Min length should be at least 3"
                                 },
@@ -39,7 +39,7 @@
             {
                 "key":"radioData",
                 "type":"radio",
-                "label":"Select one item from below",
+                "label": "${step1.radioData}",
                 "orientation":"vertical",
                 "options":[
                     {
@@ -132,7 +132,7 @@
             {
                 "key":"name",
                 "type":"edit_text",
-                "hint":"Enter Country"
+                "hint": "${step2.name}"
             },
             {
                 "key":"checkData",
@@ -164,5 +164,15 @@
             }
         ],
         "title":"Step 3 of 3"
+    },
+    "bundle": {
+        "es": {
+            "step1.name": "Introduzca su nombre",
+            "step1.radioData": "Seleccione un elemento"
+        },
+        "en": {
+            "step1.name": "Enter Your Name",
+            "step1.radioData": "Select one item from below"
+        }
     }
 }

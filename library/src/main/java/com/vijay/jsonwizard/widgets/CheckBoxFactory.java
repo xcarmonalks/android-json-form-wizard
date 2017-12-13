@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.customviews.CheckBox;
+import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
 
@@ -27,29 +28,30 @@ import static com.vijay.jsonwizard.utils.FormUtils.*;
  * Created by vijay on 24-05-2015.
  */
 public class CheckBoxFactory implements FormWidgetFactory {
+
     @Override
-    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener, int visualizationMode) throws JSONException {
+    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener, JsonFormBundle bundle, int visualizationMode) throws JSONException {
         List<View> views = null;
         switch (visualizationMode){
             case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY :
-                views = getReadOnlyViewsFromJson(context, jsonObject);
+                views = getReadOnlyViewsFromJson(context, jsonObject, bundle);
                 break;
             default:
-                views = getEditableViewsFromJson(context, jsonObject, listener);
+                views = getEditableViewsFromJson(context, jsonObject, listener, bundle);
         }
         return views;
     }
 
-    private List<View> getEditableViewsFromJson(Context context, JSONObject jsonObject, CommonListener listener) throws JSONException {
+    private List<View> getEditableViewsFromJson(Context context, JSONObject jsonObject, CommonListener listener, JsonFormBundle bundle) throws JSONException {
         List<View> views = new ArrayList<>(1);
-        views.add(getTextViewWith(context, 16, jsonObject.getString("label"), jsonObject.getString("key"),
+        views.add(getTextViewWith(context, 16, bundle.resolveKey(jsonObject.getString("label")), jsonObject.getString("key"),
                 jsonObject.getString("type"), getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0, 0),
                 FONT_BOLD_PATH));
         JSONArray options = jsonObject.getJSONArray(JsonFormConstants.OPTIONS_FIELD_NAME);
         for (int i = 0; i < options.length(); i++) {
             JSONObject item = options.getJSONObject(i);
             CheckBox checkBox = (CheckBox) LayoutInflater.from(context).inflate(R.layout.item_checkbox, null);
-            checkBox.setText(item.getString("text"));
+            checkBox.setText(bundle.resolveKey(item.getString("text")));
             checkBox.setTag(R.id.key, jsonObject.getString("key"));
             checkBox.setTag(R.id.type, jsonObject.getString("type"));
             checkBox.setTag(R.id.childKey, item.getString("key"));
@@ -69,9 +71,9 @@ public class CheckBoxFactory implements FormWidgetFactory {
         return views;
     }
 
-    private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject) throws JSONException {
+    private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject, JsonFormBundle bundle) throws JSONException {
         List<View> views = new ArrayList<>(1);
-        views.add(getTextViewWith(context, 16, jsonObject.getString("label"), jsonObject.getString("key"),
+        views.add(getTextViewWith(context, 16, bundle.resolveKey(jsonObject.getString("label")), jsonObject.getString("key"),
                 jsonObject.getString("type"), getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0, (int) context
                         .getResources().getDimension(R.dimen.extra_bottom_margin)),
                 FONT_BOLD_PATH));
@@ -79,7 +81,7 @@ public class CheckBoxFactory implements FormWidgetFactory {
         for (int i = 0; i < options.length(); i++) {
             JSONObject item = options.getJSONObject(i);
             if (!TextUtils.isEmpty(item.optString("value")) && item.optBoolean("value")) {
-                views.add(getTextViewWith(context, 16, item.getString("text"), item.getString("key"),
+                views.add(getTextViewWith(context, 16, bundle.resolveKey(item.getString("text")), item.getString("key"),
                         null, getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0, (int) context
                                 .getResources().getDimension(R.dimen.default_bottom_margin)), FONT_REGULAR_PATH));
             }

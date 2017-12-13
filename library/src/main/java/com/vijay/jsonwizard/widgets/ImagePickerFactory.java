@@ -7,11 +7,13 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import com.vijay.jsonwizard.R;
+import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
 import com.vijay.jsonwizard.utils.ImageUtils;
 import com.vijay.jsonwizard.utils.ValidationStatus;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -28,7 +30,7 @@ import static com.vijay.jsonwizard.utils.FormUtils.getLayoutParams;
 public class ImagePickerFactory implements FormWidgetFactory {
 
     @Override
-    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener, int visualizationMode) throws Exception {
+    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener, JsonFormBundle bundle, int visualizationMode) throws JSONException {
         List<View> views = new ArrayList<>(1);
         ImageView imageView = new ImageView(context);
         imageView.setImageDrawable(context.getResources().getDrawable(R.mipmap.grey_bg));

@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.vijay.jsonwizard.constants.JsonFormConstants;
+import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
 import com.vijay.jsonwizard.widgets.CheckBoxFactory;
@@ -24,6 +25,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -37,7 +39,7 @@ public class JsonFormInteractor {
     private JsonFormInteractor() {
     }
 
-    public List<View> fetchFormElements(String stepName, Context context, JSONObject parentJson, CommonListener listener, int visualizationMode) {
+    public List<View> fetchFormElements(String stepName, Context context, JSONObject parentJson, CommonListener listener, JsonFormBundle bundle, int visualizationMode) {
         Log.d(TAG, "fetchFormElements called");
         List<View> viewsFromJson = new ArrayList<>(5);
         try {
@@ -46,7 +48,7 @@ public class JsonFormInteractor {
                 JSONObject childJson = fields.getJSONObject(i);
                 try {
                     List<View> views = WidgetFactoryRegistry.getWidgetFactory(childJson.getString("type")).
-                            getViewsFromJson(stepName, context, childJson, listener, visualizationMode);
+                            getViewsFromJson(stepName, context, childJson, listener, bundle, visualizationMode);
                     if (views.size() > 0) {
                         viewsFromJson.addAll(views);
                     }

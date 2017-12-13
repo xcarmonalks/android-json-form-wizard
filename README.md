@@ -334,6 +334,32 @@ options - EditText included in the EditGroup.
 
 ```
 
+#### I18n
+##### Bundle definition
+```json
+"bundle": {
+  "es": {
+    "step1.name": "Introduzca su nombre",
+    "step1.radioData": "Seleccione un elemento"
+  },
+  "en": {
+    "step1.name": "Enter Your Name",
+    "step1.radioData": "Select one item from below"
+  }
+}
+```
+
+##### Using bundle labels
+```json
+{
+    "key": "name",
+    "type": "edit_text",
+    "hint": "${step1.name}",
+    "value":"name_val"
+}
+
+```
+
 ## Demo Input Json (Complete)
 
 ```json
@@ -449,6 +475,16 @@ options - EditText included in the EditGroup.
             }
         ],
         "title":"Step 3 of 3"
+    },
+    "bundle": {
+       "es": {
+         "step1.name": "Introduzca su nombre",
+         "step1.radioData": "Seleccione un elemento"
+       },
+       "en": {
+         "step1.name": "Enter Your Name",
+         "step1.radioData": "Select one item from below"
+       }
     }
 }
 ```

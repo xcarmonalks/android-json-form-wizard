@@ -1,6 +1,7 @@
 package com.vijay.jsonwizard.widgets;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +9,7 @@ import android.widget.LinearLayout;
 
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
+import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
 
@@ -33,7 +35,7 @@ public class EditGroupFactory implements FormWidgetFactory {
     private static final String TAG = "EditGroupFactory";
 
     @Override
-    public List<View> getViewsFromJson(String stepName, Context context, JSONObject parentJson, CommonListener listener, int visualizationMode) throws Exception {
+    public List<View> getViewsFromJson(String stepName, Context context, JSONObject parentJson, CommonListener listener, JsonFormBundle bundle, int visualizationMode) throws JSONException {
         List<View> viewsFromJson = new ArrayList<>();
 
         LinearLayout linearLayout = new LinearLayout(context);
@@ -44,8 +46,8 @@ public class EditGroupFactory implements FormWidgetFactory {
 
 
 
-        String groupTitle = parentJson.optString("title");
-        if (groupTitle != null) {
+        String groupTitle = bundle.resolveKey(parentJson.optString("title"));
+        if (!TextUtils.isEmpty(groupTitle)) {
             viewsFromJson.add(getTextViewWith(context, 16, groupTitle, parentJson.getString("key"),
                     parentJson.getString("type"), getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0, 0),
                     FONT_BOLD_PATH));
@@ -58,7 +60,7 @@ public class EditGroupFactory implements FormWidgetFactory {
             for (int i = 0; i < optNumber; i++) {
                 JSONObject childJson = fields.getJSONObject(i);
                 try {
-                    List<View> views = WidgetFactoryRegistry.getWidgetFactory(childJson.getString("type")).getViewsFromJson(stepName, context, childJson, listener, visualizationMode);
+                    List<View> views = WidgetFactoryRegistry.getWidgetFactory(childJson.getString("type")).getViewsFromJson(stepName, context, childJson, listener, bundle, visualizationMode);
                     for (View v : views) {
                         LinearLayout.LayoutParams layoutParams=new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
                         layoutParams.setMargins(0,0,10,0);
