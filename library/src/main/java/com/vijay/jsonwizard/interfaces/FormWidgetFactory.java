@@ -3,6 +3,7 @@ package com.vijay.jsonwizard.interfaces;
 import android.content.Context;
 import android.view.View;
 
+import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
 
 import org.json.JSONObject;
@@ -15,6 +16,8 @@ import java.util.Map;
  */
 public interface FormWidgetFactory {
 
-    List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener, JsonFormBundle bundle, int visualizationMode) throws Exception;
+    List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject,
+            CommonListener listener, JsonFormBundle bundle, JsonExpressionResolver resolver,
+            int visualizationMode) throws Exception;
 
 }

@@ -34,6 +34,7 @@ dependencies {
         exclude group: 'com.nineoldandroids', module: 'library'
         exclude group: 'com.android.support', module: 'appcompat-v7'
     }
+    compile 'com.jayway.jsonpath:json-path:2.3.0'
 }
 sonarqube {
     properties {

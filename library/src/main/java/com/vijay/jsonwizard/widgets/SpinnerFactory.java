@@ -10,6 +10,7 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rey.material.util.ViewUtil;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
+import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
@@ -30,19 +31,19 @@ import fr.ganfra.materialspinner.MaterialSpinner;
 public class SpinnerFactory implements FormWidgetFactory {
 
     @Override
-    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener, JsonFormBundle bundle, int visualizationMode) throws JSONException {
+    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener, JsonFormBundle bundle,JsonExpressionResolver resolver, int visualizationMode) throws JSONException {
         List<View> views = null;
         switch (visualizationMode){
             case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY :
                 views = getReadOnlyViewsFromJson(context, jsonObject, bundle);
                 break;
             default:
-                views = getEditableViewsFromJson(context, jsonObject, listener, bundle);
+                views = getEditableViewsFromJson(context, jsonObject, listener, bundle,resolver);
         }
         return views;
     }
 
-    private List<View> getEditableViewsFromJson(Context context, JSONObject jsonObject, CommonListener listener, JsonFormBundle bundle) throws JSONException {
+    private List<View> getEditableViewsFromJson(Context context, JSONObject jsonObject, CommonListener listener, JsonFormBundle bundle, JsonExpressionResolver resolver) throws JSONException {
         List<View> views = new ArrayList<>(1);
         MaterialSpinner spinner = (MaterialSpinner) LayoutInflater.from(context).inflate(R.layout.item_spinner, null);
 
@@ -73,19 +74,17 @@ public class SpinnerFactory implements FormWidgetFactory {
             valueToSelect = value;
         }
 
-        JSONArray valuesJson = jsonObject.optJSONArray("values");
-        final int valuesJsonLength = valuesJson.length();
-        String[] values = null;
-        if (valuesJson != null && valuesJsonLength > 0) {
-            values = new String[valuesJsonLength];
-            for (int i = 0; i < valuesJsonLength; i++) {
-                values[i] = valuesJson.optString(i);
-                if (valueToSelect.equals(values[i])) {
-                    indexToSelect = i;
-                    break;
-                }
-            }
+        String valuesExpression = getValuesAsJsonExpression(jsonObject, resolver);
+
+        JSONArray valuesJson = null;
+        if (valuesExpression == null) {
+            valuesJson = jsonObject.optJSONArray("values");
+        } else {
+            valuesJson = resolver.resolveAsArray(valuesExpression);
         }
+
+        String[] values = getValues(valuesJson);
+        indexToSelect = getSelectedIdx(values, valueToSelect);
 
         if (values != null) {
             spinner.setAdapter(new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, values));
@@ -94,6 +93,39 @@ public class SpinnerFactory implements FormWidgetFactory {
         }
         views.add(spinner);
         return views;
+    }
+
+    private String[] getValues(JSONArray valuesJson) {
+        String[] values = null;
+        final int valuesJsonLength = valuesJson.length();
+        if (valuesJson != null && valuesJsonLength > 0) {
+            values = new String[valuesJsonLength];
+            for (int i = 0; i < valuesJsonLength; i++) {
+                values[i] = valuesJson.optString(i);
+            }
+        }
+        return values;
+    }
+
+    private int getSelectedIdx(String[] values, String valueToSelect ) {
+        int indexToSelect = -1;
+        if (values != null && values.length > 0) {
+            for (int i = 0; i < values.length; i++) {
+                 if (valueToSelect.equals(values[i])) {
+                     indexToSelect = i;
+                     break;
+                }
+            }
+        }
+        return indexToSelect;
+    }
+
+    private String getValuesAsJsonExpression(JSONObject jsonObject, JsonExpressionResolver resolver) {
+            String valuesExpression = jsonObject.optString("values");
+            if (resolver.isValidExpression(valuesExpression)) {
+                return valuesExpression;
+            }
+            return null;
     }
 
     private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject, JsonFormBundle bundle) throws JSONException {

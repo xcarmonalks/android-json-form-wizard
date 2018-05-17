@@ -12,6 +12,7 @@ import android.view.WindowManager;
 
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
+import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.fragments.JsonFormFragment;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.JsonApi;
@@ -31,6 +32,7 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
     private JSONObject mJSONObject;
     private int mVisualizationMode;
     private JsonFormBundle mJsonBundle;
+    private JsonExpressionResolver mResolver;
 
     public void init(String json, Integer visualizationMode) {
         try {
@@ -170,6 +172,18 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
             }
         }
         return mJsonBundle;
+    }
+
+    @Override
+    public JsonExpressionResolver getExpressionResolver() {
+        if (mResolver==null) {
+            try {
+                mResolver = new JsonExpressionResolver(mJSONObject);
+            } catch (JSONException e) {
+                Log.e(TAG, e.getMessage(), e);
+            }
+        }
+        return mResolver;
     }
 
     private void configureInputMethod() {

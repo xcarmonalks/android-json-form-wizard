@@ -13,6 +13,7 @@ import com.rey.material.util.ViewUtil;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.customviews.RadioButton;
+import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
@@ -34,19 +35,19 @@ public class RadioButtonFactory implements FormWidgetFactory {
     private final String H_ORIENTATION_VALUE = "horizontal";
 
     @Override
-    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener, JsonFormBundle bundle, int visualizationMode) throws JSONException {
+    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener, JsonFormBundle bundle,JsonExpressionResolver resolver, int visualizationMode) throws JSONException {
         List<View> views = null;
         switch (visualizationMode){
             case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY :
                 views = getReadOnlyViewsFromJson(context, jsonObject, bundle);
                 break;
             default:
-                views = getEditableViewsFromJson(context, jsonObject, listener, bundle);
+                views = getEditableViewsFromJson(context, jsonObject, listener, bundle,resolver);
         }
         return views;
     }
 
-    private List<View> getEditableViewsFromJson(Context context, JSONObject jsonObject, CommonListener listener, JsonFormBundle bundle) throws JSONException {
+    private List<View> getEditableViewsFromJson(Context context, JSONObject jsonObject, CommonListener listener, JsonFormBundle bundle, JsonExpressionResolver resolver) throws JSONException {
         List<View> views = new ArrayList<>(1);
         views.add(getTextViewWith(context, 16, bundle.resolveKey(jsonObject.getString("label")), jsonObject.getString("key"),
                 jsonObject.getString("type"), getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0, 0),
@@ -56,7 +57,15 @@ public class RadioButtonFactory implements FormWidgetFactory {
         boolean horizontal = H_ORIENTATION_VALUE.equals(orientationStr);
         int layoutOrientation = horizontal ? RadioGroup.HORIZONTAL : RadioGroup.VERTICAL;
         int layoutWidth = horizontal ? WRAP_CONTENT : MATCH_PARENT;
-        JSONArray options = jsonObject.getJSONArray(JsonFormConstants.OPTIONS_FIELD_NAME);
+
+        JSONArray options = null;
+        String valuesExpression = getValuesAsJsonExpression(jsonObject, resolver);
+        if (valuesExpression!=null) {
+            options = resolver.resolveAsArray(valuesExpression);
+        } else {
+            options = jsonObject.getJSONArray(JsonFormConstants.OPTIONS_FIELD_NAME);
+        }
+
         int optionsLength = options.length();
         if(optionsLength > 0) {
             RadioGroup rg = new RadioGroup(context);
@@ -86,6 +95,15 @@ public class RadioButtonFactory implements FormWidgetFactory {
         }
         return views;
     }
+
+    private String getValuesAsJsonExpression(JSONObject jsonObject, JsonExpressionResolver resolver) {
+        String valuesExpression = jsonObject.optString(JsonFormConstants.OPTIONS_FIELD_NAME);
+        if (resolver.isValidExpression(valuesExpression)) {
+            return valuesExpression;
+        }
+        return null;
+    }
+
 
     private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject, JsonFormBundle bundle)  throws JSONException {
         List<View> views = new ArrayList<>(1);
