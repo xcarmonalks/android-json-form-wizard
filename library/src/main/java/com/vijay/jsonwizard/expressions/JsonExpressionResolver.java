@@ -56,7 +56,11 @@ public class JsonExpressionResolver {
         if (array.length() == 0) {
             return null;
         }
-        return array.getJSONArray(0);
+        Object item = array.get(0);
+        if (item instanceof JSONArray) {
+            return (JSONArray) item;
+        }
+        return array;
     }
 
     static {
