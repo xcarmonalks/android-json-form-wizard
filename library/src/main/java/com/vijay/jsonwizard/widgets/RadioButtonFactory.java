@@ -2,6 +2,7 @@ package com.vijay.jsonwizard.widgets;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -18,6 +19,8 @@ import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
 
+import com.vijay.jsonwizard.interfaces.JsonApi;
+import com.vijay.jsonwizard.utils.JsonFormUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -61,7 +64,8 @@ public class RadioButtonFactory implements FormWidgetFactory {
         JSONArray options = null;
         String valuesExpression = getValuesAsJsonExpression(jsonObject, resolver);
         if (valuesExpression!=null) {
-            options = resolver.resolveAsArray(valuesExpression);
+            JSONObject currentValues = getCurrentValues(context);
+            options = resolver.resolveAsArray(valuesExpression,currentValues);
         } else {
             options = jsonObject.getJSONArray(JsonFormConstants.OPTIONS_FIELD_NAME);
         }
@@ -102,6 +106,17 @@ public class RadioButtonFactory implements FormWidgetFactory {
             return valuesExpression;
         }
         return null;
+    }
+
+    @Nullable
+    private JSONObject getCurrentValues(Context context) throws JSONException {
+        JSONObject currentValues = null;
+        if (context instanceof JsonApi) {
+            String currentJsonState = ((JsonApi) context).currentJsonState();
+            JSONObject currentJsonObject = new JSONObject(currentJsonState);
+            currentValues =  JsonFormUtils.extractDataFromForm(currentJsonObject);
+        }
+        return currentValues;
     }
 
 
