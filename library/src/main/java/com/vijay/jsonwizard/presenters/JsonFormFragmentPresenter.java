@@ -20,6 +20,7 @@ import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.customviews.CheckBox;
 import com.vijay.jsonwizard.customviews.RadioButton;
+import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.fragments.JsonFormFragment;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interactors.JsonFormInteractor;
@@ -71,13 +72,14 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         mStepName = getView().getArguments().getString("stepName");
         JSONObject step = getView().getStep(mStepName);
         JsonFormBundle bundle = getView().getBundle(getView().getContext().getResources().getConfiguration().locale);
+        JsonExpressionResolver resolver = getView().getExpressionResolver();
 
         try {
             mStepDetails = new JSONObject(step.toString());
         } catch (JSONException e) {
             Log.e(TAG, e.getMessage(), e);
         }
-        List<View> views = getStepFormElements(mStepName, mStepDetails, bundle);
+        List<View> views = getStepFormElements(mStepName, mStepDetails, bundle, resolver);
         getView().addFormElements(views);
     }
 
@@ -85,13 +87,14 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         String stepName = getView().getArguments().getString("stepName");
         JSONObject step = getView().getStep(stepName);
         JsonFormBundle bundle = getView().getBundle(getView().getContext().getResources().getConfiguration().locale);
+        JsonExpressionResolver resolver = getView().getExpressionResolver();
 
-        List<View> views = getStepFormElements(stepName, step, bundle);
+        List<View> views = getStepFormElements(stepName, step, bundle,resolver);
         if(step.has("next")){
             try{
                 stepName = step.getString("next");
                 step = getView().getStep(stepName);
-                views.addAll(getStepFormElements(stepName, step, bundle));
+                views.addAll(getStepFormElements(stepName, step, bundle,resolver));
             } catch (JSONException e) {
                 Log.e(TAG, e.getMessage(), e);
             }
@@ -99,9 +102,9 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         getView().addFormElements(views);
     }
 
-    private List<View> getStepFormElements(String stepName, JSONObject stepDetails, JsonFormBundle bundle){
+    private List<View> getStepFormElements(String stepName, JSONObject stepDetails, JsonFormBundle bundle, JsonExpressionResolver resolver){
         List<View> views = mJsonFormInteractor.fetchFormElements(stepName, getView().getContext(), stepDetails,
-                getView().getCommonListener(), bundle, mVisualizationMode);
+                getView().getCommonListener(), bundle, resolver, mVisualizationMode);
         return views;
     }
 

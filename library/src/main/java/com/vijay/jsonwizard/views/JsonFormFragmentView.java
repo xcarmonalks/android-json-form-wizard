@@ -1,5 +1,6 @@
 package com.vijay.jsonwizard.views;
 
+import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import java.util.List;
 import java.util.Locale;
 
@@ -70,4 +71,6 @@ public interface JsonFormFragmentView<VS extends ViewState> extends MvpView {
     String getCount();
 
     JsonFormBundle getBundle(Locale locale);
+
+    JsonExpressionResolver getExpressionResolver();
 }
