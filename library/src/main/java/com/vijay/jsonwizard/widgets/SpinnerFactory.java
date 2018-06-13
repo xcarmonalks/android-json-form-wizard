@@ -19,6 +19,7 @@ import com.vijay.jsonwizard.interfaces.JsonApi;
 import com.vijay.jsonwizard.utils.JsonFormUtils;
 import com.vijay.jsonwizard.utils.ValidationStatus;
 
+import java.util.Arrays;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -89,6 +90,13 @@ public class SpinnerFactory implements FormWidgetFactory {
         }
 
         String[] values = getValues(valuesJson);
+        String otherOption = bundle.resolveKey(jsonObject.optString("other"));
+        if (!TextUtils.isEmpty(otherOption)) {
+            List<String> valuesWithOther = new ArrayList<>(Arrays.asList(values));
+            valuesWithOther.add(otherOption);
+            values = valuesWithOther.toArray(values);
+        }
+
         indexToSelect = getSelectedIdx(values, valueToSelect);
 
         if (values != null) {
