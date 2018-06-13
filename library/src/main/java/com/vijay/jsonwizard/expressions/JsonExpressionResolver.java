@@ -51,8 +51,14 @@ public class JsonExpressionResolver {
         return array.getJSONObject(0);
     }
 
-    public JSONArray resolveAsArray(String expression) throws JSONException {
+    public JSONArray resolveAsArray(String expression, JSONObject instance) throws JSONException {
+        if (instance != null) {
+            dataDocumentContext.put("$", "current-values", instance);
+        }
         JSONArray array = dataDocumentContext.read(expression);
+
+        dataDocumentContext.delete("current-values");
+
         if (array.length() == 0) {
             return null;
         }
