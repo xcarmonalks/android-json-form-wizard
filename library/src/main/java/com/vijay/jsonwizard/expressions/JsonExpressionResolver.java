@@ -69,6 +69,16 @@ public class JsonExpressionResolver {
         return array;
     }
 
+    public boolean existsExpression(String expression, JSONObject instance) throws JSONException {
+        if (instance != null) {
+            dataDocumentContext.put("$", "current-values", instance);
+        }
+        JSONArray array = dataDocumentContext.read(expression);
+        dataDocumentContext.delete("current-values");
+
+        return array.length() > 0;
+    }
+
     static {
         Configuration.setDefaults(new Configuration.Defaults() {
 

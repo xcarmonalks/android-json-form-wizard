@@ -62,7 +62,7 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(Context activity) {
         if (activity instanceof JsonApi) {
             mJsonApi = (JsonApi) activity;
         }
