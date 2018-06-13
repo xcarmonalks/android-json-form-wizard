@@ -2,10 +2,12 @@ package com.vijay.jsonwizard.presenters;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -24,9 +26,11 @@ import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.fragments.JsonFormFragment;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interactors.JsonFormInteractor;
+import com.vijay.jsonwizard.interfaces.JsonApi;
 import com.vijay.jsonwizard.mvp.MvpBasePresenter;
 import com.vijay.jsonwizard.utils.DateUtils;
 import com.vijay.jsonwizard.utils.ImageUtils;
+import com.vijay.jsonwizard.utils.JsonFormUtils;
 import com.vijay.jsonwizard.utils.ValidationStatus;
 import com.vijay.jsonwizard.views.JsonFormFragmentView;
 import com.vijay.jsonwizard.viewstates.JsonFormFragmentViewState;
@@ -35,6 +39,7 @@ import com.vijay.jsonwizard.widgets.EditTextFactory;
 import com.vijay.jsonwizard.widgets.ImagePickerFactory;
 import com.vijay.jsonwizard.widgets.SpinnerFactory;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -136,10 +141,56 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         getView().backClick();
     }
 
+    private String resolveNextStep(JSONObject mStepDetails)  {
+        try {
+            JSONObject nextObject = mStepDetails.optJSONObject("next");
+            if (nextObject != null) {
+                JSONArray names = nextObject.names();
+                for (int i = 0; i < names.length(); i++) {
+                    if (isDefaultStep(nextObject, names.optString(i))) {
+                        return names.optString(i);
+                    } else {
+                        JsonExpressionResolver resolver =  getView().getExpressionResolver();
+                        String expression = nextObject.optString(names.optString(i));
+                        if (resolver.isValidExpression(expression)) {
+                            boolean eval = resolver
+                                    .existsExpression(nextObject.optString(names.optString(i)),
+                                            getCurrentValues());
+                            if (eval) {
+                                return names.optString(i);
+                            }
+                        } else {
+                            Log.e(TAG,"resolveNextStep: Error evaluating next step - Expression is not valid");
+                        }
+                    }
+                }
+            }
+        } catch (JSONException e) {
+            Log.e(TAG, "resolveNextStep: Error evaluating next step",e);
+        }
+        return mStepDetails.optString("next");
+    }
+
+    private JSONObject getCurrentValues() throws JSONException {
+        String currentJsonState =  getView().getCurrentJsonState();
+        JSONObject currentJsonObject = new JSONObject(currentJsonState);
+        JSONObject currentValues =  JsonFormUtils.extractDataFromForm(currentJsonObject);
+        return currentValues;
+    }
+
+     private boolean isDefaultStep(JSONObject steps,String key) {
+         try {
+             return steps.getBoolean(key);
+         } catch (JSONException e) {
+             return false;
+         }
+     }
+
     public void onNextClick(LinearLayout mainView) {
         ValidationStatus validationStatus = writeValuesAndValidate(mainView);
         if (validationStatus.isValid()) {
-            JsonFormFragment next = JsonFormFragment.getFormFragment(mStepDetails.optString("next"));
+            String nextStep = resolveNextStep(mStepDetails);
+            JsonFormFragment next = JsonFormFragment.getFormFragment(nextStep);
             getView().hideKeyBoard();
             getView().transactThis(next);
         } else {
