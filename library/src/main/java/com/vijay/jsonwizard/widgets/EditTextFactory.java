@@ -50,6 +50,11 @@ public class EditTextFactory implements FormWidgetFactory {
     }
 
     private List<View> getEditableViewsFromJson(String stepName, Context context, JSONObject jsonObject, JsonFormBundle bundle) throws JSONException {
+        String readonly = jsonObject.optString("readonly");
+        if (Boolean.TRUE.toString().equalsIgnoreCase(readonly)) {
+            return getReadOnlyViewsFromJson(context, jsonObject, bundle);
+        }
+
         int minLength = MIN_LENGTH;
         int maxLength= MAX_LENGTH;
         List<View> views = new ArrayList<>(1);
