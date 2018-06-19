@@ -23,7 +23,7 @@ public class MainActivity extends ActionBarActivity {
     private static final int    REQUEST_CODE_GET_JSON = 1;
 
     private static final String TAG                   = "MainActivity";
-    private static final String DATA_JSON_PATH        = "data.json";
+    private static final String DATA_JSON_PATH        = "form.json";
     private static final String COMPLETE_JSON_PATH        = "complete.json";
 
     @Override
@@ -36,6 +36,7 @@ public class MainActivity extends ActionBarActivity {
                 Intent intent = new Intent(MainActivity.this, JsonFormActivity.class);
                 String json = CommonUtils.loadJSONFromAsset(getApplicationContext(), DATA_JSON_PATH);
                 intent.putExtra("json", json);
+                intent.putExtra("resolver", "com.vijay.jsonwizard.demo.expressions.AssetsContentResolver");
                 //intent.putExtra(JsonFormConstants.ORIENTATION_EXTRA, JsonFormConstants.ORIENTATION_LANDSCAPE);
                 //intent.putExtra(JsonFormConstants.INPUT_METHOD_EXTRA, JsonFormConstants.INPUT_METHOD_HIDDEN);
                 startActivityForResult(intent, REQUEST_CODE_GET_JSON);

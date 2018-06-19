@@ -1,5 +1,6 @@
 package com.vijay.jsonwizard.interfaces;
 
+import com.vijay.jsonwizard.expressions.ExternalContentResolver;
 import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
 
@@ -28,4 +29,6 @@ public interface JsonApi {
     JsonFormBundle getBundle(Locale locale);
 
     JsonExpressionResolver getExpressionResolver();
+
+    ExternalContentResolver getExternalContentResolver();
 }
