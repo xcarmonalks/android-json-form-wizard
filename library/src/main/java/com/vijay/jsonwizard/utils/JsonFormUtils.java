@@ -1,5 +1,6 @@
 package com.vijay.jsonwizard.utils;
 
+import android.text.TextUtils;
 import android.util.Log;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -80,13 +81,25 @@ public class JsonFormUtils {
                 if (isContainer(field)) {
                     processFieldContainer(field, dataMap);
                 } else {
-                    if (field.has("key") && field.has("value")) {
-                        dataMap.put(field.getString("key"), field.get("value"));
-                    } else if (isCheckbox(field)) {
+                    if (isCheckbox(field)) {
                         processCheckbox(field, dataMap);
+                    } else if (isImageChooser(field)) {
+                        processImageChooser(field, dataMap);
+                    } else if (field.has("key") && field.has("value")) {
+                        dataMap.put(field.getString("key"), field.get("value"));
                     }
                 }
             }
+        }
+    }
+
+    private static void processImageChooser(JSONObject field, Map<String, Object> dataMap)
+            throws JSONException {
+        String imagePath = field.optString("value");
+        if (!TextUtils.isEmpty(imagePath)) {
+            String base64 = ImageFileUtils.processImageFromFile(imagePath);
+            dataMap.put(field.getString("key"), field.get("value"));
+            dataMap.put(field.getString("key") + "#base64", base64);
         }
     }
 
@@ -109,5 +122,9 @@ public class JsonFormUtils {
 
     private static boolean isCheckbox(JSONObject field) throws JSONException {
         return "check_box".equals(field.getString("type"));
+    }
+
+    private static boolean isImageChooser(JSONObject field) throws JSONException {
+        return "choose_image".equals(field.getString("type"));
     }
 }
