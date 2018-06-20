@@ -1,5 +1,7 @@
 package com.vijay.jsonwizard.expressions;
 
+import android.util.Log;
+import android.util.LruCache;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.InvalidPathException;
@@ -19,45 +21,90 @@ public class JsonExpressionResolver {
 
     private JSONObject dataObject;
     private DocumentContext dataDocumentContext;
+    private ExternalContentLru contentCache;
 
     public JsonExpressionResolver(JSONObject form) throws JSONException {
+        this(form, null);
+    }
+
+    public JsonExpressionResolver(JSONObject form, ExternalContentResolver contentResolver)
+            throws JSONException {
         if (form.has("data")) {
             dataObject = form.getJSONObject("data");
             dataDocumentContext = JsonPath.parse(dataObject);
         }
+        contentCache = new ExternalContentLru(contentResolver, 10);
     }
+
 
     public boolean isValidExpression(String expression) {
         if (expression == null) {
             return false;
         }
-        return expression.startsWith("$.");
+        return expression.startsWith("$.") || expression.startsWith("@.");
     }
 
-    public String resolveAsString(String expression) throws JSONException {
-        JSONArray array = dataDocumentContext.read(expression);
-        if (array.length() == 0) {
+    private String extractExternalContentReference(String expression) {
+        if (!expression.startsWith("@.")) {
             return null;
         }
-        return array.getString(0);
-    }
-
-
-    public JSONObject resolveAsObject(String expression) throws JSONException {
-        JSONArray array = dataDocumentContext.read(expression);
-        if (array.length() == 0) {
-            return null;
+        int extRefLimit = expression.indexOf("/");
+        if (extRefLimit > -1) {
+            return expression.substring(2, extRefLimit);
         }
-        return array.getJSONObject(0);
+        return null;
     }
+
+    private String extractJsonExpression(String expression) {
+        int pos = expression.indexOf("$.");
+        return expression.substring(pos);
+    }
+
+//    public String resolveAsString(String expression) throws JSONException {
+//        JSONArray array = dataDocumentContext.read(expression);
+//        if (array.length() == 0) {
+//            return null;
+//        }
+//        return array.getString(0);
+//    }
+//
+//    public JSONObject resolveAsObject(String expression) throws JSONException {
+//        JSONArray array = dataDocumentContext.read(expression);
+//        if (array.length() == 0) {
+//            return null;
+//        }
+//        return array.getJSONObject(0);
+//    }
 
     public JSONArray resolveAsArray(String expression, JSONObject instance) throws JSONException {
-        if (instance != null) {
-            dataDocumentContext.put("$", "current-values", instance);
-        }
-        JSONArray array = dataDocumentContext.read(expression);
+        String localExpression = expression;
+        String externalReference = extractExternalContentReference(expression);
 
-        dataDocumentContext.delete("current-values");
+        DocumentContext localContext = dataDocumentContext;
+
+        if (externalReference != null) {
+            localContext = contentCache.get(externalReference);
+            if (localContext == null) {
+                Log.w("ExpressionResolver", "resolveAsArray: external content " + externalReference
+                        + " can not be loaded");
+                return null;
+            }
+
+            localExpression = extractJsonExpression(expression);
+            if (localExpression == null) {
+                Log.w("ExpressionResolver",
+                        "resolveAsArray: external content expression can not be extracted "
+                                + expression);
+                return null;
+            }
+        }
+
+        if (instance != null) {
+            localContext.put("$", "current-values", instance);
+        }
+        JSONArray array = localContext.read(localExpression);
+
+        localContext.delete("current-values");
 
         if (array.length() == 0) {
             return null;
@@ -70,11 +117,33 @@ public class JsonExpressionResolver {
     }
 
     public boolean existsExpression(String expression, JSONObject instance) throws JSONException {
-        if (instance != null) {
-            dataDocumentContext.put("$", "current-values", instance);
+        String localExpression = expression;
+        String externalReference = extractExternalContentReference(expression);
+
+        DocumentContext localContext = dataDocumentContext;
+
+        if (externalReference != null) {
+            localContext = contentCache.get(externalReference);
+            if (localContext == null) {
+                Log.w("ExpressionResolver", "resolveAsArray: external content " + externalReference
+                        + " can not be loaded");
+                return false;
+            }
+
+            localExpression = extractJsonExpression(expression);
+            if (localExpression == null) {
+                Log.w("ExpressionResolver",
+                        "resolveAsArray: external content expression can not be extracted "
+                                + expression);
+                return false;
+            }
         }
-        JSONArray array = dataDocumentContext.read(expression);
-        dataDocumentContext.delete("current-values");
+
+        if (instance != null) {
+            localContext.put("$", "current-values", instance);
+        }
+        JSONArray array = localContext.read(localExpression);
+        localContext.delete("current-values");
 
         return array.length() > 0;
     }

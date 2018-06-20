@@ -7,11 +7,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.WindowManager;
 
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
+import com.vijay.jsonwizard.expressions.ExternalContentResolver;
+import com.vijay.jsonwizard.expressions.ExternalContentResolverFactory;
 import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.fragments.JsonFormFragment;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
@@ -33,6 +36,17 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
     private int mVisualizationMode;
     private JsonFormBundle mJsonBundle;
     private JsonExpressionResolver mResolver;
+    private ExternalContentResolver mContentResolver;
+    private String externalContentResolverClass;
+
+    public void init(String json, Integer visualizationMode, String externalContentResolverClass) {
+        this.externalContentResolverClass = externalContentResolverClass;
+        if (!TextUtils.isEmpty(externalContentResolverClass)) {
+            this.mContentResolver = ExternalContentResolverFactory
+                    .getInstance(this, externalContentResolverClass);
+        }
+        init(json, visualizationMode);
+    }
 
     public void init(String json, Integer visualizationMode) {
         try {
@@ -66,13 +80,20 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
 
     protected void createFragments(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
-            init(getIntent().getStringExtra("json"), getIntent().getIntExtra(JsonFormConstants.VISUALIZATION_MODE_EXTRA, JsonFormConstants.VISUALIZATION_MODE_EDIT));
-            if(mJSONObject != null){
+            String contentResolver = getIntent().getStringExtra("resolver");
+            init(getIntent().getStringExtra("json"), getIntent()
+                    .getIntExtra(JsonFormConstants.VISUALIZATION_MODE_EXTRA,
+                            JsonFormConstants.VISUALIZATION_MODE_EDIT), contentResolver);
+            if (mJSONObject != null) {
                 getSupportFragmentManager().beginTransaction()
-                        .add(R.id.container, JsonFormFragment.getFormFragment(JsonFormConstants.FIRST_STEP_NAME)).commit();
+                        .add(R.id.container,
+                                JsonFormFragment.getFormFragment(JsonFormConstants.FIRST_STEP_NAME))
+                        .commit();
             }
         } else {
-            init(savedInstanceState.getString("jsonState"), savedInstanceState.getInt(JsonFormConstants.VISUALIZATION_MODE_EXTRA));
+            init(savedInstanceState.getString("jsonState"),
+                    savedInstanceState.getInt(JsonFormConstants.VISUALIZATION_MODE_EXTRA),
+                    savedInstanceState.getString("resolver"));
         }
     }
 
@@ -109,7 +130,8 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
     }
 
     @Override
-    public void writeValue(String stepName, String parentKey, String childObjectKey, String childKey, String value)
+    public void writeValue(String stepName, String parentKey, String childObjectKey,
+            String childKey, String value)
             throws JSONException {
         synchronized (mJSONObject) {
             JSONObject jsonObject = mJSONObject.getJSONObject(stepName);
@@ -123,7 +145,7 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
                         JSONObject innerItem = jsonArray.getJSONObject(j);
                         String anotherKeyAtIndex = innerItem.getString("key");
                         if (childKey.equals(anotherKeyAtIndex)) {
-                            if(value != null && !"".equals(value)){
+                            if (value != null && !"".equals(value)) {
                                 innerItem.put("value", value);
                             }
                             return;
@@ -151,9 +173,10 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if(mJSONObject != null){
+        if (mJSONObject != null) {
             outState.putString("jsonState", mJSONObject.toString());
             outState.putInt(JsonFormConstants.VISUALIZATION_MODE_EXTRA, mVisualizationMode);
+            outState.putString("resolver", externalContentResolverClass);
         }
     }
 
@@ -164,7 +187,7 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
 
     @Override
     public JsonFormBundle getBundle(Locale locale) {
-        if(mJsonBundle == null){
+        if (mJsonBundle == null) {
             try {
                 mJsonBundle = new JsonFormBundle(mJSONObject, locale);
             } catch (JSONException e) {
@@ -176,9 +199,13 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
 
     @Override
     public JsonExpressionResolver getExpressionResolver() {
-        if (mResolver==null) {
+        if (mResolver == null) {
             try {
-                mResolver = new JsonExpressionResolver(mJSONObject);
+                if (mContentResolver != null) {
+                    mResolver = new JsonExpressionResolver(mJSONObject, mContentResolver);
+                } else {
+                    mResolver = new JsonExpressionResolver(mJSONObject);
+                }
             } catch (JSONException e) {
                 Log.e(TAG, e.getMessage(), e);
             }
@@ -186,16 +213,21 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
         return mResolver;
     }
 
+    @Override
+    public ExternalContentResolver getExternalContentResolver() {
+        return mContentResolver;
+    }
+
     private void configureInputMethod() {
-        if(getIntent().hasExtra(JsonFormConstants.INPUT_METHOD_EXTRA)){
+        if (getIntent().hasExtra(JsonFormConstants.INPUT_METHOD_EXTRA)) {
             int inputMethod = getIntent().getIntExtra(JsonFormConstants.INPUT_METHOD_EXTRA, -1);
-            if(inputMethod == JsonFormConstants.INPUT_METHOD_VISIBLE){
+            if (inputMethod == JsonFormConstants.INPUT_METHOD_VISIBLE) {
                 getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
-            }else if(inputMethod == JsonFormConstants.INPUT_METHOD_HIDDEN){
+            } else if (inputMethod == JsonFormConstants.INPUT_METHOD_HIDDEN) {
                 getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
             }
         }
-        if(JsonFormConstants.VISUALIZATION_MODE_EDIT != mVisualizationMode){
+        if (JsonFormConstants.VISUALIZATION_MODE_EDIT != mVisualizationMode) {
             getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         }
     }
@@ -204,12 +236,13 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
         boolean launchInit = true;
         boolean hasOrientationExtra = getIntent().hasExtra(JsonFormConstants.ORIENTATION_EXTRA);
         int currentOrientation = getResources().getConfiguration().orientation;
-        int orientation = getIntent().getIntExtra(JsonFormConstants.ORIENTATION_EXTRA, currentOrientation);
-        if(hasOrientationExtra){
+        int orientation = getIntent()
+                .getIntExtra(JsonFormConstants.ORIENTATION_EXTRA, currentOrientation);
+        if (hasOrientationExtra) {
             launchInit = currentOrientation == orientation;
-            if(JsonFormConstants.ORIENTATION_LANDSCAPE == orientation){
+            if (JsonFormConstants.ORIENTATION_LANDSCAPE == orientation) {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-            } else if(JsonFormConstants.ORIENTATION_PORTRAIT == orientation){
+            } else if (JsonFormConstants.ORIENTATION_PORTRAIT == orientation) {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             }
             getIntent().removeExtra(JsonFormConstants.ORIENTATION_EXTRA);
