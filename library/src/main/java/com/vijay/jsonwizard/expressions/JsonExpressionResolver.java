@@ -31,8 +31,10 @@ public class JsonExpressionResolver {
             throws JSONException {
         if (form.has("data")) {
             dataObject = form.getJSONObject("data");
-            dataDocumentContext = JsonPath.parse(dataObject);
+        } else {
+            dataObject = new JSONObject("{}");
         }
+        dataDocumentContext = JsonPath.parse(dataObject);
         contentCache = new ExternalContentLru(contentResolver, 10);
     }
 
