@@ -2,12 +2,14 @@ package com.vijay.jsonwizard.expressions;
 
 
 import android.support.v4.util.LruCache;
+import android.util.Log;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import org.json.JSONObject;
 
 public class ExternalContentLru extends LruCache<String, DocumentContext> {
 
+    public static final String TAG = "ExternalContentLru";
     private ExternalContentResolver contentResolver;
 
     /**
@@ -22,6 +24,11 @@ public class ExternalContentLru extends LruCache<String, DocumentContext> {
 
     @Override
     protected DocumentContext create(String key) {
+        if (contentResolver == null) {
+            Log.w(TAG, "External content resolver not specified");
+            return null;
+        }
+
         JSONObject content = contentResolver.loadExtenalContent(key);
         if (content != null) {
             return JsonPath.parse(content);

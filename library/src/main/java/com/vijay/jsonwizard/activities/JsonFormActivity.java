@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.WindowManager;
 
@@ -40,8 +41,10 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
 
     public void init(String json, Integer visualizationMode, String externalContentResolverClass) {
         this.externalContentResolverClass = externalContentResolverClass;
-        this.mContentResolver = ExternalContentResolverFactory
-                .getInstance(this, externalContentResolverClass);
+        if (!TextUtils.isEmpty(externalContentResolverClass)) {
+            this.mContentResolver = ExternalContentResolverFactory
+                    .getInstance(this, externalContentResolverClass);
+        }
         init(json, visualizationMode);
     }
 

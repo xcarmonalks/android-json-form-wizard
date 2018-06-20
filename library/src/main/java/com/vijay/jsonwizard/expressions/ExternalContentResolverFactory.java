@@ -5,7 +5,7 @@ import android.util.Log;
 
 public class ExternalContentResolverFactory {
 
-    private static final String TAG = "ExternalContentResolverFactory";
+    private static final String TAG = "ExtContentResolverFact";
 
     public static ExternalContentResolver getInstance(Context context, String clazz) {
         try {
@@ -17,12 +17,8 @@ public class ExternalContentResolverFactory {
             }
             ((ExternalContentResolver)instance).setContext(context);
             return (ExternalContentResolver) instance;
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            Log.e(TAG, "Error creating ExternalContentResolver instance",e);
         }
         return null;
     }
