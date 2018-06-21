@@ -31,8 +31,11 @@ public class JsonFormUtils {
         return mergedForm;
     }
 
+    public static JSONObject extractDataFromForm(JSONObject form) throws JSONException {
+        return extractDataFromForm(form, true);
+    }
 
-    public static JSONObject extractDataFromForm(JSONObject form)
+    public static JSONObject extractDataFromForm(JSONObject form, boolean includeBase64)
             throws JSONException {
         Map<String, Object> dataMap = new HashMap<>();
 
@@ -40,7 +43,7 @@ public class JsonFormUtils {
         for (int i = 0; i < names.length(); i++) {
             String nodeName = names.get(i).toString();
             if (nodeName.contains("step")) {
-                processFieldContainer((JSONObject) form.get(nodeName), dataMap);
+                processFieldContainer((JSONObject) form.get(nodeName), dataMap, includeBase64);
             }
         }
         return new JSONObject(dataMap);
@@ -72,18 +75,19 @@ public class JsonFormUtils {
         return null;
     }
 
-    private static void processFieldContainer(JSONObject container, Map<String, Object> dataMap)
+    private static void processFieldContainer(JSONObject container, Map<String, Object> dataMap,
+            boolean incluideBase64)
             throws JSONException {
         JSONArray fields = container.optJSONArray("fields");
         if (fields != null) {
             for (int i = 0; i < fields.length(); i++) {
                 JSONObject field = (JSONObject) fields.get(i);
                 if (isContainer(field)) {
-                    processFieldContainer(field, dataMap);
+                    processFieldContainer(field, dataMap, incluideBase64);
                 } else {
                     if (isCheckbox(field)) {
                         processCheckbox(field, dataMap);
-                    } else if (isImageChooser(field)) {
+                    } else if (isImageChooser(field) && incluideBase64) {
                         processImageChooser(field, dataMap);
                     } else if (field.has("key") && field.has("value")) {
                         dataMap.put(field.getString("key"), field.get("value"));

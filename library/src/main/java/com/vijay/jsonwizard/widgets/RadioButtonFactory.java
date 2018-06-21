@@ -114,7 +114,7 @@ public class RadioButtonFactory implements FormWidgetFactory {
         if (context instanceof JsonApi) {
             String currentJsonState = ((JsonApi) context).currentJsonState();
             JSONObject currentJsonObject = new JSONObject(currentJsonState);
-            currentValues =  JsonFormUtils.extractDataFromForm(currentJsonObject);
+            currentValues =  JsonFormUtils.extractDataFromForm(currentJsonObject,false);
         }
         return currentValues;
     }
