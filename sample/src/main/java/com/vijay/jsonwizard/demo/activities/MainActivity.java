@@ -12,17 +12,27 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+
+import com.vijay.jsonwizard.activities.JsonFormActivity;
+import com.vijay.jsonwizard.constants.JsonFormConstants;
+import com.vijay.jsonwizard.demo.R;
+import com.vijay.jsonwizard.demo.utils.CommonUtils;
+import com.vijay.jsonwizard.utils.JsonFormUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 /**
  * Created by vijay on 5/16/15.
  */
 public class MainActivity extends AppCompatActivity {
 
-    private static final int    REQUEST_CODE_GET_JSON = 1;
+    private static final int REQUEST_CODE_GET_JSON = 1;
 
-    private static final String TAG                   = "MainActivity";
-    private static final String DATA_JSON_PATH        = "form.json";
-    private static final String COMPLETE_JSON_PATH        = "complete.json";
+    private static final String TAG = "MainActivity";
+    private static final String DATA_JSON_PATH = "form.json";
+    private static final String COMPLETE_JSON_PATH = "complete.json";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -32,9 +42,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, JsonFormActivity.class);
-                String json = CommonUtils.loadJSONFromAsset(getApplicationContext(), DATA_JSON_PATH);
+                String json = CommonUtils
+                        .loadJSONFromAsset(getApplicationContext(), DATA_JSON_PATH);
                 intent.putExtra("json", json);
-                intent.putExtra("resolver", "com.vijay.jsonwizard.demo.expressions.AssetsContentResolver");
+                intent.putExtra("resolver",
+                        "com.vijay.jsonwizard.demo.expressions.AssetsContentResolver");
                 //intent.putExtra(JsonFormConstants.ORIENTATION_EXTRA, JsonFormConstants.ORIENTATION_LANDSCAPE);
                 //intent.putExtra(JsonFormConstants.INPUT_METHOD_EXTRA, JsonFormConstants.INPUT_METHOD_HIDDEN);
                 startActivityForResult(intent, REQUEST_CODE_GET_JSON);
@@ -44,9 +56,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, JsonFormActivity.class);
-                String json = CommonUtils.loadJSONFromAsset(getApplicationContext(), COMPLETE_JSON_PATH);
+                String json = CommonUtils
+                        .loadJSONFromAsset(getApplicationContext(), COMPLETE_JSON_PATH);
                 intent.putExtra("json", json);
-                intent.putExtra(JsonFormConstants.VISUALIZATION_MODE_EXTRA, JsonFormConstants.VISUALIZATION_MODE_READ_ONLY);
+                intent.putExtra(JsonFormConstants.VISUALIZATION_MODE_EXTRA,
+                        JsonFormConstants.VISUALIZATION_MODE_READ_ONLY);
                 startActivityForResult(intent, REQUEST_CODE_GET_JSON);
             }
         });
@@ -55,8 +69,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE_GET_JSON && resultCode == RESULT_OK) {
-            Log.d(TAG, data.getStringExtra("json"));
-        }else if (requestCode == REQUEST_CODE_GET_JSON && resultCode == JsonFormConstants.RESULT_JSON_PARSE_ERROR) {
+            String json = data.getStringExtra("json");
+            Log.d(TAG, json);
+            JSONObject result = extractDataFromForm(json);
+            Log.d(TAG, result.toString());
+        } else if (requestCode == REQUEST_CODE_GET_JSON
+                && resultCode == JsonFormConstants.RESULT_JSON_PARSE_ERROR) {
             AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
             alertDialog.setTitle("Error");
             alertDialog.setMessage((CharSequence) data.getData().toString());
@@ -69,5 +87,16 @@ public class MainActivity extends AppCompatActivity {
             alertDialog.show();
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+
+    private static JSONObject extractDataFromForm(String form) {
+        try {
+            return JsonFormUtils
+                    .extractDataFromForm((JSONObject) new JSONTokener(form).nextValue());
+        } catch (JSONException e) {
+            Log.e(TAG, "Error parsing JSON document", e);
+        }
+        return null;
     }
 }

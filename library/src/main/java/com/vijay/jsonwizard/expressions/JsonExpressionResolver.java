@@ -63,13 +63,13 @@ public class JsonExpressionResolver {
         return expression.substring(pos);
     }
 
-//    public String resolveAsString(String expression) throws JSONException {
-//        JSONArray array = dataDocumentContext.read(expression);
-//        if (array.length() == 0) {
-//            return null;
-//        }
-//        return array.getString(0);
-//    }
+    public String resolveAsString(String expression, JSONObject instance) throws JSONException {
+        JSONArray array = resolveExpression(expression,instance);
+        if (array.length() == 0) {
+            return null;
+        }
+        return array.getString(0);
+    }
 //
 //    public JSONObject resolveAsObject(String expression) throws JSONException {
 //        JSONArray array = dataDocumentContext.read(expression);
@@ -80,6 +80,18 @@ public class JsonExpressionResolver {
 //    }
 
     public JSONArray resolveAsArray(String expression, JSONObject instance) throws JSONException {
+        JSONArray array = resolveExpression(expression,instance);
+        if (array.length() == 0) {
+            return null;
+        }
+        Object item = array.get(0);
+        if (item instanceof JSONArray) {
+            return (JSONArray) item;
+        }
+        return array;
+    }
+
+    private JSONArray resolveExpression(String expression, JSONObject instance) throws JSONException {
         String localExpression = expression;
         String externalReference = extractExternalContentReference(expression);
 
