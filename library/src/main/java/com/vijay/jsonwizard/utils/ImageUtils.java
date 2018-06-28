@@ -1,5 +1,8 @@
 package com.vijay.jsonwizard.utils;
 
+import java.io.File;
+import java.io.FileOutputStream;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,6 +16,7 @@ import android.view.WindowManager;
  */
 public class ImageUtils {
 
+    private static final String TAG = "ImageUtils";
     private static LruCache<String, Bitmap> mBitmapLruCache = new LruCache<>(10000000);
 
     public static Bitmap loadBitmapFromFile(String path, int requiredWidth, int requiredHeight) {
@@ -62,5 +66,26 @@ public class ImageUtils {
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
         return display.getWidth();
+    }
+
+    public static boolean saveToFile(Bitmap bitmap, File file){
+        final int COMPRESSION_RATIO = 80;
+        try {
+                // Create folder if doesn't exist
+            File folder = new File(file.getParent());
+            if (!folder.exists()) {
+                folder.mkdirs();
+            }
+
+            FileOutputStream fos = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, COMPRESSION_RATIO, fos);
+            fos.flush();
+            fos.close();
+
+            return true;
+        } catch (Exception e) {
+            Log.e(TAG, "Error compressing bitmap", e);
+        }
+        return false;
     }
 }

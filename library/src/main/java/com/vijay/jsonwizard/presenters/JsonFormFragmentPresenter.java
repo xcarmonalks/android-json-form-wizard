@@ -1,20 +1,12 @@
 package com.vijay.jsonwizard.presenters;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
-import android.provider.MediaStore;
-import android.support.annotation.Nullable;
-import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.CompoundButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.Toast;
+import java.io.File;
+import java.util.Date;
+import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rey.material.widget.Switch;
@@ -26,9 +18,10 @@ import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.fragments.JsonFormFragment;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interactors.JsonFormInteractor;
-import com.vijay.jsonwizard.interfaces.JsonApi;
 import com.vijay.jsonwizard.mvp.MvpBasePresenter;
+import com.vijay.jsonwizard.utils.CarouselAdapter;
 import com.vijay.jsonwizard.utils.DateUtils;
+import com.vijay.jsonwizard.utils.ImagePicker;
 import com.vijay.jsonwizard.utils.ImageUtils;
 import com.vijay.jsonwizard.utils.JsonFormUtils;
 import com.vijay.jsonwizard.utils.ValidationStatus;
@@ -38,18 +31,27 @@ import com.vijay.jsonwizard.widgets.DatePickerFactory;
 import com.vijay.jsonwizard.widgets.EditTextFactory;
 import com.vijay.jsonwizard.widgets.ImagePickerFactory;
 import com.vijay.jsonwizard.widgets.SpinnerFactory;
+import com.yarolegovich.discretescrollview.DiscreteScrollView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.util.Log;
+import android.view.View;
+import android.view.ViewParent;
+import android.widget.AdapterView;
+import android.widget.CompoundButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import fr.ganfra.materialspinner.MaterialSpinner;
-
-import static com.vijay.jsonwizard.utils.FormUtils.dpToPixels;
 
 /**
  * Created by vijay on 5/14/15.
@@ -283,30 +285,31 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == RESULT_LOAD_IMG && resultCode == Activity.RESULT_OK && null != data) {
-            Uri selectedImage = data.getData();
-            String[] filePathColumn = {MediaStore.Images.Media.DATA};
-            // No need for null check on cursor
-            Cursor cursor = getView().getContext().getContentResolver()
-                    .query(selectedImage, filePathColumn, null, null, null);
-            cursor.moveToFirst();
-
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String imagePath = cursor.getString(columnIndex);
-            getView().updateRelevantImageView(ImageUtils.loadBitmapFromFile(imagePath, ImageUtils.getDeviceWidth(getView().getContext()), dpToPixels(getView().getContext(), 200)), imagePath, mCurrentKey);
-            cursor.close();
+        if (requestCode == RESULT_LOAD_IMG) {
+            Context context = getView().getContext();
+            Bitmap bitmap = ImagePicker.getImageFromResult(context, resultCode, data);
+            //
+            if(bitmap!=null) {
+                File image = new File(context.getExternalCacheDir(), System.currentTimeMillis()+".jpg");
+                ImageUtils.saveToFile(bitmap, image);
+                getView().updateRelevantImageView(bitmap, image.getAbsolutePath(), mCurrentKey);
+            }
         }
     }
 
     public void onClick(View v) {
-        String key = (String) v.getTag(R.id.key);
-        String type = (String) v.getTag(R.id.type);
-        if (JsonFormConstants.CHOOSE_IMAGE.equals(type)) {
-            getView().hideKeyBoard();
-            Intent galleryIntent = new Intent(Intent.ACTION_PICK,
-                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            mCurrentKey = key;
-            getView().startActivityForResult(galleryIntent, RESULT_LOAD_IMG);
+
+        if(checkFormPermissions()) {
+            String key = (String) v.getTag(R.id.key);
+            String type = (String) v.getTag(R.id.type);
+            if (JsonFormConstants.CHOOSE_IMAGE.equals(type)) {
+                getView().hideKeyBoard();
+           /*Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);*/
+                Intent pickerIntent = ImagePicker.getPickImageIntent(v.getContext());
+                mCurrentKey = key;
+                getView().startActivityForResult(pickerIntent, RESULT_LOAD_IMG);
+            }
         }
     }
 
@@ -334,6 +337,22 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         }
     }
 
+    public void onCurrentItemChanged(@Nullable CarouselAdapter.ViewHolder holder, int position) {
+        if (holder != null) {
+            ViewParent parent = holder.itemView.getParent();
+            if (parent instanceof DiscreteScrollView){
+                DiscreteScrollView dsvParent = (DiscreteScrollView) parent;
+                String parentKey = (String) dsvParent.getTag(R.id.key);
+                View view = holder.itemView.findViewById(R.id.text);
+                if(view instanceof TextView){
+                    TextView textView = (TextView) view;
+                    String value = textView.getText().toString();
+                    getView().writeValue(mStepName, parentKey, value);
+                }
+            }
+        }
+    }
+
     public void onSwitchOnOrOff(Switch v, boolean checked) {
         String key = (String) v.getTag(R.id.key);
         getView().writeValue(mStepName, key, String.valueOf(checked));
@@ -353,5 +372,33 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
 
     public void setVisualizationMode(int visualizationMode){
         this.mVisualizationMode = visualizationMode;
+    }
+
+    private boolean checkFormPermissions(){
+
+        int PERMISSION_ALL = 1;
+        String[] PERMISSIONS = {
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.CAMERA
+        };
+
+        if(!hasPermissions(getView().getContext(), PERMISSIONS)){
+            JsonFormFragment formFragment = (JsonFormFragment) getView();
+            ActivityCompat.requestPermissions(formFragment.getActivity(), PERMISSIONS, PERMISSION_ALL);
+        }else{
+            return true;
+        }
+        return false;
+    }
+
+    private boolean hasPermissions(Context context, String... permissions) {
+        if (context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

@@ -1,10 +1,10 @@
 package com.vijay.jsonwizard.widgets;
 
-import com.vijay.jsonwizard.constants.JsonFormConstants;
-import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import com.vijay.jsonwizard.constants.JsonFormConstants;
+import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
 
 /**
  * Created by jurkiri on 23/11/17.
@@ -24,6 +24,7 @@ public class WidgetFactoryRegistry {
         map.put(JsonFormConstants.DATE_PICKER, new DatePickerFactory());
         map.put(JsonFormConstants.EDIT_GROUP, new EditGroupFactory());
         map.put(JsonFormConstants.SEPARATOR, new SeparatorFactory());
+        map.put(JsonFormConstants.CAROUSEL, new CarouselFactory());
     }
 
     public static FormWidgetFactory getWidgetFactory(String type) {

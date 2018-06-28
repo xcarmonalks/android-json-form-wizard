@@ -1,11 +1,31 @@
 package com.vijay.jsonwizard.fragments;
 
+import java.util.List;
+import java.util.Locale;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.rey.material.widget.Switch;
+import com.vijay.jsonwizard.R;
+import com.vijay.jsonwizard.activities.JsonFormActivity;
+import com.vijay.jsonwizard.customviews.RadioButton;
+import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
+import com.vijay.jsonwizard.i18n.JsonFormBundle;
+import com.vijay.jsonwizard.interfaces.CommonListener;
+import com.vijay.jsonwizard.interfaces.JsonApi;
+import com.vijay.jsonwizard.mvp.MvpFragment;
+import com.vijay.jsonwizard.presenters.JsonFormFragmentPresenter;
+import com.vijay.jsonwizard.utils.CarouselAdapter;
+import com.vijay.jsonwizard.views.JsonFormFragmentView;
+import com.vijay.jsonwizard.viewstates.JsonFormFragmentViewState;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -22,26 +42,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.Toast;
-
-import com.rey.material.widget.Switch;
-import com.vijay.jsonwizard.R;
-import com.vijay.jsonwizard.activities.JsonFormActivity;
-import com.vijay.jsonwizard.constants.JsonFormConstants;
-import com.vijay.jsonwizard.customviews.RadioButton;
-import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
-import com.vijay.jsonwizard.i18n.JsonFormBundle;
-import com.vijay.jsonwizard.interfaces.CommonListener;
-import com.vijay.jsonwizard.interfaces.JsonApi;
-import com.vijay.jsonwizard.mvp.MvpFragment;
-import com.vijay.jsonwizard.presenters.JsonFormFragmentPresenter;
-import com.vijay.jsonwizard.views.JsonFormFragmentView;
-import com.vijay.jsonwizard.viewstates.JsonFormFragmentViewState;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.List;
-import java.util.Locale;
 
 /**
  * Created by vijay on 5/7/15.
@@ -151,6 +151,8 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
                     imageView.setImageBitmap(bitmap);
                     imageView.setVisibility(View.VISIBLE);
                     imageView.setTag(R.id.imagePath, imagePath);
+                    //imageView.setAdjustViewBounds(true);
+                    imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
                 }
             }
         }
@@ -345,5 +347,26 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
     @Override
     public JsonExpressionResolver getExpressionResolver() {
         return mJsonApi.getExpressionResolver();
+    }
+
+    @Override
+    public void onCurrentItemChanged(@Nullable CarouselAdapter.ViewHolder viewHolder, int adapterPosition) {
+        presenter.onCurrentItemChanged(viewHolder, adapterPosition);
+    }
+
+    @Override
+    public void onScrollStart(@NonNull CarouselAdapter.ViewHolder currentItemHolder, int adapterPosition) {
+
+    }
+
+    @Override
+    public void onScrollEnd(@NonNull CarouselAdapter.ViewHolder currentItemHolder, int adapterPosition) {
+
+    }
+
+    @Override
+    public void onScroll(float scrollPosition, int currentPosition, int newPosition, @Nullable CarouselAdapter
+            .ViewHolder currentHolder, @Nullable CarouselAdapter.ViewHolder newCurrent) {
+
     }
 }

@@ -9,7 +9,8 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".activities.MainActivity"
-            android:label="@string/library_name" >
+            android:label="@string/library_name"
+            android:configChanges="orientation|screenSize|keyboardHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -18,10 +19,12 @@
         </activity>
         <activity
             android:name="com.vijay.jsonwizard.activities.JsonFormActivity"
-            android:label="@string/library_name" >
-        </activity>
+            android:label="@string/library_name"
+            android:configChanges="orientation|screenSize|keyboardHidden"/>
     </application>
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-feature android:name="android.hardware.camera" android:required="true" />
 </manifest>

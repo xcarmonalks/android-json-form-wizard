@@ -1,24 +1,22 @@
 package com.vijay.jsonwizard.demo.activities;
 
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.res.Configuration;
-import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.AlertDialog;
-import android.util.Log;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-
 import com.vijay.jsonwizard.activities.JsonFormActivity;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.demo.R;
 import com.vijay.jsonwizard.demo.utils.CommonUtils;
 
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.View;
+
 /**
  * Created by vijay on 5/16/15.
  */
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity {
 
     private static final int    REQUEST_CODE_GET_JSON = 1;
 

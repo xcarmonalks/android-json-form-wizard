@@ -1,14 +1,14 @@
 package com.vijay.jsonwizard.mvp;
 
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 
 /**
  * Created by vijay on 4/21/15.
  */
-public abstract class BaseActivity<VS extends ViewState> extends ActionBarActivity {
+public abstract class BaseActivity<VS extends ViewState> extends AppCompatActivity {
     // @Icicle
     protected VS mViewState;
 

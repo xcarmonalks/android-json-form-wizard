@@ -1,7 +1,5 @@
 package com.vijay.jsonwizard.constants;
 
-import android.content.res.Configuration;
-
 /**
  * Created by vijay on 5/7/15.
  */
@@ -19,6 +17,7 @@ public class JsonFormConstants {
     public static final String DATE_PICKER = "date_picker";
     public static final String EDIT_GROUP = "edit_group";
     public static final String SEPARATOR = "separator";
+    public static final String CAROUSEL = "carousel";
 
     public static final String ORIENTATION_EXTRA = "screen_orientation";
     public static final int ORIENTATION_LANDSCAPE = 2;
