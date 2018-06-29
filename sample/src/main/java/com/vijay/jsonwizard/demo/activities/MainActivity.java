@@ -1,9 +1,14 @@
 package com.vijay.jsonwizard.demo.activities;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
 import com.vijay.jsonwizard.activities.JsonFormActivity;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.demo.R;
 import com.vijay.jsonwizard.demo.utils.CommonUtils;
+import com.vijay.jsonwizard.utils.JsonFormUtils;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,16 +17,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-
-import com.vijay.jsonwizard.activities.JsonFormActivity;
-import com.vijay.jsonwizard.constants.JsonFormConstants;
-import com.vijay.jsonwizard.demo.R;
-import com.vijay.jsonwizard.demo.utils.CommonUtils;
-import com.vijay.jsonwizard.utils.JsonFormUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 
 /**
  * Created by vijay on 5/16/15.

@@ -1,22 +1,21 @@
 package com.vijay.jsonwizard.expressions;
 
-import java.util.EnumSet;
-import java.util.Set;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import android.util.Log;
+import android.util.LruCache;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.InvalidPathException;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.spi.json.JsonOrgJsonProvider;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import com.jayway.jsonpath.spi.mapper.JsonOrgMappingProvider;
 import com.jayway.jsonpath.spi.mapper.MappingProvider;
-
-import android.util.Log;
+import java.util.EnumSet;
+import java.util.Set;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class JsonExpressionResolver {
 
@@ -84,7 +83,7 @@ public class JsonExpressionResolver {
         if (array.length() == 0) {
             return null;
         }
-        Object item = array.get(0);
+        Object item = array.opt(0);
         if (item instanceof JSONArray) {
             return (JSONArray) item;
         }
@@ -121,13 +120,6 @@ public class JsonExpressionResolver {
 
         localContext.delete("current-values");
 
-        if (array.length() == 0) {
-            return null;
-        }
-        Object item = array.opt(0);
-        if (item instanceof JSONArray) {
-            return (JSONArray) item;
-        }
         return array;
     }
 
