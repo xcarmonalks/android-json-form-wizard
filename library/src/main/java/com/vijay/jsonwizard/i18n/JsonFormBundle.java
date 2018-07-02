@@ -1,8 +1,8 @@
 package com.vijay.jsonwizard.i18n;
 
 import android.text.TextUtils;
+import android.util.Log;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -16,8 +16,12 @@ import java.util.Map;
  */
 public class JsonFormBundle {
 
+    private static final String TAG = "JsonFormBundle";
+
     private static final String BUNDLE_KEY_PREFIX = "${";
     private static final String BUNDLE_KEY_SUFIX = "}";
+
+    private static final String BUNDLE_DEFAULT_PROPERTY = "default";
 
     private final Map<String, String> mBundle;
 
@@ -39,13 +43,36 @@ public class JsonFormBundle {
     }
 
     private void loadBundle(JSONObject bundle, String country) throws JSONException {
-        if(bundle.has(country)){
-            JSONObject translations = bundle.getJSONObject(country);
+        String lang = country;
+        if(!bundle.has(lang)){
+            lang = getDefaultLang(bundle);
+        }
+        if(!"".equals(lang)){
+            JSONObject translations = bundle.getJSONObject(lang);
             Iterator<String> transIter = translations.keys();
             while(transIter.hasNext()){
                 String key = transIter.next();
                 mBundle.put(key, translations.getString(key));
             }
         }
+    }
+
+    private String getDefaultLang(JSONObject bundle) {
+        String defLang = "";
+        for(int i = 0; i< bundle.names().length(); i++){
+            try {
+                String currentLang = bundle.names().getString(i);
+                if("".equals(defLang)){
+                    defLang = currentLang;
+                }
+                JSONObject translations = bundle.getJSONObject(currentLang);
+                if(translations.optBoolean(BUNDLE_DEFAULT_PROPERTY)) {
+                    return currentLang;
+                }
+            } catch (JSONException e) {
+                Log.e(TAG, e.getMessage(), e);
+            }
+        }
+        return defLang;
     }
 }
