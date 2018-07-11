@@ -22,7 +22,9 @@ public class LengthValidator extends METValidator {
             if(charSequence.length() >= minLength && charSequence.length() <= maxLength) {
                 return true;
             }
+            return false;
+        } else{
+            return true;
         }
-        return false;
     }
 }
