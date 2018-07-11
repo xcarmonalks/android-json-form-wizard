@@ -57,7 +57,7 @@ public class ImagePickerFactory implements FormWidgetFactory {
         }
         views.add(imageView);
         Button uploadButton = new Button(context);
-        uploadButton.setText(jsonObject.getString("uploadButtonText"));
+        uploadButton.setText(bundle.resolveKey(jsonObject.getString("uploadButtonText")));
         uploadButton.setLayoutParams(getLayoutParams(WRAP_CONTENT, WRAP_CONTENT, 0, 0, 0, (int) context
                 .getResources().getDimension(R.dimen.default_bottom_margin)));
         uploadButton.setOnClickListener(listener);

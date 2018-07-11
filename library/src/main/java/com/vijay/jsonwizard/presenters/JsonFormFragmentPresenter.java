@@ -122,7 +122,8 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
             if (!mStepName.equals(JsonFormConstants.FIRST_STEP_NAME)) {
                 getView().setUpBackButton();
             }
-            getView().setActionBarTitle(mStepDetails.optString("title"));
+            JsonFormBundle bundle = getView().getBundle(getView().getContext().getResources().getConfiguration().locale);
+            getView().setActionBarTitle(bundle.resolveKey(mStepDetails.optString("title")));
             if (mStepDetails.has("next")) {
                 getView().updateVisibilityOfNextAndSave(true, false);
             } else {
