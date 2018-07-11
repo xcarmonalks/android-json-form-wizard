@@ -78,7 +78,8 @@ public class CarouselAdapter extends RecyclerView.Adapter<CarouselAdapter.ViewHo
                     .load(R.mipmap.error_icon)
                     .into(holder.image);
         }
-        holder.text.setText(data.get(position).getName());
+        holder.name.setText(data.get(position).getName());
+        holder.value.setText(data.get(position).getValue());
     }
 
     @Override
@@ -98,12 +99,14 @@ public class CarouselAdapter extends RecyclerView.Adapter<CarouselAdapter.ViewHo
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private ImageView image;
-        private TextView text;
+        private TextView name;
+        private TextView value;
 
         public ViewHolder(View itemView) {
             super(itemView);
             image = (ImageView) itemView.findViewById(R.id.image);
-            text = (TextView) itemView.findViewById(R.id.text);
+            name = (TextView) itemView.findViewById(R.id.name);
+            value = (TextView) itemView.findViewById(R.id.value);
         }
 
         @Override
