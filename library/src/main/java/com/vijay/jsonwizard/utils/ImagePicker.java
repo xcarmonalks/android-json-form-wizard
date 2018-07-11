@@ -27,7 +27,6 @@ import android.util.Log;
  */
 public class ImagePicker {
 
-    private static final int DEFAULT_PIXEL_QUALITY = 1600;        // min pixels
     private static final String TAG = "ImagePicker";
     private static final String TEMP_IMAGE_NAME = "tempImage";
 
