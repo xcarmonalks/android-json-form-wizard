@@ -27,6 +27,7 @@ import com.vijay.jsonwizard.utils.JsonFormUtils;
 import com.vijay.jsonwizard.utils.ValidationStatus;
 import com.vijay.jsonwizard.views.JsonFormFragmentView;
 import com.vijay.jsonwizard.viewstates.JsonFormFragmentViewState;
+import com.vijay.jsonwizard.widgets.CarouselFactory;
 import com.vijay.jsonwizard.widgets.DatePickerFactory;
 import com.vijay.jsonwizard.widgets.EditTextFactory;
 import com.vijay.jsonwizard.widgets.ImagePickerFactory;
@@ -267,7 +268,13 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                 } else {
                     spinner.setError(null);
                 }
-            } else if (childAt instanceof LinearLayout) {
+            } else if (childAt instanceof DiscreteScrollView) {
+            DiscreteScrollView dsv = (DiscreteScrollView) childAt;
+            ValidationStatus validationStatus = CarouselFactory.validate(dsv);
+            if (!validationStatus.isValid()) {
+                return validationStatus;
+            }
+        }  else if (childAt instanceof LinearLayout) {
                 writeValuesAndValidate((LinearLayout) childAt);
             }
         }
@@ -341,14 +348,17 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
     public void onCurrentItemChanged(@Nullable CarouselAdapter.ViewHolder holder, int position) {
         if (holder != null) {
             ViewParent parent = holder.itemView.getParent();
-            if (parent instanceof DiscreteScrollView){
+            if (parent !=null && parent instanceof DiscreteScrollView){
                 DiscreteScrollView dsvParent = (DiscreteScrollView) parent;
                 String parentKey = (String) dsvParent.getTag(R.id.key);
-                View view = holder.itemView.findViewById(R.id.text);
-                if(view instanceof TextView){
+                View view = holder.itemView.findViewById(R.id.value);
+                if(view != null && view instanceof TextView){
                     TextView textView = (TextView) view;
                     String value = textView.getText().toString();
-                    getView().writeValue(mStepName, parentKey, value);
+                    JsonFormFragmentView jffview = getView();
+                    if(jffview!=null) {
+                        jffview.writeValue(mStepName, parentKey, value);
+                    }
                 }
             }
         }

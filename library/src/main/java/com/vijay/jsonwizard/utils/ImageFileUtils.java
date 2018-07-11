@@ -27,8 +27,8 @@ public class ImageFileUtils {
 
     private static final String TAG = "ImageFileUtils";
 
-    private static final int IMAGE_MAX_SIZE = 1600;
-    private static final int IMAGE_COMPRESSION_RATIO = 80;
+    public static final int IMAGE_MAX_SIZE = 1600;
+    public static final int IMAGE_COMPRESSION_RATIO = 80;
 
     public static String processImageFromFile(String filePath) {
         Bitmap tempImage;

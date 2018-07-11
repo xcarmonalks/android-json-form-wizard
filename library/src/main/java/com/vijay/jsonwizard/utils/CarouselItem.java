@@ -7,15 +7,21 @@ package com.vijay.jsonwizard.utils;
 public class CarouselItem {
 
     private final String name;
+    private final String value;
     private final String image;
 
-    public CarouselItem(String name, String image) {
+    public CarouselItem(String name, String value, String image) {
         this.name = name;
+        this.value = value;
         this.image = image;
     }
 
     public String getName() {
         return name;
+    }
+
+    public String getValue() {
+        return value;
     }
 
     public String getImage() {

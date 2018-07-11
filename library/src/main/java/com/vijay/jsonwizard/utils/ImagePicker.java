@@ -27,11 +27,8 @@ import android.util.Log;
  */
 public class ImagePicker {
 
-    private static final int DEFAULT_MIN_WIDTH_QUALITY = 400;        // min pixels
     private static final String TAG = "ImagePicker";
     private static final String TEMP_IMAGE_NAME = "tempImage";
-
-    public static int minWidthQuality = DEFAULT_MIN_WIDTH_QUALITY;
 
 
     public static Intent getPickImageIntent(Context context) {
@@ -124,14 +121,8 @@ public class ImagePicker {
      * Resize to avoid using too much memory loading big images (e.g.: 2560*1920)
      **/
     private static Bitmap getImageResized(Context context, Uri selectedImage) {
-        Bitmap bm = null;
-        int[] sampleSizes = new int[]{5, 3, 2, 1};
-        int i = 0;
-        do {
-            bm = decodeBitmap(context, selectedImage, sampleSizes[i]);
-            Log.d(TAG, "resizer: new bitmap width = " + bm.getWidth());
-            i++;
-        } while (bm.getWidth() < minWidthQuality && i < sampleSizes.length);
+        Bitmap bm = decodeBitmap(context, selectedImage, 1);
+        bm = ImageFileUtils.scaleToFit(bm, ImageFileUtils.IMAGE_MAX_SIZE);
         return bm;
     }
 

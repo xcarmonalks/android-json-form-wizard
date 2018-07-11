@@ -33,9 +33,6 @@ import java.util.List;
  */
 public class EditTextFactory implements FormWidgetFactory {
 
-    public static final int MIN_LENGTH = 0;
-    public static final int MAX_LENGTH = 100;
-
     @Override
     public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener, JsonFormBundle bundle,JsonExpressionResolver resolver, int visualizationMode) throws JSONException {
         List<View> views = null;
@@ -55,8 +52,8 @@ public class EditTextFactory implements FormWidgetFactory {
             return getReadOnlyViewsFromJson(context, jsonObject, bundle);
         }
 
-        int minLength = MIN_LENGTH;
-        int maxLength= MAX_LENGTH;
+        int minLength;
+        int maxLength;
         List<View> views = new ArrayList<>(1);
         MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(
                 R.layout.item_edit_text, null);
@@ -94,6 +91,7 @@ public class EditTextFactory implements FormWidgetFactory {
             if (!TextUtils.isEmpty(minLengthValue)) {
                 minLength = Integer.parseInt(minLengthValue);
                 editText.addValidator(new MinLengthValidator(bundle.resolveKey(minLengthObject.getString("err")), Integer.parseInt(minLengthValue)));
+                editText.setMinCharacters(minLength);
             }
         }
 
@@ -103,11 +101,9 @@ public class EditTextFactory implements FormWidgetFactory {
             if (!TextUtils.isEmpty(maxLengthValue)) {
                 maxLength = Integer.parseInt(maxLengthValue);
                 editText.addValidator(new MaxLengthValidator(bundle.resolveKey(maxLengthObject.getString("err")), Integer.parseInt(maxLengthValue)));
+                editText.setMaxCharacters(maxLength);
             }
         }
-
-        editText.setMaxCharacters(maxLength);
-        editText.setMinCharacters(minLength);
 
         JSONObject regexObject = jsonObject.optJSONObject("v_regex");
         if(regexObject != null) {

@@ -35,8 +35,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import fr.ganfra.materialspinner.MaterialSpinner;
-
 /**
  * Created by xcarmona on 21/06/18.
  */
@@ -68,6 +66,14 @@ public class CarouselFactory implements FormWidgetFactory {
         scrollView.setTag(R.id.type, jsonObject.getString("type"));
 
         //Skip required part. One is always selected
+        JSONObject requiredObject = jsonObject.optJSONObject("v_required");
+        if (requiredObject != null) {
+            String requiredValue = requiredObject.getString("value");
+            if (!TextUtils.isEmpty(requiredValue)) {
+                scrollView.setTag(R.id.v_required, requiredValue);
+                scrollView.setTag(R.id.error, bundle.resolveKey(requiredObject.optString("err")));
+            }
+        }
 
         String valueToSelect = "";
         int indexToSelect = -1;
@@ -86,17 +92,9 @@ public class CarouselFactory implements FormWidgetFactory {
             valuesJson = resolver.resolveAsArray(valuesExpression,currentValues);
         }
 
-        String[] values = getValues(valuesJson);
-        String otherOption = bundle.resolveKey(jsonObject.optString("other"));
-        if (!TextUtils.isEmpty(otherOption)) {
-            List<String> valuesWithOther = new ArrayList<>(Arrays.asList(values));
-            valuesWithOther.add(otherOption);
-            values = valuesWithOther.toArray(values);
-        }
-
         String imagesExpression = getImagesAsJsonExpression(jsonObject, resolver);
 
-        JSONArray imagesJson = null;
+        JSONArray imagesJson;
         if(imagesExpression == null){
             imagesJson = jsonObject.optJSONArray("images");
         } else {
@@ -104,21 +102,43 @@ public class CarouselFactory implements FormWidgetFactory {
             imagesJson = resolver.resolveAsArray(imagesExpression,currentValues);
         }
 
+        String[] values = getValues(valuesJson);
+        String[] names;
         String[] images = getValues(imagesJson);
-        String[] imagesWithOther = new String[images.length+1];
-        System.arraycopy(images,0, imagesWithOther, 0, images.length);
-        imagesWithOther[images.length]=Integer.toString(R.mipmap.other_icon); // Add option for other
+
+        List<String> listValues = new ArrayList<>(Arrays.asList(values));
+        List<String> listNames = new ArrayList<>(Arrays.asList(values));
+        List<String> listImages = new ArrayList<>(Arrays.asList(images));
+
+
+        String otherOption = bundle.resolveKey(jsonObject.optString("other"));
+        String chooseOption = bundle.resolveKey(jsonObject.optString("hint"));
+        chooseOption = (TextUtils.isEmpty(chooseOption)) ? context.getString(R.string.image_picker) : chooseOption;
+
+        //Add choose option
+        listValues.add(0, null);
+        listNames.add(0, chooseOption);
+        listImages.add(0, Integer.toString(R.mipmap.choose_icon));
+
+        if(!TextUtils.isEmpty(otherOption)){
+            //Add other option
+            listValues.add(otherOption);
+            listNames.add(otherOption);
+            listImages.add(Integer.toString(R.mipmap.other_icon));
+        }
+
+        values = listValues.toArray(values);
 
         indexToSelect = getSelectedIdx(values, valueToSelect);
 
-        if (values != null) {
+        if (values != null && values.length > 1) {
             List<CarouselItem> data = new ArrayList<>();
-            for (int i = 0; i<values.length; i++){
-                String imagePath = imagesWithOther[i];
-                if(!TextUtils.isEmpty(imagesWithOther[i]) && !isInteger(imagesWithOther[i])) {
-                    imagePath = moveAssetToCache(context, imagesWithOther[i], "imagenes");
+            for (int i = 0; i<listValues.size(); i++){
+                String imagePath = listImages.get(i);
+                if(!TextUtils.isEmpty(imagePath) && !isInteger(imagePath)) {
+                    imagePath = moveAssetToCache(context, imagePath, "imagenes");
                 }
-                data.add(new CarouselItem(values[i], imagePath));
+                data.add(new CarouselItem(listNames.get(i), listValues.get(i), imagePath));
             }
             scrollView.setOrientation(DSVOrientation.HORIZONTAL);
             scrollView.setSlideOnFling(true);
@@ -127,7 +147,7 @@ public class CarouselFactory implements FormWidgetFactory {
             scrollView.addOnItemChangedListener(listener);
             scrollView.scrollToPosition(indexToSelect);
 
-            scrollView.setItemTransitionTimeMillis(150);
+            scrollView.setItemTransitionTimeMillis(120);
             scrollView.setItemTransformer(new ScaleTransformer.Builder().setMinScale(0.8f).build());
 
         }
@@ -204,19 +224,19 @@ public class CarouselFactory implements FormWidgetFactory {
         return views;
     }
 
-    public static ValidationStatus validate(MaterialSpinner spinner) {
-        if (!(spinner.getTag(R.id.v_required) instanceof String) || !(spinner.getTag(R.id.error) instanceof String)) {
+    public static ValidationStatus validate(DiscreteScrollView dsv) {
+        if (!(dsv.getTag(R.id.v_required) instanceof String) || !(dsv.getTag(R.id.error) instanceof String)) {
             return new ValidationStatus(true, null);
         }
-        Boolean isRequired = Boolean.valueOf((String) spinner.getTag(R.id.v_required));
+        Boolean isRequired = Boolean.valueOf((String) dsv.getTag(R.id.v_required));
         if (!isRequired) {
             return new ValidationStatus(true, null);
         }
-        int selectedItemPosition = spinner.getSelectedItemPosition();
+        int selectedItemPosition = dsv.getCurrentItem();
         if(selectedItemPosition > 0) {
             return new ValidationStatus(true, null);
         }
-        return new ValidationStatus(false, (String) spinner.getTag(R.id.error));
+        return new ValidationStatus(false, (String) dsv.getTag(R.id.error));
     }
 
     private static String moveAssetToCache(Context context, String assetName, String assetFolderName){
@@ -233,7 +253,9 @@ public class CarouselFactory implements FormWidgetFactory {
             FileOutputStream fos = new FileOutputStream(f);
             fos.write(buffer);
             fos.close();
-        } catch (Exception e) { throw new RuntimeException(e); }
+        } catch (Exception e) {
+            return null;
+        }
         return f.getAbsolutePath();
     }
 
