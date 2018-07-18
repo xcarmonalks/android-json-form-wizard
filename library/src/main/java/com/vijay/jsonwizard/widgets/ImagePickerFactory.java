@@ -43,7 +43,7 @@ public class ImagePickerFactory implements FormWidgetFactory {
             String requiredValue = requiredObject.getString("value");
             if (!TextUtils.isEmpty(requiredValue)) {
                 imageView.setTag(R.id.v_required, requiredValue);
-                imageView.setTag(R.id.error, requiredObject.optString("err"));
+                imageView.setTag(R.id.error, bundle.resolveKey(requiredObject.optString("err")));
             }
         }
 
