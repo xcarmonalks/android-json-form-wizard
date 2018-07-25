@@ -47,7 +47,7 @@ public class ImagePickerFactory implements FormWidgetFactory {
             }
         }
 
-        imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         imageView.setLayoutParams(getLayoutParams(MATCH_PARENT, dpToPixels(context, 200), 0, 0, 0, (int) context
                 .getResources().getDimension(R.dimen.default_bottom_margin)));
         String imagePath = jsonObject.optString("value");
