@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Surface;
 import android.view.WindowManager;
 
 import com.vijay.jsonwizard.R;
@@ -236,12 +237,17 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
         boolean launchInit = true;
         boolean hasOrientationExtra = getIntent().hasExtra(JsonFormConstants.ORIENTATION_EXTRA);
         int currentOrientation = getResources().getConfiguration().orientation;
+        final int rotation = this.getWindowManager().getDefaultDisplay().getRotation();
         int orientation = getIntent()
                 .getIntExtra(JsonFormConstants.ORIENTATION_EXTRA, currentOrientation);
         if (hasOrientationExtra) {
             launchInit = currentOrientation == orientation;
             if (JsonFormConstants.ORIENTATION_LANDSCAPE == orientation) {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                if (rotation == Surface.ROTATION_90) {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                } else if (rotation == Surface.ROTATION_270) {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+                }
             } else if (JsonFormConstants.ORIENTATION_PORTRAIT == orientation) {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             }

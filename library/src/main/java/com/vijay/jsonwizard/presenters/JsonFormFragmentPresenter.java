@@ -98,7 +98,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         JsonExpressionResolver resolver = getView().getExpressionResolver();
 
         List<View> views = getStepFormElements(stepName, step, bundle,resolver);
-        if(step.has("next")){
+        while(step.has("next")){
             try{
                 stepName = step.getString("next");
                 step = getView().getStep(stepName);
