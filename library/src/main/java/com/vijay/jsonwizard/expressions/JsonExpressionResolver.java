@@ -7,6 +7,7 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.InvalidPathException;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
+import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.spi.json.JsonOrgJsonProvider;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import com.jayway.jsonpath.spi.mapper.JsonOrgMappingProvider;
@@ -149,7 +150,13 @@ public class JsonExpressionResolver {
         if (instance != null) {
             localContext.put("$", "current-values", instance);
         }
-        JSONArray array = localContext.read(localExpression);
+        JSONArray array = new JSONArray();
+        try {
+            array = localContext.read(localExpression);
+        } catch (PathNotFoundException e) {
+            Log.d("ExpressionResolver", "existsExpression: checking for missing path "+localExpression);
+        }
+
         localContext.delete("current-values");
 
         return array.length() > 0;
