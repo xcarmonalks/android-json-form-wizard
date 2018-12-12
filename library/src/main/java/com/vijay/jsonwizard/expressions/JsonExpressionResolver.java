@@ -65,7 +65,10 @@ public class JsonExpressionResolver {
 
     public String resolveAsString(String expression, JSONObject instance) throws JSONException {
         JSONArray array = resolveExpression(expression,instance);
-        if (array.length() == 0) {
+        if (array == null || array.length() == 0) {
+            return null;
+        }
+        if (array.isNull(0)) {
             return null;
         }
         return array.getString(0);
@@ -159,7 +162,16 @@ public class JsonExpressionResolver {
 
         localContext.delete("current-values");
 
-        return array.length() > 0;
+        //Check if not null values are present
+        if (array!= null && array.length()>0) {
+            for (int i = 0; i <array.length() ; i++) {
+                if (!array.isNull(i)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     static {
