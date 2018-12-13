@@ -73,14 +73,6 @@ public class JsonExpressionResolver {
         }
         return array.getString(0);
     }
-//
-//    public JSONObject resolveAsObject(String expression) throws JSONException {
-//        JSONArray array = dataDocumentContext.read(expression);
-//        if (array.length() == 0) {
-//            return null;
-//        }
-//        return array.getJSONObject(0);
-//    }
 
     public JSONArray resolveAsArray(String expression, JSONObject instance) throws JSONException {
         JSONArray array = resolveExpression(expression,instance);
