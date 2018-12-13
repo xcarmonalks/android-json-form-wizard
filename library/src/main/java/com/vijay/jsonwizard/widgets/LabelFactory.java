@@ -55,7 +55,7 @@ public class LabelFactory implements FormWidgetFactory {
 
     private List<View> getAsLabel(String stepName, Context context, JSONObject jsonObject, CommonListener listener, JsonFormBundle bundle,JsonExpressionResolver resolver, int visualizationMode)  throws JSONException {
         List<View> views = new ArrayList<>(1);
-        LinearLayout.LayoutParams layoutParams = getLayoutParams(WRAP_CONTENT, WRAP_CONTENT, 0, 0, 0, (int) context
+        LinearLayout.LayoutParams layoutParams = getLayoutParams(WRAP_CONTENT, WRAP_CONTENT, 0, 0 , 0, (int) context
                 .getResources().getDimension(R.dimen.default_bottom_margin));
 
         String valuesExpression = getValuesAsJsonExpression(jsonObject, resolver);
