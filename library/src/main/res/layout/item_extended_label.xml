@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<org.sufficientlysecure.htmltextview.HtmlTextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/extra_bottom_margin"
+    android:layout_marginBottom="32dp"
+    android:layout_gravity="center"
+    android:padding="10dp"
+    android:background="@drawable/textview_border"
+    android:textAppearance="@android:style/TextAppearance.Small" />
+

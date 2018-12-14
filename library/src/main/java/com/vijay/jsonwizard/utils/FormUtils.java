@@ -2,6 +2,7 @@ package com.vijay.jsonwizard.utils;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.text.Spanned;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -25,6 +26,19 @@ public class FormUtils {
 
     public static TextView getTextViewWith(Context context, int textSizeInSp, String text, String key, String type,
                                            LinearLayout.LayoutParams layoutParams, String fontPath) {
+        TextView textView = new TextView(context);
+        textView.setText(text);
+        textView.setTag(R.id.key, key);
+        textView.setTag(R.id.type, type);
+        textView.setId(ViewUtil.generateViewId());
+        textView.setTextSize(textSizeInSp);
+        textView.setLayoutParams(layoutParams);
+        textView.setTypeface(Typeface.createFromAsset(context.getAssets(), fontPath));
+        return textView;
+    }
+
+    public static TextView getTextViewWith(Context context, int textSizeInSp, Spanned text, String key, String type,
+            LinearLayout.LayoutParams layoutParams, String fontPath) {
         TextView textView = new TextView(context);
         textView.setText(text);
         textView.setTag(R.id.key, key);

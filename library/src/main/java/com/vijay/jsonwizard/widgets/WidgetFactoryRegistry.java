@@ -25,6 +25,7 @@ public class WidgetFactoryRegistry {
         map.put(JsonFormConstants.EDIT_GROUP, new EditGroupFactory());
         map.put(JsonFormConstants.SEPARATOR, new SeparatorFactory());
         map.put(JsonFormConstants.CAROUSEL, new CarouselFactory());
+        map.put(JsonFormConstants.EXTENDED_LABEL, new ExtendedLabelFactory());
     }
 
     public static FormWidgetFactory getWidgetFactory(String type) {

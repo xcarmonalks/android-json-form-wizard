@@ -2,6 +2,7 @@ package com.vijay.jsonwizard.widgets;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.text.Html;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,7 +55,7 @@ public class LabelFactory implements FormWidgetFactory {
 
     private List<View> getAsLabel(String stepName, Context context, JSONObject jsonObject, CommonListener listener, JsonFormBundle bundle,JsonExpressionResolver resolver, int visualizationMode)  throws JSONException {
         List<View> views = new ArrayList<>(1);
-        LinearLayout.LayoutParams layoutParams = getLayoutParams(WRAP_CONTENT, WRAP_CONTENT, 0, 0, 0, (int) context
+        LinearLayout.LayoutParams layoutParams = getLayoutParams(WRAP_CONTENT, WRAP_CONTENT, 0, 0 , 0, (int) context
                 .getResources().getDimension(R.dimen.default_bottom_margin));
 
         String valuesExpression = getValuesAsJsonExpression(jsonObject, resolver);
@@ -69,7 +70,7 @@ public class LabelFactory implements FormWidgetFactory {
 
         boolean bold = jsonObject.optBoolean(BOLD_FIELD,true);
 
-        views.add(getTextViewWith(context, 16,textValue, jsonObject.getString(KEY_FIELD),
+        views.add(getTextViewWith(context, 16,Html.fromHtml(textValue), jsonObject.getString(KEY_FIELD),
                 jsonObject.getString(TYPE_FIELD), layoutParams, bold?FONT_BOLD_PATH:FONT_REGULAR_PATH));
 
         return views;
@@ -97,7 +98,7 @@ public class LabelFactory implements FormWidgetFactory {
             textValue = resolver.resolveAsString(valuesExpression,currentValues);
         }
 
-        editText.setText(textValue);
+        editText.setText(Html.fromHtml(textValue));
         editText.setEnabled(false);
         views.add(editText);
         return views;
