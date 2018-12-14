@@ -28,7 +28,7 @@ import org.sufficientlysecure.htmltextview.HtmlTextView;
 public class ExtendedLabelFactory implements FormWidgetFactory {
 
     private static final String TEXT_FIELD = "text";
-    private static final String PARAMS_FIELD = "hint";
+    private static final String PARAMS_FIELD = "params";
 
     @Override
     public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject,
@@ -51,17 +51,20 @@ public class ExtendedLabelFactory implements FormWidgetFactory {
         String valuesExpression = getValuesAsJsonExpression(jsonObject, resolver);
 
         String textValue = null;
+        JSONObject currentValues = null;
         if (valuesExpression == null) {
             textValue = bundle.resolveKey(jsonObject.getString(TEXT_FIELD));
         } else {
-            JSONObject currentValues = getCurrentValues(context);
+            currentValues = getCurrentValues(context);
             textValue = resolver.resolveAsString(valuesExpression, currentValues);
         }
 
         List<String> paramValues = new ArrayList<>();
         JSONArray params = jsonObject.optJSONArray(PARAMS_FIELD);
         if (params != null && params.length() > 0) {
-            JSONObject currentValues = getCurrentValues(context);
+            if (currentValues == null) {
+                currentValues = getCurrentValues(context);
+            }
             for (int i = 0; i < params.length(); i++) {
                 String expression = params.getString(i);
                 String value = "";
