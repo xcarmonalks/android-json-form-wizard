@@ -50,12 +50,16 @@ public class JsonFormUtils {
     }
 
     private static JSONObject findFieldInForm(JSONObject form, String key) throws JSONException {
-        int count = form.getInt("count");
-        for (int i = 1; i <= count; i++) {
-            JSONObject step = form.getJSONObject("step" + i);
-            JSONObject field = findInJSON(step, key);
-            if (field != null) {
-                return field;
+
+        JSONArray names = form.names();
+        for (int i = 0; i < names.length(); i++) {
+            String nodeName = names.get(i).toString();
+            if (nodeName.contains("step")) {
+                JSONObject step = form.getJSONObject(nodeName);
+                JSONObject field = findInJSON(step, key);
+                if (field != null) {
+                    return field;
+                }
             }
         }
         return null;
@@ -131,4 +135,5 @@ public class JsonFormUtils {
     private static boolean isImageChooser(JSONObject field) throws JSONException {
         return "choose_image".equals(field.getString("type"));
     }
+
 }
