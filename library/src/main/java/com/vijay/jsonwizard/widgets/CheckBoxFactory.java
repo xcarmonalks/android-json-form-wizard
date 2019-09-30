@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.customviews.CheckBox;
+import com.vijay.jsonwizard.demo.resources.ResourceResolver;
 import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
@@ -38,8 +39,8 @@ public class CheckBoxFactory implements FormWidgetFactory {
 
     @Override
     public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject,
-            CommonListener listener, JsonFormBundle bundle, JsonExpressionResolver resolver,
-            int visualizationMode) throws JSONException {
+                                       CommonListener listener, JsonFormBundle bundle, JsonExpressionResolver resolver,
+                                       ResourceResolver resourceResolver, int visualizationMode) throws JSONException {
         List<View> views = null;
         switch (visualizationMode) {
             case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY:

@@ -9,6 +9,7 @@ import android.widget.LinearLayout;
 
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
+import com.vijay.jsonwizard.demo.resources.ResourceResolver;
 import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
@@ -36,7 +37,7 @@ public class EditGroupFactory implements FormWidgetFactory {
     private static final String TAG = "EditGroupFactory";
 
     @Override
-    public List<View> getViewsFromJson(String stepName, Context context, JSONObject parentJson, CommonListener listener, JsonFormBundle bundle,JsonExpressionResolver resolver, int visualizationMode) throws JSONException {
+    public List<View> getViewsFromJson(String stepName, Context context, JSONObject parentJson, CommonListener listener, JsonFormBundle bundle, JsonExpressionResolver resolver, ResourceResolver resourceResolver, int visualizationMode) throws JSONException {
         List<View> viewsFromJson = new ArrayList<>();
 
         LinearLayout linearLayout = new LinearLayout(context);
@@ -61,7 +62,7 @@ public class EditGroupFactory implements FormWidgetFactory {
             for (int i = 0; i < optNumber; i++) {
                 JSONObject childJson = fields.getJSONObject(i);
                 try {
-                    List<View> views = WidgetFactoryRegistry.getWidgetFactory(childJson.getString("type")).getViewsFromJson(stepName, context, childJson, listener, bundle,resolver, visualizationMode);
+                    List<View> views = WidgetFactoryRegistry.getWidgetFactory(childJson.getString("type")).getViewsFromJson(stepName, context, childJson, listener, bundle, resolver, resourceResolver, visualizationMode);
                     for (View v : views) {
                         LinearLayout.LayoutParams layoutParams=new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
                         layoutParams.setMargins(0,0,10,0);

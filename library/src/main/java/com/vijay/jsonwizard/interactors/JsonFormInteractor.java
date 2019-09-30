@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.vijay.jsonwizard.constants.JsonFormConstants;
+import com.vijay.jsonwizard.demo.resources.ResourceResolver;
 import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
@@ -45,8 +46,8 @@ public class JsonFormInteractor {
     }
 
     public List<View> fetchFormElements(String stepName, Context context, JSONObject parentJson,
-            CommonListener listener, JsonFormBundle bundle, JsonExpressionResolver resolver,
-            int visualizationMode) {
+                                        CommonListener listener, JsonFormBundle bundle, JsonExpressionResolver resolver,
+                                        ResourceResolver resourceResolver, int visualizationMode) {
         Log.d(TAG, "fetchFormElements called");
         List<View> viewsFromJson = new ArrayList<>(5);
         try {
@@ -58,8 +59,7 @@ public class JsonFormInteractor {
                         List<View> views = WidgetFactoryRegistry
                                 .getWidgetFactory(childJson.getString("type")).
                                         getViewsFromJson(stepName, context, childJson, listener,
-                                                bundle,
-                                                resolver, visualizationMode);
+                                                bundle, resolver, resourceResolver, visualizationMode);
                         if (views.size() > 0) {
                             viewsFromJson.addAll(views);
                         }

@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import com.rey.material.util.ViewUtil;
 import com.vijay.jsonwizard.R;
+import com.vijay.jsonwizard.demo.resources.ResourceResolver;
 import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
@@ -32,8 +33,8 @@ public class ExtendedLabelFactory implements FormWidgetFactory {
 
     @Override
     public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject,
-            CommonListener listener, JsonFormBundle bundle, JsonExpressionResolver resolver,
-            int visualizationMode) throws JSONException {
+                                       CommonListener listener, JsonFormBundle bundle, JsonExpressionResolver resolver,
+                                       ResourceResolver resourceResolver, int visualizationMode) throws JSONException {
         return getAsLabel(stepName, context, jsonObject, listener, bundle, resolver,
                 visualizationMode);
     }

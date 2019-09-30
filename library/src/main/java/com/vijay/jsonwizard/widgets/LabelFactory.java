@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rey.material.util.ViewUtil;
 import com.vijay.jsonwizard.R;
+import com.vijay.jsonwizard.demo.resources.ResourceResolver;
 import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
@@ -43,7 +44,7 @@ public class LabelFactory implements FormWidgetFactory {
     private static final String BOLD_FIELD = "bold";
 
     @Override
-    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener, JsonFormBundle bundle,JsonExpressionResolver resolver, int visualizationMode) throws JSONException {
+    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener, JsonFormBundle bundle, JsonExpressionResolver resolver, ResourceResolver resourceResolver, int visualizationMode) throws JSONException {
         if (TextUtils.isEmpty(jsonObject.optString(HINT_FIELD))) {
             return getAsLabel(stepName, context, jsonObject, listener, bundle, resolver,
                     visualizationMode);

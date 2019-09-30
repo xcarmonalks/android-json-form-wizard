@@ -12,6 +12,7 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rey.material.util.ViewUtil;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
+import com.vijay.jsonwizard.demo.resources.ResourceResolver;
 import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
@@ -46,20 +47,21 @@ public class CarouselFactory implements FormWidgetFactory {
     @Override
     public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject,
             CommonListener listener, JsonFormBundle bundle, JsonExpressionResolver resolver,
-            int visualizationMode) throws JSONException {
+            ResourceResolver resourceResolver, int visualizationMode) throws JSONException {
         List<View> views = null;
         switch (visualizationMode) {
             case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY:
                 views = getReadOnlyViewsFromJson(context, jsonObject);
                 break;
             default:
-                views = getEditableViewsFromJson(context, jsonObject, listener, bundle, resolver);
+                views = getEditableViewsFromJson(context, jsonObject, listener, bundle, resolver, resourceResolver);
         }
         return views;
     }
 
     private List<View> getEditableViewsFromJson(Context context, JSONObject jsonObject,
-            CommonListener listener, JsonFormBundle bundle, JsonExpressionResolver resolver)
+                                                CommonListener listener, JsonFormBundle bundle,
+                                                JsonExpressionResolver resolver, ResourceResolver resourceResolver)
             throws JSONException {
         List<View> views = new ArrayList<>(1);
 
@@ -109,7 +111,6 @@ public class CarouselFactory implements FormWidgetFactory {
         }
 
         String[] values = getValues(valuesJson);
-        String[] names;
         String[] images = getValues(imagesJson);
 
         List<String> listValues = new ArrayList<>(Arrays.asList(values));
@@ -142,8 +143,8 @@ public class CarouselFactory implements FormWidgetFactory {
             List<CarouselItem> data = new ArrayList<>();
             for (int i = 0; i < listValues.size(); i++) {
                 String imagePath = listImages.get(i);
-                if (!TextUtils.isEmpty(imagePath) && !isInteger(imagePath)) {
-                    imagePath = moveAssetToCache(context, imagePath, "imagenes");
+                if(!isInteger(imagePath)){
+                    imagePath = resourceResolver.resolvePath(context, imagePath);
                 }
                 data.add(new CarouselItem(listNames.get(i), listValues.get(i), imagePath));
             }
@@ -250,32 +251,6 @@ public class CarouselFactory implements FormWidgetFactory {
         return new ValidationStatus(false, (String) dsv.getTag(R.id.error));
     }
 
-    private static String moveAssetToCache(Context context, String assetName,
-            String assetFolderName) {
-
-        File f = new File(context.getCacheDir() + File.separator + assetName);
-        if (!f.exists()) {
-            try (InputStream is = context.getAssets()
-                    .open(assetFolderName + File.separator + assetName);
-                    FileOutputStream fos = new FileOutputStream(f);) {
-
-                byte[] buffer = new byte[1024];
-                int length;
-
-                while ((length = is.read(buffer)) > 0) {
-                    fos.write(buffer, 0, length);
-                }
-                fos.flush();
-
-            } catch (Exception e) {
-                Log.e(TAG, "moveAssetToCache: Error moving asset " + assetFolderName + " to cache",
-                        e);
-                return null;
-            }
-        }
-        return f.getAbsolutePath();
-    }
-
     private boolean isInteger(String s) {
         try {
             Integer.parseInt(s);
@@ -285,5 +260,4 @@ public class CarouselFactory implements FormWidgetFactory {
         }
         // only got here if we didn't return false
     }
-
 }

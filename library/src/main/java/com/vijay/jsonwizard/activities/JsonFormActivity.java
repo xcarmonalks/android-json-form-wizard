@@ -14,6 +14,9 @@ import android.view.WindowManager;
 
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
+import com.vijay.jsonwizard.demo.resources.AssetsResourceResolver;
+import com.vijay.jsonwizard.demo.resources.ResourceResolver;
+import com.vijay.jsonwizard.demo.resources.ResourceResolverFactory;
 import com.vijay.jsonwizard.expressions.ExternalContentResolver;
 import com.vijay.jsonwizard.expressions.ExternalContentResolverFactory;
 import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
@@ -37,15 +40,24 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
     private int mVisualizationMode;
     private JsonFormBundle mJsonBundle;
     private JsonExpressionResolver mResolver;
+    private ResourceResolver mResourceResolver;
     private ExternalContentResolver mContentResolver;
     private String externalContentResolverClass;
+    private String resourceResolverClass;
 
-    public void init(String json, Integer visualizationMode, String externalContentResolverClass) {
+    public void init(String json, Integer visualizationMode, String externalContentResolverClass, String resourceResolverClass) {
         this.externalContentResolverClass = externalContentResolverClass;
+        this.resourceResolverClass = resourceResolverClass;
         if (!TextUtils.isEmpty(externalContentResolverClass)) {
             this.mContentResolver = ExternalContentResolverFactory
                     .getInstance(this, externalContentResolverClass);
         }
+
+        if (TextUtils.isEmpty(resourceResolverClass)) {
+            this.resourceResolverClass = AssetsResourceResolver.class.getName();
+        }
+        this.mResourceResolver = ResourceResolverFactory
+                .getInstance(this, this.resourceResolverClass);
         init(json, visualizationMode);
     }
 
@@ -80,9 +92,10 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
     protected void createFragments(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
             String contentResolver = getIntent().getStringExtra("resolver");
+            String resourceResolver = getIntent().getStringExtra("resourceResolver");
             init(getIntent().getStringExtra("json"), getIntent()
                     .getIntExtra(JsonFormConstants.VISUALIZATION_MODE_EXTRA,
-                            JsonFormConstants.VISUALIZATION_MODE_EDIT), contentResolver);
+                            JsonFormConstants.VISUALIZATION_MODE_EDIT), contentResolver, resourceResolver);
             if (mJSONObject != null) {
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.container,
@@ -92,7 +105,8 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
         } else {
             init(savedInstanceState.getString("jsonState"),
                     savedInstanceState.getInt(JsonFormConstants.VISUALIZATION_MODE_EXTRA),
-                    savedInstanceState.getString("resolver"));
+                    savedInstanceState.getString("resolver"),
+                    savedInstanceState.getString("resourceResolver"));
         }
     }
 
@@ -176,6 +190,7 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
             outState.putString("jsonState", mJSONObject.toString());
             outState.putInt(JsonFormConstants.VISUALIZATION_MODE_EXTRA, mVisualizationMode);
             outState.putString("resolver", externalContentResolverClass);
+            outState.putString("resourceResolver", resourceResolverClass);
         }
     }
 
@@ -210,6 +225,11 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
             }
         }
         return mResolver;
+    }
+
+    @Override
+    public ResourceResolver getResourceResolver() {
+        return mResourceResolver;
     }
 
     @Override

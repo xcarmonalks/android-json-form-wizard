@@ -10,6 +10,7 @@ import com.rey.material.widget.Switch;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.activities.JsonFormActivity;
 import com.vijay.jsonwizard.customviews.RadioButton;
+import com.vijay.jsonwizard.demo.resources.ResourceResolver;
 import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
@@ -347,6 +348,11 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
     @Override
     public JsonExpressionResolver getExpressionResolver() {
         return mJsonApi.getExpressionResolver();
+    }
+
+    @Override
+    public ResourceResolver getResourceResolver() {
+        return mJsonApi.getResourceResolver();
     }
 
     @Override
