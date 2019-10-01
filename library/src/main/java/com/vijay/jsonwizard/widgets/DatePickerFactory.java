@@ -19,13 +19,17 @@ import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
 import com.vijay.jsonwizard.utils.DateUtils;
 import com.vijay.jsonwizard.utils.ValidationStatus;
+
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 /**
  * Created by jurkiri on 16/11/17.
@@ -53,12 +57,17 @@ public class DatePickerFactory implements FormWidgetFactory {
         final MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(
                 R.layout.item_edit_text, null);
         final String hint = bundle.resolveKey(jsonObject.getString("hint"));
+        final String minDate = jsonObject.optString("minDate");
+        final String maxDate = jsonObject.optString("maxDate");
+
         editText.setHint(hint);
         editText.setFloatingLabelText(hint);
         editText.setId(ViewUtil.generateViewId());
         editText.setTag(R.id.key, jsonObject.getString("key"));
         editText.setTag(R.id.type, jsonObject.getString("type"));
         editText.setTag(R.id.v_pattern, bundle.resolveKey(jsonObject.getString("pattern")));
+        editText.setTag(R.id.minDate, minDate);
+        editText.setTag(R.id.maxDate, maxDate);
 
         final String value = jsonObject.optString("value");
         if (!TextUtils.isEmpty(value)) {
@@ -80,6 +89,7 @@ public class DatePickerFactory implements FormWidgetFactory {
         final MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(
                 R.layout.item_edit_text, null);
         final String hint = bundle.resolveKey(jsonObject.getString("hint"));
+
         editText.setHint(hint);
         editText.setFloatingLabelText(hint);
         editText.setId(ViewUtil.generateViewId());
@@ -140,7 +150,16 @@ public class DatePickerFactory implements FormWidgetFactory {
                 }
             }
 
-            Dialog.Builder builder = new DatePickerDialog.Builder(R.style.Material_App_Dialog_DatePicker).date(date.getTime());
+            final String minDateStr = (String) view.getTag(R.id.minDate);
+            final String maxDateStr = (String) view.getTag(R.id.maxDate);
+            String pattern = (String) dateText.getTag(R.id.v_pattern);
+            Date minDate = resolveDate(minDateStr, pattern);
+            Date maxDate = resolveDate(maxDateStr, pattern);
+
+            DatePickerDialog.Builder builder = new DatePickerDialog.Builder(R.style.Material_App_Dialog_DatePicker).date(date.getTime());
+            if(minDate != null && maxDate != null){
+                builder.dateRange(minDate.getTime(), maxDate.getTime());
+            }
             d = builder.build(view.getContext());
 
             d.positiveActionClickListener(new View.OnClickListener() {
@@ -161,6 +180,21 @@ public class DatePickerFactory implements FormWidgetFactory {
 
             d.positiveAction("OK").negativeAction("CANCEL");
             d.show();
+        }
+
+        private Date resolveDate(String dateStr, String pattern) {
+            DateFormat sdf;
+            if(TextUtils.isEmpty(pattern)){
+                sdf = SimpleDateFormat.getDateInstance();
+            }else{
+                sdf = new SimpleDateFormat(pattern);
+            }
+            try {
+                return sdf.parse(dateStr);
+            } catch (ParseException e){
+                Log.e(TAG, "Error parsing " + dateStr + ": " + e.getMessage());
+            }
+            return null;
         }
     }
 }
