@@ -33,6 +33,7 @@ import com.vijay.jsonwizard.widgets.DatePickerFactory;
 import com.vijay.jsonwizard.widgets.EditTextFactory;
 import com.vijay.jsonwizard.widgets.ImagePickerFactory;
 import com.vijay.jsonwizard.widgets.SpinnerFactory;
+import com.vijay.jsonwizard.widgets.TimePickerFactory;
 import com.yarolegovich.discretescrollview.DiscreteScrollView;
 
 import android.Manifest;
@@ -229,6 +230,20 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                     }
                 }else if(editText.getTag(R.id.type).equals(JsonFormConstants.DATE_PICKER)){
                     ValidationStatus validationStatus = DatePickerFactory.validate(editText);
+                    if (!validationStatus.isValid()) {
+                        return validationStatus;
+                    }
+                    Date date = DateUtils.parseDate(editText.getText().toString(), (String) editText.getTag(R.id.v_pattern));
+                    if(JsonFormConstants.EDIT_GROUP.equals(type)){
+                        String parentKey = (String) childAt.getTag(R.id.key);
+                        String childKey = (String) childAt.getTag(R.id.childKey);
+                        getView().writeValue(mStepName, parentKey, JsonFormConstants.FIELDS_FIELD_NAME,
+                                childKey, DateUtils.toJSONDateFormat(date));
+                    } else {
+                        getView().writeValue(mStepName, key, DateUtils.toJSONDateFormat(date));
+                    }
+                }else if(editText.getTag(R.id.type).equals(JsonFormConstants.TIME_PICKER)){
+                    ValidationStatus validationStatus = TimePickerFactory.validate(editText);
                     if (!validationStatus.isValid()) {
                         return validationStatus;
                     }

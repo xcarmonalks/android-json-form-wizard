@@ -16,6 +16,7 @@ public class JsonFormConstants {
     public static final String FIELDS_FIELD_NAME = "fields";
     public static final String SPINNER = "spinner";
     public static final String DATE_PICKER = "date_picker";
+    public static final String TIME_PICKER = "time_picker";
     public static final String EDIT_GROUP = "edit_group";
     public static final String SEPARATOR = "separator";
     public static final String CAROUSEL = "carousel";

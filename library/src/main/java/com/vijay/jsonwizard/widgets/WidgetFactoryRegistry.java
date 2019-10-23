@@ -22,6 +22,7 @@ public class WidgetFactoryRegistry {
         map.put(JsonFormConstants.CHOOSE_IMAGE, new ImagePickerFactory());
         map.put(JsonFormConstants.SPINNER, new SpinnerFactory());
         map.put(JsonFormConstants.DATE_PICKER, new DatePickerFactory());
+        map.put(JsonFormConstants.TIME_PICKER, new TimePickerFactory());
         map.put(JsonFormConstants.EDIT_GROUP, new EditGroupFactory());
         map.put(JsonFormConstants.SEPARATOR, new SeparatorFactory());
         map.put(JsonFormConstants.CAROUSEL, new CarouselFactory());
