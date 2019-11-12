@@ -43,7 +43,7 @@ public class RadioButton extends CompoundButton {
 
     private void internalApplyStyle(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         RadioButtonDrawable drawable = new RadioButtonDrawable.Builder(context, attrs, defStyleAttr, defStyleRes)
-                .build();
+            .build();
         drawable.setInEditMode(isInEditMode());
         drawable.setAnimEnable(false);
         setButtonDrawable(null);
@@ -63,9 +63,8 @@ public class RadioButton extends CompoundButton {
     /**
      * Change the checked state of this button immediately without showing
      * animation.
-     * 
-     * @param checked
-     *            The checked state.
+     *
+     * @param checked The checked state.
      */
     public void setCheckedImmediately(boolean checked) {
         if (mButtonDrawable instanceof RadioButtonDrawable) {

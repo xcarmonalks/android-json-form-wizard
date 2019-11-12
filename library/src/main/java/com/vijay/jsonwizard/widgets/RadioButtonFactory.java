@@ -1,13 +1,21 @@
 package com.vijay.jsonwizard.widgets;
 
+import static com.vijay.jsonwizard.utils.FormUtils.FONT_BOLD_PATH;
+import static com.vijay.jsonwizard.utils.FormUtils.FONT_REGULAR_PATH;
+import static com.vijay.jsonwizard.utils.FormUtils.MATCH_PARENT;
+import static com.vijay.jsonwizard.utils.FormUtils.WRAP_CONTENT;
+import static com.vijay.jsonwizard.utils.FormUtils.getLayoutParams;
+import static com.vijay.jsonwizard.utils.FormUtils.getTextViewWith;
+
 import android.content.Context;
 import android.graphics.Typeface;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RadioGroup;
+
+import androidx.annotation.Nullable;
 
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rey.material.util.ViewUtil;
@@ -19,17 +27,15 @@ import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
-
 import com.vijay.jsonwizard.interfaces.JsonApi;
 import com.vijay.jsonwizard.utils.JsonFormUtils;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.vijay.jsonwizard.utils.FormUtils.*;
 
 /**
  * Created by vijay on 24-05-2015.
@@ -39,23 +45,26 @@ public class RadioButtonFactory implements FormWidgetFactory {
     private final String H_ORIENTATION_VALUE = "horizontal";
 
     @Override
-    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener, JsonFormBundle bundle, JsonExpressionResolver resolver, ResourceResolver resourceResolver, int visualizationMode) throws JSONException {
+    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener,
+        JsonFormBundle bundle, JsonExpressionResolver resolver, ResourceResolver resourceResolver,
+        int visualizationMode) throws JSONException {
         List<View> views = null;
-        switch (visualizationMode){
-            case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY :
+        switch (visualizationMode) {
+            case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY:
                 views = getReadOnlyViewsFromJson(context, jsonObject, bundle);
                 break;
             default:
-                views = getEditableViewsFromJson(context, jsonObject, listener, bundle,resolver);
+                views = getEditableViewsFromJson(context, jsonObject, listener, bundle, resolver);
         }
         return views;
     }
 
-    private List<View> getEditableViewsFromJson(Context context, JSONObject jsonObject, CommonListener listener, JsonFormBundle bundle, JsonExpressionResolver resolver) throws JSONException {
+    private List<View> getEditableViewsFromJson(Context context, JSONObject jsonObject, CommonListener listener,
+        JsonFormBundle bundle, JsonExpressionResolver resolver) throws JSONException {
         List<View> views = new ArrayList<>(1);
-        views.add(getTextViewWith(context, 16, bundle.resolveKey(jsonObject.getString("label")), jsonObject.getString("key"),
-                jsonObject.getString("type"), getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0, 0),
-                FONT_BOLD_PATH));
+        views.add(
+            getTextViewWith(context, 16, bundle.resolveKey(jsonObject.getString("label")), jsonObject.getString("key"),
+                jsonObject.getString("type"), getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0, 0), FONT_BOLD_PATH));
 
         String orientationStr = (String) jsonObject.get("orientation");
         boolean horizontal = H_ORIENTATION_VALUE.equals(orientationStr);
@@ -64,21 +73,21 @@ public class RadioButtonFactory implements FormWidgetFactory {
 
         JSONArray options = null;
         String valuesExpression = getValuesAsJsonExpression(jsonObject, resolver);
-        if (valuesExpression!=null) {
+        if (valuesExpression != null) {
             JSONObject currentValues = getCurrentValues(context);
-            options = resolver.resolveAsArray(valuesExpression,currentValues);
+            options = resolver.resolveAsArray(valuesExpression, currentValues);
         } else {
             options = jsonObject.getJSONArray(JsonFormConstants.OPTIONS_FIELD_NAME);
         }
 
         int optionsLength = options.length();
-        if(optionsLength > 0) {
+        if (optionsLength > 0) {
             RadioGroup rg = new RadioGroup(context);
             rg.setOrientation(layoutOrientation);
             for (int i = 0; i < optionsLength; i++) {
                 JSONObject item = options.getJSONObject(i);
                 RadioButton radioButton = (RadioButton) LayoutInflater.from(context).inflate(R.layout.item_radiobutton,
-                        null);
+                    null);
                 radioButton.setId(i);
                 radioButton.setText(bundle.resolveKey(item.getString("text")));
                 radioButton.setTag(R.id.key, jsonObject.getString("key"));
@@ -88,12 +97,12 @@ public class RadioButtonFactory implements FormWidgetFactory {
                 radioButton.setTextSize(16);
                 radioButton.setTypeface(Typeface.createFromAsset(context.getAssets(), FONT_REGULAR_PATH));
                 radioButton.setOnCheckedChangeListener(listener);
-                if (!TextUtils.isEmpty(jsonObject.optString("value"))
-                        && jsonObject.optString("value").equals(item.getString("key"))) {
+                if (!TextUtils.isEmpty(jsonObject.optString("value")) && jsonObject.optString("value").equals(
+                    item.getString("key"))) {
                     radioButton.setChecked(true);
                 }
-                radioButton.setLayoutParams(getLayoutParams(layoutWidth, WRAP_CONTENT, 0, 0, 0, (int) context
-                        .getResources().getDimension(R.dimen.extra_bottom_margin)));
+                radioButton.setLayoutParams(getLayoutParams(layoutWidth, WRAP_CONTENT, 0, 0, 0,
+                    (int) context.getResources().getDimension(R.dimen.extra_bottom_margin)));
                 rg.addView(radioButton);
             }
             views.add(rg);
@@ -115,16 +124,17 @@ public class RadioButtonFactory implements FormWidgetFactory {
         if (context instanceof JsonApi) {
             String currentJsonState = ((JsonApi) context).currentJsonState();
             JSONObject currentJsonObject = new JSONObject(currentJsonState);
-            currentValues =  JsonFormUtils.extractDataFromForm(currentJsonObject,false);
+            currentValues = JsonFormUtils.extractDataFromForm(currentJsonObject, false);
         }
         return currentValues;
     }
 
 
-    private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject, JsonFormBundle bundle)  throws JSONException {
+    private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject, JsonFormBundle bundle)
+        throws JSONException {
         List<View> views = new ArrayList<>(1);
-        MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(
-                R.layout.item_edit_text, null);
+        MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(R.layout.item_edit_text,
+            null);
         editText.setId(ViewUtil.generateViewId());
         final String label = bundle.resolveKey(jsonObject.getString("label"));
         editText.setHint(label);
@@ -141,7 +151,7 @@ public class RadioButtonFactory implements FormWidgetFactory {
 
     private String resolveValueText(String value, JSONObject jsonObject, JsonFormBundle bundle) throws JSONException {
         String valueText = "";
-        if (value != null && !"".equals(value)){
+        if (value != null && !"".equals(value)) {
             JSONArray options = jsonObject.getJSONArray(JsonFormConstants.OPTIONS_FIELD_NAME);
             for (int i = 0; i < options.length(); i++) {
                 JSONObject item = options.getJSONObject(i);

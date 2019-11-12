@@ -6,6 +6,7 @@ package com.vijay.jsonwizard.constants;
 public class JsonFormConstants {
 
     public static final String FIRST_STEP_NAME = "step1";
+    public static final String BARCODE_TEXT = "barcode_text";
     public static final String EDIT_TEXT = "edit_text";
     public static final String CHECK_BOX = "check_box";
     public static final String RADIO_BUTTON = "radio";

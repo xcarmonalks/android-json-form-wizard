@@ -1,11 +1,30 @@
 package com.vijay.jsonwizard.fragments;
 
-import java.util.List;
-import java.util.Locale;
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.CompoundButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RadioGroup;
+import android.widget.Toast;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
 
+import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rey.material.widget.Switch;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.activities.JsonFormActivity;
@@ -21,45 +40,36 @@ import com.vijay.jsonwizard.utils.CarouselAdapter;
 import com.vijay.jsonwizard.views.JsonFormFragmentView;
 import com.vijay.jsonwizard.viewstates.JsonFormFragmentViewState;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.CompoundButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RadioGroup;
-import android.widget.Toast;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by vijay on 5/7/15.
  */
-public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, JsonFormFragmentViewState> implements
-        CommonListener, JsonFormFragmentView<JsonFormFragmentViewState> {
+public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, JsonFormFragmentViewState>
+    implements CommonListener, JsonFormFragmentView<JsonFormFragmentViewState> {
     private static final String TAG = "JsonFormFragment";
-    private LinearLayout        mMainView;
-    private Menu                mMenu;
-    private JsonApi             mJsonApi;
+    private LinearLayout mMainView;
+    private Menu mMenu;
+    private JsonApi mJsonApi;
 
-    public void setJsonApi(JsonApi jsonApi) {
-        this.mJsonApi = jsonApi;
+    public static JsonFormFragment getFormFragment(String stepName) {
+        JsonFormFragment jsonFormFragment = new JsonFormFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("stepName", stepName);
+        jsonFormFragment.setArguments(bundle);
+        return jsonFormFragment;
     }
 
     public JsonApi getJsonApi() {
         return mJsonApi;
+    }
+
+    public void setJsonApi(JsonApi jsonApi) {
+        this.mJsonApi = jsonApi;
     }
 
     @Override
@@ -77,7 +87,8 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+        @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_json_wizard, null);
         mMainView = (LinearLayout) rootView.findViewById(R.id.main_layout);
         return rootView;
@@ -159,6 +170,38 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
         }
     }
 
+    private MaterialEditText findMaterialiEditTextByTag(ViewGroup v, String searchKey) {
+
+        MaterialEditText found = null;
+
+        for (int i = 0; i < v.getChildCount(); i++) {
+            Object child = v.getChildAt(i);
+            if (child instanceof MaterialEditText) {
+                MaterialEditText editText = (MaterialEditText) child;
+                String key = (String) editText.getTag(R.id.key);
+                if (key.equals(searchKey)) {
+                    return editText;
+                }
+            } else if (child instanceof ViewGroup) {
+                found = findMaterialiEditTextByTag((ViewGroup) child, searchKey);
+                if (found != null) {
+                    break;
+                }
+            }
+        }
+        return found;
+
+    }
+
+    @Override
+    public void updateRelevantEditText(String currentKey, String value) {
+
+        MaterialEditText editText = findMaterialiEditTextByTag(mMainView, currentKey);
+        if (editText != null) {
+            editText.setText(value);
+        }
+    }
+
     @Override
     public void writeValue(String stepName, String key, String s) {
         try {
@@ -204,7 +247,6 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
         Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
     }
 
-
     @Override
     public CommonListener getCommonListener() {
         return this;
@@ -212,7 +254,7 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
 
     @Override
     public void addFormElements(List<View> views) {
-        for (View view : views) {
+        for (View view: views) {
             mMainView.addView(view);
         }
     }
@@ -285,20 +327,9 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
 
     @Override
     public void transactThis(JsonFormFragment next) {
-        getActivity()
-                .getSupportFragmentManager()
-                .beginTransaction()
-                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left,
-                        R.anim.exit_to_right).replace(R.id.container, next)
-                .addToBackStack(next.getClass().getSimpleName()).commit();
-    }
-
-    public static JsonFormFragment getFormFragment(String stepName) {
-        JsonFormFragment jsonFormFragment = new JsonFormFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString("stepName", stepName);
-        jsonFormFragment.setArguments(bundle);
-        return jsonFormFragment;
+        getActivity().getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.enter_from_right,
+            R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right).replace(R.id.container, next)
+                     .addToBackStack(next.getClass().getSimpleName()).commit();
     }
 
     @Override
@@ -371,8 +402,8 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
     }
 
     @Override
-    public void onScroll(float scrollPosition, int currentPosition, int newPosition, @Nullable CarouselAdapter
-            .ViewHolder currentHolder, @Nullable CarouselAdapter.ViewHolder newCurrent) {
+    public void onScroll(float scrollPosition, int currentPosition, int newPosition,
+        @Nullable CarouselAdapter.ViewHolder currentHolder, @Nullable CarouselAdapter.ViewHolder newCurrent) {
 
     }
 }

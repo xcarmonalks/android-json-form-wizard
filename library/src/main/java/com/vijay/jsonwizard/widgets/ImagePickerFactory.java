@@ -1,5 +1,10 @@
 package com.vijay.jsonwizard.widgets;
 
+import static com.vijay.jsonwizard.utils.FormUtils.MATCH_PARENT;
+import static com.vijay.jsonwizard.utils.FormUtils.WRAP_CONTENT;
+import static com.vijay.jsonwizard.utils.FormUtils.dpToPixels;
+import static com.vijay.jsonwizard.utils.FormUtils.getLayoutParams;
+
 import android.content.Context;
 import android.text.TextUtils;
 import android.view.View;
@@ -21,18 +26,31 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.vijay.jsonwizard.utils.FormUtils.MATCH_PARENT;
-import static com.vijay.jsonwizard.utils.FormUtils.WRAP_CONTENT;
-import static com.vijay.jsonwizard.utils.FormUtils.dpToPixels;
-import static com.vijay.jsonwizard.utils.FormUtils.getLayoutParams;
-
 /**
  * Created by vijay on 24-05-2015.
  */
 public class ImagePickerFactory implements FormWidgetFactory {
 
+    public static ValidationStatus validate(ImageView imageView) {
+        if (!(imageView.getTag(R.id.v_required) instanceof String) || !(imageView.getTag(
+            R.id.error) instanceof String)) {
+            return new ValidationStatus(true, null);
+        }
+        Boolean isRequired = Boolean.valueOf((String) imageView.getTag(R.id.v_required));
+        if (!isRequired) {
+            return new ValidationStatus(true, null);
+        }
+        Object path = imageView.getTag(R.id.imagePath);
+        if (path instanceof String && !TextUtils.isEmpty((String) path)) {
+            return new ValidationStatus(true, null);
+        }
+        return new ValidationStatus(false, (String) imageView.getTag(R.id.error));
+    }
+
     @Override
-    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener, JsonFormBundle bundle, JsonExpressionResolver resolver, ResourceResolver resourceResolver, int visualizationMode) throws JSONException {
+    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener,
+        JsonFormBundle bundle, JsonExpressionResolver resolver, ResourceResolver resourceResolver,
+        int visualizationMode) throws JSONException {
         List<View> views = new ArrayList<>(1);
         ImageView imageView = new ImageView(context);
         imageView.setImageDrawable(context.getResources().getDrawable(R.mipmap.grey_bg));
@@ -49,37 +67,23 @@ public class ImagePickerFactory implements FormWidgetFactory {
         }
 
         imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-        imageView.setLayoutParams(getLayoutParams(MATCH_PARENT, dpToPixels(context, 200), 0, 0, 0, (int) context
-                .getResources().getDimension(R.dimen.default_bottom_margin)));
+        imageView.setLayoutParams(getLayoutParams(MATCH_PARENT, dpToPixels(context, 200), 0, 0, 0,
+            (int) context.getResources().getDimension(R.dimen.default_bottom_margin)));
         String imagePath = jsonObject.optString("value");
         if (!TextUtils.isEmpty(imagePath)) {
             imageView.setTag(R.id.imagePath, imagePath);
-            imageView.setImageBitmap(ImageUtils.loadBitmapFromFile(imagePath, ImageUtils.getDeviceWidth(context), dpToPixels(context, 200)));
+            imageView.setImageBitmap(
+                ImageUtils.loadBitmapFromFile(imagePath, ImageUtils.getDeviceWidth(context), dpToPixels(context, 200)));
         }
         views.add(imageView);
         Button uploadButton = new Button(context);
         uploadButton.setText(bundle.resolveKey(jsonObject.getString("uploadButtonText")));
-        uploadButton.setLayoutParams(getLayoutParams(WRAP_CONTENT, WRAP_CONTENT, 0, 0, 0, (int) context
-                .getResources().getDimension(R.dimen.default_bottom_margin)));
+        uploadButton.setLayoutParams(getLayoutParams(WRAP_CONTENT, WRAP_CONTENT, 0, 0, 0,
+            (int) context.getResources().getDimension(R.dimen.default_bottom_margin)));
         uploadButton.setOnClickListener(listener);
         uploadButton.setTag(R.id.key, jsonObject.getString("key"));
         uploadButton.setTag(R.id.type, jsonObject.getString("type"));
         views.add(uploadButton);
         return views;
-    }
-
-    public static ValidationStatus validate(ImageView imageView) {
-        if (!(imageView.getTag(R.id.v_required) instanceof String) || !(imageView.getTag(R.id.error) instanceof String)) {
-            return new ValidationStatus(true, null);
-        }
-        Boolean isRequired = Boolean.valueOf((String) imageView.getTag(R.id.v_required));
-        if (!isRequired) {
-            return new ValidationStatus(true, null);
-        }
-        Object path = imageView.getTag(R.id.imagePath);
-        if (path instanceof String && !TextUtils.isEmpty((String) path)) {
-            return new ValidationStatus(true, null);
-        }
-        return new ValidationStatus(false, (String) imageView.getTag(R.id.error));
     }
 }

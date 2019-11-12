@@ -1,25 +1,26 @@
 package com.vijay.jsonwizard.views;
 
-import com.vijay.jsonwizard.demo.resources.ResourceResolver;
-import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
-import java.util.List;
-import java.util.Locale;
-
-import org.json.JSONObject;
-
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
+
+import com.vijay.jsonwizard.demo.resources.ResourceResolver;
+import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.fragments.JsonFormFragment;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.mvp.MvpView;
 import com.vijay.jsonwizard.mvp.ViewState;
+
+import org.json.JSONObject;
+
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by vijay on 5/14/15.
@@ -52,6 +53,8 @@ public interface JsonFormFragmentView<VS extends ViewState> extends MvpView {
     void startActivityForResult(Intent intent, int requestCode);
 
     void updateRelevantImageView(Bitmap bitmap, String imagePath, String currentKey);
+
+    void updateRelevantEditText(String currentKey, String value);
 
     void writeValue(String stepName, String key, String value);
 

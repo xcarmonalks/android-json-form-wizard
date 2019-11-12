@@ -1,10 +1,12 @@
 package com.vijay.jsonwizard.widgets;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+
+import androidx.annotation.Nullable;
+
 import com.rey.material.util.ViewUtil;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.demo.resources.ResourceResolver;
@@ -14,14 +16,16 @@ import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
 import com.vijay.jsonwizard.interfaces.JsonApi;
 import com.vijay.jsonwizard.utils.JsonFormUtils;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.sufficientlysecure.htmltextview.HtmlAssetsImageGetter;
 import org.sufficientlysecure.htmltextview.HtmlTextView;
+
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by vijay on 24-05-2015.
@@ -32,20 +36,17 @@ public class ExtendedLabelFactory implements FormWidgetFactory {
     private static final String PARAMS_FIELD = "params";
 
     @Override
-    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject,
-                                       CommonListener listener, JsonFormBundle bundle, JsonExpressionResolver resolver,
-                                       ResourceResolver resourceResolver, int visualizationMode) throws JSONException {
-        return getAsLabel(stepName, context, jsonObject, listener, bundle, resolver,
-                visualizationMode);
+    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener,
+        JsonFormBundle bundle, JsonExpressionResolver resolver, ResourceResolver resourceResolver,
+        int visualizationMode) throws JSONException {
+        return getAsLabel(stepName, context, jsonObject, listener, bundle, resolver, visualizationMode);
     }
 
-    private List<View> getAsLabel(String stepName, Context context, JSONObject jsonObject,
-            CommonListener listener, JsonFormBundle bundle, JsonExpressionResolver resolver,
-            int visualizationMode) throws JSONException {
+    private List<View> getAsLabel(String stepName, Context context, JSONObject jsonObject, CommonListener listener,
+        JsonFormBundle bundle, JsonExpressionResolver resolver, int visualizationMode) throws JSONException {
         List<View> views = new ArrayList<>(1);
 
-        HtmlTextView textView = (HtmlTextView) LayoutInflater.from(context)
-                .inflate(R.layout.item_extended_label, null);
+        HtmlTextView textView = (HtmlTextView) LayoutInflater.from(context).inflate(R.layout.item_extended_label, null);
         textView.setId(ViewUtil.generateViewId());
 
 
@@ -97,8 +98,7 @@ public class ExtendedLabelFactory implements FormWidgetFactory {
         return currentValues;
     }
 
-    private String getValuesAsJsonExpression(JSONObject jsonObject,
-            JsonExpressionResolver resolver) {
+    private String getValuesAsJsonExpression(JSONObject jsonObject, JsonExpressionResolver resolver) {
         String valuesExpression = jsonObject.optString(TEXT_FIELD);
         if (resolver.isValidExpression(valuesExpression)) {
             return valuesExpression;

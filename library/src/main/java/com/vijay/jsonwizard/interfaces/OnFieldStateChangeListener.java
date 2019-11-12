@@ -7,7 +7,9 @@ package com.vijay.jsonwizard.interfaces;
 public interface OnFieldStateChangeListener {
 
     void onInitialValueSet(String parentKey, String childKey, String value);
+
     void onValueChange(String parentKey, String childKey, String value);
+
     void onVisibilityChange(String key, String o, boolean b);
 
 }

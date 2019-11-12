@@ -30,13 +30,13 @@ android:
     #- extra-google-m2repository
     #- extra-android-m2repository
     #- addon-google_apis-google-19
-    
+
     # Device emulator images
     # - sys-img-armeabi-v7a-google_apis-23
 env:
- global:
-  # install timeout in minutes (2 minutes by default)
-  - ADB_INSTALL_TIMEOUT=8
+  global:
+    # install timeout in minutes (2 minutes by default)
+    - ADB_INSTALL_TIMEOUT=8
 
 # Emulator Management: Create, Start and Wait
 #before_script:
@@ -45,5 +45,5 @@ env:
 # - android-wait-for-emulator
 # - adb shell input keyevent 82 &
 script:
- # By default Travis-ci executes './gradlew build connectedCheck' if no 'script:' section found.
- - ./gradlew :library:sonarqube
+  # By default Travis-ci executes './gradlew build connectedCheck' if no 'script:' section found.
+  - ./gradlew :library:sonarqube

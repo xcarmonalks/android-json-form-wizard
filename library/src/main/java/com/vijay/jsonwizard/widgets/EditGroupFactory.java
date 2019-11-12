@@ -1,5 +1,11 @@
 package com.vijay.jsonwizard.widgets;
 
+import static com.vijay.jsonwizard.utils.FormUtils.FONT_BOLD_PATH;
+import static com.vijay.jsonwizard.utils.FormUtils.MATCH_PARENT;
+import static com.vijay.jsonwizard.utils.FormUtils.WRAP_CONTENT;
+import static com.vijay.jsonwizard.utils.FormUtils.getLayoutParams;
+import static com.vijay.jsonwizard.utils.FormUtils.getTextViewWith;
+
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
@@ -22,12 +28,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.vijay.jsonwizard.utils.FormUtils.FONT_BOLD_PATH;
-import static com.vijay.jsonwizard.utils.FormUtils.MATCH_PARENT;
-import static com.vijay.jsonwizard.utils.FormUtils.WRAP_CONTENT;
-import static com.vijay.jsonwizard.utils.FormUtils.getLayoutParams;
-import static com.vijay.jsonwizard.utils.FormUtils.getTextViewWith;
-
 /**
  * Created by jurkiri on 22/11/17.
  */
@@ -37,22 +37,24 @@ public class EditGroupFactory implements FormWidgetFactory {
     private static final String TAG = "EditGroupFactory";
 
     @Override
-    public List<View> getViewsFromJson(String stepName, Context context, JSONObject parentJson, CommonListener listener, JsonFormBundle bundle, JsonExpressionResolver resolver, ResourceResolver resourceResolver, int visualizationMode) throws JSONException {
+    public List<View> getViewsFromJson(String stepName, Context context, JSONObject parentJson, CommonListener listener,
+        JsonFormBundle bundle, JsonExpressionResolver resolver, ResourceResolver resourceResolver,
+        int visualizationMode) throws JSONException {
         List<View> viewsFromJson = new ArrayList<>();
 
         LinearLayout linearLayout = new LinearLayout(context);
-        linearLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        linearLayout.setLayoutParams(
+            new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         linearLayout.setOrientation(LinearLayout.HORIZONTAL);
         linearLayout.setTag(R.id.key, parentJson.getString("key"));
         linearLayout.setTag(R.id.type, JsonFormConstants.EDIT_GROUP);
 
 
-
         String groupTitle = bundle.resolveKey(parentJson.optString("title"));
         if (!TextUtils.isEmpty(groupTitle)) {
-            viewsFromJson.add(getTextViewWith(context, 16, groupTitle, parentJson.getString("key"),
-                    parentJson.getString("type"), getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0, 0),
-                    FONT_BOLD_PATH));
+            viewsFromJson.add(
+                getTextViewWith(context, 16, groupTitle, parentJson.getString("key"), parentJson.getString("type"),
+                    getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0, 0), FONT_BOLD_PATH));
         }
 
         try {
@@ -62,17 +64,19 @@ public class EditGroupFactory implements FormWidgetFactory {
             for (int i = 0; i < optNumber; i++) {
                 JSONObject childJson = fields.getJSONObject(i);
                 try {
-                    List<View> views = WidgetFactoryRegistry.getWidgetFactory(childJson.getString("type")).getViewsFromJson(stepName, context, childJson, listener, bundle, resolver, resourceResolver, visualizationMode);
-                    for (View v : views) {
-                        LinearLayout.LayoutParams layoutParams=new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
-                        layoutParams.setMargins(0,0,10,0);
+                    List<View> views = WidgetFactoryRegistry.getWidgetFactory(childJson.getString("type"))
+                                                            .getViewsFromJson(stepName, context, childJson, listener,
+                                                                bundle, resolver, resourceResolver, visualizationMode);
+                    for (View v: views) {
+                        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(0,
+                            LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+                        layoutParams.setMargins(0, 0, 10, 0);
                         v.setLayoutParams(layoutParams);
                         linearLayout.addView(v);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG,
-                            "Exception occurred in making child view at index : " + i + " : Exception is : "
-                                    + e.getMessage());
+                    Log.e(TAG, "Exception occurred in making child view at index : " + i + " : Exception is : " + e
+                        .getMessage());
                 }
             }
         } catch (JSONException e) {

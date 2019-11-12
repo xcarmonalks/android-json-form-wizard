@@ -1,15 +1,16 @@
 package com.vijay.jsonwizard.utils;
 
-import java.io.File;
-import java.io.FileOutputStream;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.v4.util.LruCache;
 import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
+
+import androidx.collection.LruCache;
+
+import java.io.File;
+import java.io.FileOutputStream;
 
 /**
  * Created by vijay.rawat01 on 7/29/15.
@@ -22,7 +23,7 @@ public class ImageUtils {
     public static Bitmap loadBitmapFromFile(String path, int requiredWidth, int requiredHeight) {
         String key = path + ":" + requiredWidth + ":" + requiredHeight;
         Bitmap bitmap = mBitmapLruCache.get(key);
-        if(bitmap != null) {
+        if (bitmap != null) {
             Log.d("ImagePickerFactory", "Found in cache.");
             return bitmap;
         }
@@ -53,8 +54,7 @@ public class ImageUtils {
             final int halfWidth = width / 2;
             // Calculate the largest inSampleSize value that is a power of 2 and keeps both
             // height and width larger than the requested height and width.
-            while ((halfHeight / inSampleSize) > reqHeight
-                    && (halfWidth / inSampleSize) > reqWidth) {
+            while ((halfHeight / inSampleSize) > reqHeight && (halfWidth / inSampleSize) > reqWidth) {
                 inSampleSize *= 2;
             }
         }
@@ -68,10 +68,10 @@ public class ImageUtils {
         return display.getWidth();
     }
 
-    public static boolean saveToFile(Bitmap bitmap, File file){
+    public static boolean saveToFile(Bitmap bitmap, File file) {
         final int COMPRESSION_RATIO = 80;
         try {
-                // Create folder if doesn't exist
+            // Create folder if doesn't exist
             File folder = new File(file.getParent());
             if (!folder.exists()) {
                 folder.mkdirs();

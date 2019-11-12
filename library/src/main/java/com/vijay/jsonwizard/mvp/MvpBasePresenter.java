@@ -16,7 +16,7 @@ public class MvpBasePresenter<V extends MvpView> implements MvpPresenter<V> {
      * to check if the view is attached to avoid NullPointerExceptions
      */
     protected V getView() {
-        if(viewRef!=null) {
+        if (viewRef != null) {
             return viewRef.get();
         }
         return null;

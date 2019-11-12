@@ -16,7 +16,7 @@ public class GenericTextWatcher implements TextWatcher {
 
     private static final String TAG = "GenericTextWatcher";
 
-    private View   mView;
+    private View mView;
     private String mStepName;
 
     public GenericTextWatcher(String stepName, View view) {
@@ -36,9 +36,9 @@ public class GenericTextWatcher implements TextWatcher {
         String text = editable.toString();
         JsonApi api = null;
         Context ctx = mView.getContext();
-        if(ctx instanceof JsonApi) {
+        if (ctx instanceof JsonApi) {
             api = (JsonApi) ctx;
-        } else if(ctx instanceof ContextWrapper) {
+        } else if (ctx instanceof ContextWrapper) {
             ContextWrapper contextWrapper = (ContextWrapper) ctx;
             api = (JsonApi) contextWrapper.getBaseContext();
         } else {

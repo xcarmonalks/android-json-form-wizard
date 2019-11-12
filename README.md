@@ -276,7 +276,7 @@ Not supported yet.
      "key":"selectDate",
      "type":"date_picker",
      "pattern":"dd/MM/yyyy",
-     "hint":"Enter date" 
+     "hint":"Enter date"
 }
 ```
 key - must be unique in that particular step.
@@ -333,6 +333,28 @@ options - EditText included in the EditGroup.
 }
 
 ```
+
+#### Barcode EditText
+```json
+    {
+        "key":"name",
+        "type":"barcode_text",
+        "hint":"Enter Your Name"
+    }
+```
+
+key - must be unique in that particular step.
+
+type - must be barcode_text for Barcode EditText.
+
+hint - hint for Barcode EditText.
+
+lines - number of lines shown by the Barcode EditText
+
+value - will be the value present in the Barcode EditText after completion of wizard
+
+##### Barcode EditText Required Validation
+same as EditText
 
 #### I18n
 ##### Bundle definition
@@ -653,6 +675,25 @@ Step 2. Add the dependency in the form
     <version>1.0</version>
 </dependency>
 ```
+
+##### Barcode Editext usage:
+Barcode uses the MLKit API from Firebase. In order to use it, the following steeps are needed.
+Step 1. Apply google services plugin
+```gradle
+apply plugin: 'com.google.gms.google-services'
+```
+Step 2. Add camera permission
+```xml
+<uses-permission android:name="android.permission.CAMERA"/>
+```
+Step 3. Add the Firebase MLKit vision API key to the app
+Step 4 (Optional). Add metadata to the app Manifest to download the barcode module as soon as the app is installed.
+```xml
+<meta-data
+    android:name="com.google.firebase.ml.vision.DEPENDENCIES"
+    android:value="barcode"/>
+```
+
 # TODOs
 
 - Support validation for Checkbox and RadioButton.
