@@ -2,19 +2,20 @@ package com.vijay.jsonwizard.utils;
 
 import android.text.TextUtils;
 import android.util.Log;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class JsonFormUtils {
 
     private static final String TAG = "JsonFormUtils";
 
-    public static JSONObject mergeFormData(JSONObject form, JSONObject dataJson)
-            throws JSONException {
+    public static JSONObject mergeFormData(JSONObject form, JSONObject dataJson) throws JSONException {
         JSONObject mergedForm = new JSONObject(form.toString());
 
         Iterator<String> keys = dataJson.keys();
@@ -35,8 +36,7 @@ public class JsonFormUtils {
         return extractDataFromForm(form, true);
     }
 
-    public static JSONObject extractDataFromForm(JSONObject form, boolean includeBase64)
-            throws JSONException {
+    public static JSONObject extractDataFromForm(JSONObject form, boolean includeBase64) throws JSONException {
         Map<String, Object> dataMap = new HashMap<>();
 
         JSONArray names = form.names();
@@ -79,9 +79,8 @@ public class JsonFormUtils {
         return null;
     }
 
-    private static void processFieldContainer(JSONObject container, Map<String, Object> dataMap,
-            boolean incluideBase64)
-            throws JSONException {
+    private static void processFieldContainer(JSONObject container, Map<String, Object> dataMap, boolean incluideBase64)
+        throws JSONException {
         JSONArray fields = container.optJSONArray("fields");
         if (fields != null) {
             for (int i = 0; i < fields.length(); i++) {
@@ -101,8 +100,7 @@ public class JsonFormUtils {
         }
     }
 
-    private static void processImageChooser(JSONObject field, Map<String, Object> dataMap)
-            throws JSONException {
+    private static void processImageChooser(JSONObject field, Map<String, Object> dataMap) throws JSONException {
         String imagePath = field.optString("value");
         if (!TextUtils.isEmpty(imagePath)) {
             String base64 = ImageFileUtils.processImageFromFile(imagePath);
@@ -111,8 +109,7 @@ public class JsonFormUtils {
         }
     }
 
-    private static void processCheckbox(JSONObject field, Map<String, Object> dataMap)
-            throws JSONException {
+    private static void processCheckbox(JSONObject field, Map<String, Object> dataMap) throws JSONException {
         JSONArray options = field.optJSONArray("options");
         if (options != null) {
             for (int j = 0; j < options.length(); j++) {

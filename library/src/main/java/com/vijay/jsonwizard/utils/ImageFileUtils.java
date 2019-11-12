@@ -3,13 +3,6 @@ package com.vijay.jsonwizard.utils;
 
 import static android.os.Environment.getExternalStorageDirectory;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap.Config;
@@ -20,15 +13,20 @@ import android.graphics.Rect;
 import android.util.Base64;
 import android.util.Log;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 /**
  * Created by x.carmona on 18/01/17.
  */
 public class ImageFileUtils {
 
-    private static final String TAG = "ImageFileUtils";
-
     public static final int IMAGE_MAX_SIZE = 1600;
     public static final int IMAGE_COMPRESSION_RATIO = 80;
+    private static final String TAG = "ImageFileUtils";
 
     public static String processImageFromFile(String filePath) {
         Bitmap tempImage;
@@ -62,17 +60,13 @@ public class ImageFileUtils {
         // Only scale if necessary
         if ((unscaledBitmap.getWidth() > maxSize) || (unscaledBitmap.getHeight() > maxSize)) {
 
-            Rect srcRect = calculateSrcRect(unscaledBitmap.getWidth(), unscaledBitmap.getHeight(),
-                    maxSize, maxSize,
-                    ScalingLogic.FIT);
-            Rect destRect = calculateDestRect(unscaledBitmap.getWidth(), unscaledBitmap.getHeight(),
-                    maxSize, maxSize,
-                    ScalingLogic.FIT);
-            scaledBitmap = Bitmap
-                    .createBitmap(destRect.width(), destRect.height(), Config.ARGB_8888);
+            Rect srcRect = calculateSrcRect(unscaledBitmap.getWidth(), unscaledBitmap.getHeight(), maxSize, maxSize,
+                ScalingLogic.FIT);
+            Rect destRect = calculateDestRect(unscaledBitmap.getWidth(), unscaledBitmap.getHeight(), maxSize, maxSize,
+                ScalingLogic.FIT);
+            scaledBitmap = Bitmap.createBitmap(destRect.width(), destRect.height(), Config.ARGB_8888);
             Canvas canvas = new Canvas(scaledBitmap);
-            canvas.drawBitmap(unscaledBitmap, srcRect, destRect,
-                    new Paint(Paint.FILTER_BITMAP_FLAG));
+            canvas.drawBitmap(unscaledBitmap, srcRect, destRect, new Paint(Paint.FILTER_BITMAP_FLAG));
         } else {
             scaledBitmap = unscaledBitmap;
         }
@@ -80,7 +74,7 @@ public class ImageFileUtils {
     }
 
     public static Rect calculateSrcRect(int srcWidth, int srcHeight, int dstWidth, int dstHeight,
-            ScalingLogic scalingLogic) {
+        ScalingLogic scalingLogic) {
         if (scalingLogic == ScalingLogic.CROP) {
             final float srcAspect = (float) srcWidth / (float) srcHeight;
             final float dstAspect = (float) dstWidth / (float) dstHeight;
@@ -99,8 +93,7 @@ public class ImageFileUtils {
         }
     }
 
-    public static Rect calculateDestRect(int srcWidth, int srcHeight, int dstWidth, int dstHeight,
-            ScalingLogic logic) {
+    public static Rect calculateDestRect(int srcWidth, int srcHeight, int dstWidth, int dstHeight, ScalingLogic logic) {
         if (logic == ScalingLogic.FIT) {
             final float srcAspect = (float) srcWidth / (float) srcHeight;
             final float dstAspect = (float) dstWidth / (float) dstHeight;
@@ -167,6 +160,7 @@ public class ImageFileUtils {
     }
 
     public static enum ScalingLogic {
-        CROP, FIT
+        CROP,
+        FIT
     }
 }

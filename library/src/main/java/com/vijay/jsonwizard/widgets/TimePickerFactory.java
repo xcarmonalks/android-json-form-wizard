@@ -35,11 +35,21 @@ public class TimePickerFactory implements FormWidgetFactory {
 
     private static final String TAG = "TimePickerFactory";
 
+    public static ValidationStatus validate(MaterialEditText editText) {
+        boolean validate = editText.validate();
+        if (!validate) {
+            return new ValidationStatus(false, editText.getError().toString());
+        }
+        return new ValidationStatus(true, null);
+    }
+
     @Override
-    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener, JsonFormBundle bundle, JsonExpressionResolver resolver, ResourceResolver resourceResolver, int visualizationMode) throws JSONException {
+    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener,
+        JsonFormBundle bundle, JsonExpressionResolver resolver, ResourceResolver resourceResolver,
+        int visualizationMode) throws JSONException {
         List<View> views = null;
-        switch (visualizationMode){
-            case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY :
+        switch (visualizationMode) {
+            case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY:
                 views = getReadOnlyViewsFromJson(context, jsonObject, bundle);
                 break;
             default:
@@ -48,10 +58,11 @@ public class TimePickerFactory implements FormWidgetFactory {
         return views;
     }
 
-    private List<View> getEditableViewsFromJson(Context context, JSONObject jsonObject, JsonFormBundle bundle) throws JSONException {
+    private List<View> getEditableViewsFromJson(Context context, JSONObject jsonObject, JsonFormBundle bundle)
+        throws JSONException {
         List<View> views = new ArrayList<>(1);
         final MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(
-                R.layout.item_edit_text, null);
+            R.layout.item_edit_text, null);
         final String hint = bundle.resolveKey(jsonObject.getString("hint"));
 
         editText.setHint(hint);
@@ -69,7 +80,7 @@ public class TimePickerFactory implements FormWidgetFactory {
                 Date date = DateUtils.parseJSONDate(value);
                 SimpleDateFormat dateFormatter = new SimpleDateFormat(widgetPattern);
                 editText.setText(dateFormatter.format(date));
-            }catch (IllegalArgumentException e){
+            } catch (IllegalArgumentException e) {
                 Log.e(TAG, "Error parsing " + value + ": " + e.getMessage());
             }
         }
@@ -83,10 +94,11 @@ public class TimePickerFactory implements FormWidgetFactory {
         return views;
     }
 
-    private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject, JsonFormBundle bundle) throws JSONException {
+    private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject, JsonFormBundle bundle)
+        throws JSONException {
         List<View> views = new ArrayList<>(1);
         final MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(
-                R.layout.item_edit_text, null);
+            R.layout.item_edit_text, null);
         final String hint = bundle.resolveKey(jsonObject.getString("hint"));
 
         editText.setHint(hint);
@@ -103,7 +115,7 @@ public class TimePickerFactory implements FormWidgetFactory {
                 Date date = DateUtils.parseJSONDate(value);
                 SimpleDateFormat widgetDateFormat = new SimpleDateFormat(widgetPattern);
                 editText.setText(widgetDateFormat.format(date));
-            }catch (IllegalArgumentException e){
+            } catch (IllegalArgumentException e) {
                 Log.e(TAG, "Error parsing " + value + ": " + e.getMessage());
             }
         }
@@ -113,26 +125,18 @@ public class TimePickerFactory implements FormWidgetFactory {
         return views;
     }
 
-    public static ValidationStatus validate(MaterialEditText editText) {
-        boolean validate = editText.validate();
-        if(!validate) {
-            return new ValidationStatus(false, editText.getError().toString());
-        }
-        return new ValidationStatus(true, null);
-    }
-
     private class TimePickerListener implements View.OnFocusChangeListener, View.OnClickListener {
 
         private Dialog d;
         private MaterialEditText timeText;
 
-        public TimePickerListener(MaterialEditText editText){
+        public TimePickerListener(MaterialEditText editText) {
             this.timeText = editText;
         }
 
         @Override
         public void onFocusChange(View view, boolean focus) {
-            if(focus){
+            if (focus) {
                 openTimePicker(view);
             }
         }
@@ -143,11 +147,11 @@ public class TimePickerFactory implements FormWidgetFactory {
         }
 
         private void openTimePicker(View view) {
-            int hour=0;
-            int minute=0;
+            int hour = 0;
+            int minute = 0;
             String timeStr = timeText.getText().toString();
             String pattern = (String) timeText.getTag(R.id.v_pattern);
-            if(timeStr != null && !"".equals(timeStr)){
+            if (timeStr != null && !"".equals(timeStr)) {
                 try {
                     SimpleDateFormat dateFormatter = new SimpleDateFormat(pattern);
                     Calendar c = Calendar.getInstance();
@@ -155,24 +159,24 @@ public class TimePickerFactory implements FormWidgetFactory {
                     hour = c.get(Calendar.HOUR_OF_DAY);
                     minute = c.get(Calendar.MINUTE);
 
-                } catch (ParseException e){
+                } catch (ParseException e) {
                     Log.e(TAG, "Error parsing " + timeStr + ": " + e.getMessage());
                 }
-            }else{
+            } else {
                 final Calendar c = Calendar.getInstance();
                 hour = c.get(Calendar.HOUR_OF_DAY);
                 minute = c.get(Calendar.MINUTE);
             }
 
-            TimePickerDialog.Builder builder = new TimePickerDialog.Builder(hour,minute);
+            TimePickerDialog.Builder builder = new TimePickerDialog.Builder(hour, minute);
 
             d = builder.build(view.getContext());
 
             d.positiveActionClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    int selectedHour=((TimePickerDialog)d).getHour();
-                    int selectedMinute=((TimePickerDialog)d).getMinute();
+                    int selectedHour = ((TimePickerDialog) d).getHour();
+                    int selectedMinute = ((TimePickerDialog) d).getMinute();
                     timeText.setText(String.format("%02d:%02d", selectedHour, selectedMinute));
                     d.hide();
                 }

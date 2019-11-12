@@ -1,10 +1,9 @@
 package com.vijay.jsonwizard.expressions;
 
 import android.util.Log;
-import android.util.LruCache;
+
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.InvalidPathException;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.PathNotFoundException;
@@ -12,13 +11,38 @@ import com.jayway.jsonpath.spi.json.JsonOrgJsonProvider;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import com.jayway.jsonpath.spi.mapper.JsonOrgMappingProvider;
 import com.jayway.jsonpath.spi.mapper.MappingProvider;
-import java.util.EnumSet;
-import java.util.Set;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public class JsonExpressionResolver {
+
+    static {
+        Configuration.setDefaults(new Configuration.Defaults() {
+
+            private final JsonProvider jsonProvider = new JsonOrgJsonProvider();
+            private final MappingProvider mappingProvider = new JsonOrgMappingProvider();
+
+            @Override
+            public JsonProvider jsonProvider() {
+                return jsonProvider;
+            }
+
+            @Override
+            public MappingProvider mappingProvider() {
+                return mappingProvider;
+            }
+
+            @Override
+            public Set<Option> options() {
+                return EnumSet.of(Option.DEFAULT_PATH_LEAF_TO_NULL, Option.ALWAYS_RETURN_LIST);
+            }
+        });
+    }
 
     private JSONObject dataObject;
     private DocumentContext dataDocumentContext;
@@ -28,8 +52,8 @@ public class JsonExpressionResolver {
         this(form, null);
     }
 
-    public JsonExpressionResolver(JSONObject form, ExternalContentResolver contentResolver)
-            throws JSONException {
+
+    public JsonExpressionResolver(JSONObject form, ExternalContentResolver contentResolver) throws JSONException {
         if (form.has("data")) {
             dataObject = form.getJSONObject("data");
         } else {
@@ -38,7 +62,6 @@ public class JsonExpressionResolver {
         dataDocumentContext = JsonPath.parse(dataObject);
         contentCache = new ExternalContentLru(contentResolver, 10);
     }
-
 
     public boolean isValidExpression(String expression) {
         if (expression == null) {
@@ -95,16 +118,15 @@ public class JsonExpressionResolver {
         if (externalReference != null) {
             localContext = contentCache.get(externalReference);
             if (localContext == null) {
-                Log.w("ExpressionResolver", "resolveAsArray: external content " + externalReference
-                        + " can not be loaded");
+                Log.w("ExpressionResolver",
+                    "resolveAsArray: external content " + externalReference + " can not be loaded");
                 return null;
             }
 
             localExpression = extractJsonExpression(expression);
             if (localExpression == null) {
                 Log.w("ExpressionResolver",
-                        "resolveAsArray: external content expression can not be extracted "
-                                + expression);
+                    "resolveAsArray: external content expression can not be extracted " + expression);
                 return null;
             }
         }
@@ -128,16 +150,15 @@ public class JsonExpressionResolver {
         if (externalReference != null) {
             localContext = contentCache.get(externalReference);
             if (localContext == null) {
-                Log.w("ExpressionResolver", "resolveAsArray: external content " + externalReference
-                        + " can not be loaded");
+                Log.w("ExpressionResolver",
+                    "resolveAsArray: external content " + externalReference + " can not be loaded");
                 return false;
             }
 
             localExpression = extractJsonExpression(expression);
             if (localExpression == null) {
                 Log.w("ExpressionResolver",
-                        "resolveAsArray: external content expression can not be extracted "
-                                + expression);
+                    "resolveAsArray: external content expression can not be extracted " + expression);
                 return false;
             }
         }
@@ -149,8 +170,7 @@ public class JsonExpressionResolver {
         try {
             array = localContext.read(localExpression);
         } catch (PathNotFoundException e) {
-            Log.d("ExpressionResolver",
-                    "existsExpression: checking for missing path " + localExpression);
+            Log.d("ExpressionResolver", "existsExpression: checking for missing path " + localExpression);
         }
 
         localContext.delete("current-values");
@@ -165,30 +185,6 @@ public class JsonExpressionResolver {
         }
 
         return false;
-    }
-
-    static {
-        Configuration.setDefaults(new Configuration.Defaults() {
-
-            private final JsonProvider jsonProvider = new JsonOrgJsonProvider();
-            private final MappingProvider mappingProvider = new JsonOrgMappingProvider();
-
-            @Override
-            public JsonProvider jsonProvider() {
-                return jsonProvider;
-            }
-
-            @Override
-            public MappingProvider mappingProvider() {
-                return mappingProvider;
-            }
-
-            @Override
-            public Set<Option> options() {
-                return EnumSet.of(Option.DEFAULT_PATH_LEAF_TO_NULL,
-                        Option.ALWAYS_RETURN_LIST);
-            }
-        });
     }
 
 }

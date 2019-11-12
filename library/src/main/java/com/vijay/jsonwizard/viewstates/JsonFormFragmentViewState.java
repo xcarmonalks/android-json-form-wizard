@@ -8,6 +8,23 @@ import com.vijay.jsonwizard.mvp.ViewState;
  * Created by vijay on 5/14/15.
  */
 public class JsonFormFragmentViewState extends ViewState implements android.os.Parcelable {
+    public static final Creator<JsonFormFragmentViewState> CREATOR = new Creator<JsonFormFragmentViewState>() {
+        public JsonFormFragmentViewState createFromParcel(Parcel source) {
+            return new JsonFormFragmentViewState(source);
+        }
+
+        public JsonFormFragmentViewState[] newArray(int size) {
+            return new JsonFormFragmentViewState[size];
+        }
+    };
+
+    public JsonFormFragmentViewState() {
+    }
+
+    private JsonFormFragmentViewState(Parcel in) {
+        super(in);
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -17,23 +34,4 @@ public class JsonFormFragmentViewState extends ViewState implements android.os.P
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
     }
-
-    public JsonFormFragmentViewState() {
-    }
-
-    private JsonFormFragmentViewState(Parcel in) {
-        super(in);
-    }
-
-    public static final Creator<JsonFormFragmentViewState> CREATOR = new Creator<JsonFormFragmentViewState>() {
-                                                                       public JsonFormFragmentViewState createFromParcel(
-                                                                               Parcel source) {
-                                                                           return new JsonFormFragmentViewState(source);
-                                                                       }
-
-                                                                       public JsonFormFragmentViewState[] newArray(
-                                                                               int size) {
-                                                                           return new JsonFormFragmentViewState[size];
-                                                                       }
-                                                                   };
 }

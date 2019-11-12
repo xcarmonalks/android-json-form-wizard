@@ -19,7 +19,7 @@ public interface JsonApi {
     void writeValue(String stepName, String key, String value) throws JSONException;
 
     void writeValue(String stepName, String prentKey, String childObjectKey, String childKey, String value)
-            throws JSONException;
+        throws JSONException;
 
     String currentJsonState();
 

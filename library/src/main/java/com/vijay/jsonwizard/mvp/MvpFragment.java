@@ -2,12 +2,13 @@ package com.vijay.jsonwizard.mvp;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
-public abstract class MvpFragment<P extends MvpPresenter, VS extends ViewState> extends BaseFragment<VS> implements
-        MvpView {
+import androidx.annotation.Nullable;
+
+public abstract class MvpFragment<P extends MvpPresenter, VS extends ViewState> extends BaseFragment<VS>
+    implements MvpView {
 
     protected P presenter;
 
@@ -41,7 +42,7 @@ public abstract class MvpFragment<P extends MvpPresenter, VS extends ViewState> 
         View view = getActivity().getCurrentFocus();
         if (view != null) {
             InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(
-                    Context.INPUT_METHOD_SERVICE);
+                Context.INPUT_METHOD_SERVICE);
             inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }
     }

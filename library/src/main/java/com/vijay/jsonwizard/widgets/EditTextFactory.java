@@ -1,12 +1,13 @@
 package com.vijay.jsonwizard.widgets;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
+
+import androidx.annotation.Nullable;
 
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rengwuxian.materialedittext.validation.RegexpValidator;
@@ -37,10 +38,18 @@ import java.util.List;
  */
 public class EditTextFactory implements FormWidgetFactory {
 
+    public static ValidationStatus validate(MaterialEditText editText) {
+        boolean validate = editText.validate();
+        if (!validate) {
+            return new ValidationStatus(false, editText.getError().toString());
+        }
+        return new ValidationStatus(true, null);
+    }
+
     @Override
-    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject,
-                                       CommonListener listener, JsonFormBundle bundle, JsonExpressionResolver resolver,
-                                       ResourceResolver resourceResolver, int visualizationMode) throws JSONException {
+    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener,
+        JsonFormBundle bundle, JsonExpressionResolver resolver, ResourceResolver resourceResolver,
+        int visualizationMode) throws JSONException {
         List<View> views = null;
         switch (visualizationMode) {
             case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY:
@@ -52,9 +61,8 @@ public class EditTextFactory implements FormWidgetFactory {
         return views;
     }
 
-    private List<View> getEditableViewsFromJson(String stepName, Context context,
-            JSONObject jsonObject, JsonFormBundle bundle, JsonExpressionResolver resolver)
-            throws JSONException {
+    private List<View> getEditableViewsFromJson(String stepName, Context context, JSONObject jsonObject,
+        JsonFormBundle bundle, JsonExpressionResolver resolver) throws JSONException {
 
         String readonlyValue = jsonObject.optString("readonly");
         boolean readonly = false;
@@ -73,8 +81,8 @@ public class EditTextFactory implements FormWidgetFactory {
         int minLength;
         int maxLength;
         List<View> views = new ArrayList<>(1);
-        MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(
-                R.layout.item_edit_text, null);
+        MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(R.layout.item_edit_text,
+            null);
         final String hint = bundle.resolveKey(jsonObject.getString("hint"));
         editText.setHint(hint);
         editText.setFloatingLabelText(hint);
@@ -106,8 +114,7 @@ public class EditTextFactory implements FormWidgetFactory {
                 }
 
                 if (required) {
-                    editText.addValidator(new RequiredValidator(
-                            bundle.resolveKey(requiredObject.getString("err"))));
+                    editText.addValidator(new RequiredValidator(bundle.resolveKey(requiredObject.getString("err"))));
                 }
             }
         }
@@ -117,9 +124,8 @@ public class EditTextFactory implements FormWidgetFactory {
             String minLengthValue = minLengthObject.optString("value");
             if (!TextUtils.isEmpty(minLengthValue)) {
                 minLength = Integer.parseInt(minLengthValue);
-                editText.addValidator(
-                        new MinLengthValidator(bundle.resolveKey(minLengthObject.getString("err")),
-                                Integer.parseInt(minLengthValue)));
+                editText.addValidator(new MinLengthValidator(bundle.resolveKey(minLengthObject.getString("err")),
+                    Integer.parseInt(minLengthValue)));
                 editText.setMinCharacters(minLength);
             }
         }
@@ -129,9 +135,8 @@ public class EditTextFactory implements FormWidgetFactory {
             String maxLengthValue = maxLengthObject.optString("value");
             if (!TextUtils.isEmpty(maxLengthValue)) {
                 maxLength = Integer.parseInt(maxLengthValue);
-                editText.addValidator(
-                        new MaxLengthValidator(bundle.resolveKey(maxLengthObject.getString("err")),
-                                Integer.parseInt(maxLengthValue)));
+                editText.addValidator(new MaxLengthValidator(bundle.resolveKey(maxLengthObject.getString("err")),
+                    Integer.parseInt(maxLengthValue)));
                 editText.setMaxCharacters(maxLength);
             }
         }
@@ -140,9 +145,7 @@ public class EditTextFactory implements FormWidgetFactory {
         if (regexObject != null) {
             String regexValue = regexObject.optString("value");
             if (!TextUtils.isEmpty(regexValue)) {
-                editText.addValidator(
-                        new RegexpValidator(bundle.resolveKey(regexObject.getString("err")),
-                                regexValue));
+                editText.addValidator(new RegexpValidator(bundle.resolveKey(regexObject.getString("err")), regexValue));
             }
         }
 
@@ -151,9 +154,8 @@ public class EditTextFactory implements FormWidgetFactory {
             String emailValue = emailObject.optString("value");
             if (!TextUtils.isEmpty(emailValue)) {
                 if (Boolean.TRUE.toString().equalsIgnoreCase(emailValue)) {
-                    editText.addValidator(
-                            new RegexpValidator(bundle.resolveKey(emailObject.getString("err")),
-                                    android.util.Patterns.EMAIL_ADDRESS.toString()));
+                    editText.addValidator(new RegexpValidator(bundle.resolveKey(emailObject.getString("err")),
+                        android.util.Patterns.EMAIL_ADDRESS.toString()));
                 }
             }
         }
@@ -163,9 +165,8 @@ public class EditTextFactory implements FormWidgetFactory {
             String urlValue = urlObject.optString("value");
             if (!TextUtils.isEmpty(urlValue)) {
                 if (Boolean.TRUE.toString().equalsIgnoreCase(urlValue)) {
-                    editText.addValidator(
-                            new RegexpValidator(bundle.resolveKey(urlObject.getString("err")),
-                                    Patterns.WEB_URL.toString()));
+                    editText.addValidator(new RegexpValidator(bundle.resolveKey(urlObject.getString("err")),
+                        Patterns.WEB_URL.toString()));
                 }
             }
         }
@@ -176,8 +177,7 @@ public class EditTextFactory implements FormWidgetFactory {
             if (!TextUtils.isEmpty(numericValue)) {
                 if (Boolean.TRUE.toString().equalsIgnoreCase(numericValue)) {
                     editText.addValidator(
-                            new RegexpValidator(bundle.resolveKey(numericObject.getString("err")),
-                                    "[0-9]+"));
+                        new RegexpValidator(bundle.resolveKey(numericObject.getString("err")), "[0-9]+"));
                 }
             }
         }
@@ -186,8 +186,7 @@ public class EditTextFactory implements FormWidgetFactory {
         String editType = jsonObject.optString("edit_type");
         if (!TextUtils.isEmpty(editType)) {
             if (editType.equals("number")) {
-                editText.setRawInputType(
-                        InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+                editText.setRawInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
             }
         }
 
@@ -196,11 +195,11 @@ public class EditTextFactory implements FormWidgetFactory {
         return views;
     }
 
-    private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject,
-            JsonFormBundle bundle) throws JSONException {
+    private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject, JsonFormBundle bundle)
+        throws JSONException {
         List<View> views = new ArrayList<>(1);
-        MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(
-                R.layout.item_edit_text, null);
+        MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(R.layout.item_edit_text,
+            null);
         editText.setId(ViewUtil.generateViewId());
         final String hint = bundle.resolveKey(jsonObject.getString("hint"));
         editText.setHint(hint);
@@ -216,14 +215,6 @@ public class EditTextFactory implements FormWidgetFactory {
         editText.setEnabled(false);
         views.add(editText);
         return views;
-    }
-
-    public static ValidationStatus validate(MaterialEditText editText) {
-        boolean validate = editText.validate();
-        if (!validate) {
-            return new ValidationStatus(false, editText.getError().toString());
-        }
-        return new ValidationStatus(true, null);
     }
 
     @Nullable

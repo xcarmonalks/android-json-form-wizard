@@ -2,15 +2,15 @@ package com.vijay.jsonwizard.activities;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
 import android.view.WindowManager;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
@@ -45,19 +45,18 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
     private String externalContentResolverClass;
     private String resourceResolverClass;
 
-    public void init(String json, Integer visualizationMode, String externalContentResolverClass, String resourceResolverClass) {
+    public void init(String json, Integer visualizationMode, String externalContentResolverClass,
+        String resourceResolverClass) {
         this.externalContentResolverClass = externalContentResolverClass;
         this.resourceResolverClass = resourceResolverClass;
         if (!TextUtils.isEmpty(externalContentResolverClass)) {
-            this.mContentResolver = ExternalContentResolverFactory
-                    .getInstance(this, externalContentResolverClass);
+            this.mContentResolver = ExternalContentResolverFactory.getInstance(this, externalContentResolverClass);
         }
 
         if (TextUtils.isEmpty(resourceResolverClass)) {
             this.resourceResolverClass = AssetsResourceResolver.class.getName();
         }
-        this.mResourceResolver = ResourceResolverFactory
-                .getInstance(this, this.resourceResolverClass);
+        this.mResourceResolver = ResourceResolverFactory.getInstance(this, this.resourceResolverClass);
         init(json, visualizationMode);
     }
 
@@ -94,19 +93,16 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
             String contentResolver = getIntent().getStringExtra("resolver");
             String resourceResolver = getIntent().getStringExtra("resourceResolver");
             init(getIntent().getStringExtra("json"), getIntent()
-                    .getIntExtra(JsonFormConstants.VISUALIZATION_MODE_EXTRA,
-                            JsonFormConstants.VISUALIZATION_MODE_EDIT), contentResolver, resourceResolver);
+                    .getIntExtra(JsonFormConstants.VISUALIZATION_MODE_EXTRA, JsonFormConstants.VISUALIZATION_MODE_EDIT),
+                contentResolver, resourceResolver);
             if (mJSONObject != null) {
-                getSupportFragmentManager().beginTransaction()
-                        .add(R.id.container,
-                                JsonFormFragment.getFormFragment(JsonFormConstants.FIRST_STEP_NAME))
-                        .commit();
+                getSupportFragmentManager().beginTransaction().add(R.id.container,
+                    JsonFormFragment.getFormFragment(JsonFormConstants.FIRST_STEP_NAME)).commit();
             }
         } else {
             init(savedInstanceState.getString("jsonState"),
-                    savedInstanceState.getInt(JsonFormConstants.VISUALIZATION_MODE_EXTRA),
-                    savedInstanceState.getString("resolver"),
-                    savedInstanceState.getString("resourceResolver"));
+                savedInstanceState.getInt(JsonFormConstants.VISUALIZATION_MODE_EXTRA),
+                savedInstanceState.getString("resolver"), savedInstanceState.getString("resourceResolver"));
         }
     }
 
@@ -143,9 +139,8 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
     }
 
     @Override
-    public void writeValue(String stepName, String parentKey, String childObjectKey,
-            String childKey, String value)
-            throws JSONException {
+    public void writeValue(String stepName, String parentKey, String childObjectKey, String childKey, String value)
+        throws JSONException {
         synchronized (mJSONObject) {
             JSONObject jsonObject = mJSONObject.getJSONObject(stepName);
             JSONArray fields = jsonObject.getJSONArray("fields");
@@ -258,9 +253,9 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
         boolean hasCurrentOrientationExtra = intent.hasExtra(JsonFormConstants.CURRENT_ORIENTATION_EXTRA);
         int currentOrientation = getResources().getConfiguration().orientation;
 
-        if(hasCurrentOrientationExtra){
-            rotation = getIntent().getIntExtra(JsonFormConstants.CURRENT_ORIENTATION_EXTRA,currentOrientation);
-        }else{
+        if (hasCurrentOrientationExtra) {
+            rotation = getIntent().getIntExtra(JsonFormConstants.CURRENT_ORIENTATION_EXTRA, currentOrientation);
+        } else {
             rotation = this.getWindowManager().getDefaultDisplay().getRotation();
         }
         if (hasOrientationExtra) {
@@ -269,7 +264,7 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
                 if (rotation == Surface.ROTATION_90) {
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                 } else if (rotation == Surface.ROTATION_270) {
-                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE );
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
                 }
             } else if (JsonFormConstants.ORIENTATION_PORTRAIT == orientation) {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);

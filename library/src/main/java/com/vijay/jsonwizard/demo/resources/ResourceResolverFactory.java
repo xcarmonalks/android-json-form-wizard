@@ -3,8 +3,6 @@ package com.vijay.jsonwizard.demo.resources;
 import android.content.Context;
 import android.util.Log;
 
-import com.vijay.jsonwizard.expressions.ExternalContentResolver;
-
 public class ResourceResolverFactory {
 
     private static final String TAG = "ExtContentResolverFact";
@@ -19,7 +17,7 @@ public class ResourceResolverFactory {
             }
             return (ResourceResolver) instance;
         } catch (Exception e) {
-            Log.e(TAG, "Error creating ResourceResolver instance",e);
+            Log.e(TAG, "Error creating ResourceResolver instance", e);
         }
         return null;
     }

@@ -18,14 +18,15 @@ public class FormUtils {
     public static final int MATCH_PARENT = -1;
     public static final int WRAP_CONTENT = -2;
 
-    public static LinearLayout.LayoutParams getLayoutParams(int width, int height, int left, int top, int right, int bottom) {
+    public static LinearLayout.LayoutParams getLayoutParams(int width, int height, int left, int top, int right,
+        int bottom) {
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, height);
         layoutParams.setMargins(left, top, right, bottom);
         return layoutParams;
     }
 
     public static TextView getTextViewWith(Context context, int textSizeInSp, String text, String key, String type,
-                                           LinearLayout.LayoutParams layoutParams, String fontPath) {
+        LinearLayout.LayoutParams layoutParams, String fontPath) {
         TextView textView = new TextView(context);
         textView.setText(text);
         textView.setTag(R.id.key, key);
@@ -38,7 +39,7 @@ public class FormUtils {
     }
 
     public static TextView getTextViewWith(Context context, int textSizeInSp, Spanned text, String key, String type,
-            LinearLayout.LayoutParams layoutParams, String fontPath) {
+        LinearLayout.LayoutParams layoutParams, String fontPath) {
         TextView textView = new TextView(context);
         textView.setText(text);
         textView.setTag(R.id.key, key);

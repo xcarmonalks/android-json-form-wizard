@@ -1,10 +1,10 @@
 package com.vijay.jsonwizard.widgets;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by jurkiri on 23/11/17.
@@ -14,7 +14,7 @@ public class WidgetFactoryRegistry {
 
     private static final Map<String, FormWidgetFactory> map = new HashMap<>();
 
-    static{
+    static {
         map.put(JsonFormConstants.EDIT_TEXT, new EditTextFactory());
         map.put(JsonFormConstants.LABEL, new LabelFactory());
         map.put(JsonFormConstants.CHECK_BOX, new CheckBoxFactory());
@@ -27,6 +27,7 @@ public class WidgetFactoryRegistry {
         map.put(JsonFormConstants.SEPARATOR, new SeparatorFactory());
         map.put(JsonFormConstants.CAROUSEL, new CarouselFactory());
         map.put(JsonFormConstants.EXTENDED_LABEL, new ExtendedLabelFactory());
+        map.put(JsonFormConstants.BARCODE_TEXT, new BarcodeTextFactory());
     }
 
     public static FormWidgetFactory getWidgetFactory(String type) {

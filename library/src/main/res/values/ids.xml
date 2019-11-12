@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item type="id" name="key"/>
-    <item type="id" name="type"/>
-    <item type="id" name="childKey"/>
-    <item type="id" name="imagePath"/>
-    <item type="id" name="required"/>
-    <item type="id" name="v_required"/>
-    <item type="id" name="error"/>
-    <item type="id" name="v_pattern"/>
-    <item type="id" name="minDate"/>
-    <item type="id" name="maxDate"/>
+    <item name="key" type="id"/>
+    <item name="type" type="id"/>
+    <item name="childKey" type="id"/>
+    <item name="imagePath" type="id"/>
+    <item name="required" type="id"/>
+    <item name="v_required" type="id"/>
+    <item name="error" type="id"/>
+    <item name="v_pattern" type="id"/>
+    <item name="minDate" type="id"/>
+    <item name="maxDate" type="id"/>
 
     <!-- signle, multiple -->
-    <item type="id" name="valueType"/>
+    <item name="valueType" type="id"/>
 </resources>

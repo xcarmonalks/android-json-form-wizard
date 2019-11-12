@@ -27,15 +27,15 @@ public class JsonFormBundle {
 
     public JsonFormBundle(JSONObject form, Locale locale) throws JSONException {
         mBundle = new HashMap<>();
-        if(form.has("bundle")){
+        if (form.has("bundle")) {
             loadBundle(form.getJSONObject("bundle"), locale.getLanguage());
         }
     }
 
     public String resolveKey(String key) {
-        if(!TextUtils.isEmpty(key) && key.startsWith(BUNDLE_KEY_PREFIX) && key.endsWith(BUNDLE_KEY_SUFIX)){
+        if (!TextUtils.isEmpty(key) && key.startsWith(BUNDLE_KEY_PREFIX) && key.endsWith(BUNDLE_KEY_SUFIX)) {
             final String finalKey = key.substring(2, key.length() - 1);
-            if(mBundle.containsKey(finalKey)) {
+            if (mBundle.containsKey(finalKey)) {
                 return mBundle.get(finalKey);
             }
         }
@@ -44,13 +44,13 @@ public class JsonFormBundle {
 
     private void loadBundle(JSONObject bundle, String country) throws JSONException {
         String lang = country;
-        if(!bundle.has(lang)){
+        if (!bundle.has(lang)) {
             lang = getDefaultLang(bundle);
         }
-        if(!"".equals(lang)){
+        if (!"".equals(lang)) {
             JSONObject translations = bundle.getJSONObject(lang);
             Iterator<String> transIter = translations.keys();
-            while(transIter.hasNext()){
+            while (transIter.hasNext()) {
                 String key = transIter.next();
                 mBundle.put(key, translations.getString(key));
             }
@@ -59,14 +59,14 @@ public class JsonFormBundle {
 
     private String getDefaultLang(JSONObject bundle) {
         String defLang = "";
-        for(int i = 0; i< bundle.names().length(); i++){
+        for (int i = 0; i < bundle.names().length(); i++) {
             try {
                 String currentLang = bundle.names().getString(i);
-                if("".equals(defLang)){
+                if ("".equals(defLang)) {
                     defLang = currentLang;
                 }
                 JSONObject translations = bundle.getJSONObject(currentLang);
-                if(translations.optBoolean(BUNDLE_DEFAULT_PROPERTY)) {
+                if (translations.optBoolean(BUNDLE_DEFAULT_PROPERTY)) {
                     return currentLang;
                 }
             } catch (JSONException e) {

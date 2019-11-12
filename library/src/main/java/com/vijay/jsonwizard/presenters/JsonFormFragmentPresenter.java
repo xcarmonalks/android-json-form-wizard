@@ -1,16 +1,28 @@
 package com.vijay.jsonwizard.presenters;
 
-import java.io.File;
-import java.util.Date;
-import java.util.List;
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.util.Log;
+import android.view.View;
+import android.view.ViewParent;
+import android.widget.AdapterView;
+import android.widget.CompoundButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rey.material.widget.Switch;
 import com.vijay.jsonwizard.R;
+import com.vijay.jsonwizard.barcode.LivePreviewActivity;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.customviews.CheckBox;
 import com.vijay.jsonwizard.customviews.RadioButton;
@@ -28,31 +40,21 @@ import com.vijay.jsonwizard.utils.JsonFormUtils;
 import com.vijay.jsonwizard.utils.ValidationStatus;
 import com.vijay.jsonwizard.views.JsonFormFragmentView;
 import com.vijay.jsonwizard.viewstates.JsonFormFragmentViewState;
+import com.vijay.jsonwizard.widgets.BarcodeTextFactory;
 import com.vijay.jsonwizard.widgets.CarouselFactory;
 import com.vijay.jsonwizard.widgets.DatePickerFactory;
 import com.vijay.jsonwizard.widgets.EditTextFactory;
 import com.vijay.jsonwizard.widgets.ImagePickerFactory;
 import com.vijay.jsonwizard.widgets.SpinnerFactory;
-import com.vijay.jsonwizard.widgets.TimePickerFactory;
 import com.yarolegovich.discretescrollview.DiscreteScrollView;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.util.Log;
-import android.view.View;
-import android.view.ViewParent;
-import android.widget.AdapterView;
-import android.widget.CompoundButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.File;
+import java.util.Date;
+import java.util.List;
 
 import fr.ganfra.materialspinner.MaterialSpinner;
 
@@ -62,6 +64,9 @@ import fr.ganfra.materialspinner.MaterialSpinner;
 public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragmentView<JsonFormFragmentViewState>> {
     private static final String TAG = "FormFragmentPresenter";
     private static final int RESULT_LOAD_IMG = 1;
+    private static final int RESULT_LOAD_BARCODE = 2;
+    private static final String PARAM_BARCODE = "barcode";
+    private static final String PARAM_ERROR = "error";
     private String mStepName;
     private JSONObject mStepDetails;
     private String mCurrentKey;
@@ -69,8 +74,8 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
     private JsonFormInteractor mJsonFormInteractor = JsonFormInteractor.getInstance();
 
     public void addFormElements() {
-        switch (mVisualizationMode){
-            case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY :
+        switch (mVisualizationMode) {
+            case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY:
                 addFormReadOnlylements();
                 break;
             default:
@@ -101,12 +106,12 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         JsonExpressionResolver resolver = getView().getExpressionResolver();
         ResourceResolver resourceResolver = getView().getResourceResolver();
 
-        List<View> views = getStepFormElements(stepName, step, bundle,resolver, resourceResolver);
-        while(step.has("next")){
-            try{
+        List<View> views = getStepFormElements(stepName, step, bundle, resolver, resourceResolver);
+        while (step.has("next")) {
+            try {
                 stepName = step.getString("next");
                 step = getView().getStep(stepName);
-                views.addAll(getStepFormElements(stepName, step, bundle,resolver, resourceResolver));
+                views.addAll(getStepFormElements(stepName, step, bundle, resolver, resourceResolver));
             } catch (JSONException e) {
                 Log.e(TAG, e.getMessage(), e);
             }
@@ -114,19 +119,21 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         getView().addFormElements(views);
     }
 
-    private List<View> getStepFormElements(String stepName, JSONObject stepDetails, JsonFormBundle bundle, JsonExpressionResolver resolver, ResourceResolver resourceResolver){
+    private List<View> getStepFormElements(String stepName, JSONObject stepDetails, JsonFormBundle bundle,
+        JsonExpressionResolver resolver, ResourceResolver resourceResolver) {
         List<View> views = mJsonFormInteractor.fetchFormElements(stepName, getView().getContext(), stepDetails,
-                getView().getCommonListener(), bundle, resolver, resourceResolver, mVisualizationMode);
+            getView().getCommonListener(), bundle, resolver, resourceResolver, mVisualizationMode);
         return views;
     }
 
     @SuppressLint("ResourceAsColor")
     public void setUpToolBar() {
-        if(mVisualizationMode == JsonFormConstants.VISUALIZATION_MODE_EDIT){
+        if (mVisualizationMode == JsonFormConstants.VISUALIZATION_MODE_EDIT) {
             if (!mStepName.equals(JsonFormConstants.FIRST_STEP_NAME)) {
                 getView().setUpBackButton();
             }
-            JsonFormBundle bundle = getView().getBundle(getView().getContext().getResources().getConfiguration().locale);
+            JsonFormBundle bundle = getView().getBundle(
+                getView().getContext().getResources().getConfiguration().locale);
             getView().setActionBarTitle(bundle.resolveKey(mStepDetails.optString("title")));
             if (mStepDetails.has("next")) {
                 getView().updateVisibilityOfNextAndSave(true, false);
@@ -149,7 +156,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         getView().backClick();
     }
 
-    private String resolveNextStep(JSONObject mStepDetails)  {
+    private String resolveNextStep(JSONObject mStepDetails) {
         try {
             JSONObject nextObject = mStepDetails.optJSONObject("next");
             if (nextObject != null) {
@@ -158,41 +165,40 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                     if (isDefaultStep(nextObject, names.optString(i))) {
                         return names.optString(i);
                     } else {
-                        JsonExpressionResolver resolver =  getView().getExpressionResolver();
+                        JsonExpressionResolver resolver = getView().getExpressionResolver();
                         String expression = nextObject.optString(names.optString(i));
                         if (resolver.isValidExpression(expression)) {
-                            boolean eval = resolver
-                                    .existsExpression(nextObject.optString(names.optString(i)),
-                                            getCurrentValues());
+                            boolean eval = resolver.existsExpression(nextObject.optString(names.optString(i)),
+                                getCurrentValues());
                             if (eval) {
                                 return names.optString(i);
                             }
                         } else {
-                            Log.e(TAG,"resolveNextStep: Error evaluating next step - Expression is not valid");
+                            Log.e(TAG, "resolveNextStep: Error evaluating next step - Expression is not valid");
                         }
                     }
                 }
             }
         } catch (JSONException e) {
-            Log.e(TAG, "resolveNextStep: Error evaluating next step",e);
+            Log.e(TAG, "resolveNextStep: Error evaluating next step", e);
         }
         return mStepDetails.optString("next");
     }
 
     private JSONObject getCurrentValues() throws JSONException {
-        String currentJsonState =  getView().getCurrentJsonState();
+        String currentJsonState = getView().getCurrentJsonState();
         JSONObject currentJsonObject = new JSONObject(currentJsonState);
-        JSONObject currentValues =  JsonFormUtils.extractDataFromForm(currentJsonObject);
+        JSONObject currentValues = JsonFormUtils.extractDataFromForm(currentJsonObject);
         return currentValues;
     }
 
-     private boolean isDefaultStep(JSONObject steps,String key) {
-         try {
-             return steps.getBoolean(key);
-         } catch (JSONException e) {
-             return false;
-         }
-     }
+    private boolean isDefaultStep(JSONObject steps, String key) {
+        try {
+            return steps.getBoolean(key);
+        } catch (JSONException e) {
+            return false;
+        }
+    }
 
     public void onNextClick(LinearLayout mainView) {
         ValidationStatus validationStatus = writeValuesAndValidate(mainView);
@@ -215,48 +221,63 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
             String key = (String) childAt.getTag(R.id.key);
             if (childAt instanceof MaterialEditText) {
                 MaterialEditText editText = (MaterialEditText) childAt;
-                if(editText.getTag(R.id.type).equals(JsonFormConstants.EDIT_TEXT)){
+                if (editText.getTag(R.id.type).equals(JsonFormConstants.EDIT_TEXT)) {
                     ValidationStatus validationStatus = EditTextFactory.validate(editText);
                     if (!validationStatus.isValid()) {
                         return validationStatus;
                     }
-                    if(JsonFormConstants.EDIT_GROUP.equals(type)){
+                    if (JsonFormConstants.EDIT_GROUP.equals(type)) {
                         String parentKey = (String) mainView.getTag(R.id.key);
                         String childKey = (String) childAt.getTag(R.id.key);
-                        getView().writeValue(mStepName, parentKey, JsonFormConstants.FIELDS_FIELD_NAME,
-                                childKey, editText.getText().toString());
+                        getView().writeValue(mStepName, parentKey, JsonFormConstants.FIELDS_FIELD_NAME, childKey,
+                            editText.getText().toString());
                     } else {
                         getView().writeValue(mStepName, key, editText.getText().toString());
                     }
-                }else if(editText.getTag(R.id.type).equals(JsonFormConstants.DATE_PICKER)){
+                } else if (editText.getTag(R.id.type).equals(JsonFormConstants.DATE_PICKER)) {
                     ValidationStatus validationStatus = DatePickerFactory.validate(editText);
                     if (!validationStatus.isValid()) {
                         return validationStatus;
                     }
-                    Date date = DateUtils.parseDate(editText.getText().toString(), (String) editText.getTag(R.id.v_pattern));
-                    if(JsonFormConstants.EDIT_GROUP.equals(type)){
+                    Date date = DateUtils.parseDate(editText.getText().toString(),
+                        (String) editText.getTag(R.id.v_pattern));
+                    if (JsonFormConstants.EDIT_GROUP.equals(type)) {
                         String parentKey = (String) childAt.getTag(R.id.key);
                         String childKey = (String) childAt.getTag(R.id.childKey);
-                        getView().writeValue(mStepName, parentKey, JsonFormConstants.FIELDS_FIELD_NAME,
-                                childKey, DateUtils.toJSONDateFormat(date));
+                        getView().writeValue(mStepName, parentKey, JsonFormConstants.FIELDS_FIELD_NAME, childKey,
+                            DateUtils.toJSONDateFormat(date));
                     } else {
                         getView().writeValue(mStepName, key, DateUtils.toJSONDateFormat(date));
                     }
-                }else if(editText.getTag(R.id.type).equals(JsonFormConstants.TIME_PICKER)){
-                    ValidationStatus validationStatus = TimePickerFactory.validate(editText);
+                } else if (editText.getTag(R.id.type).equals(JsonFormConstants.BARCODE_TEXT)) {
+                    ValidationStatus validationStatus = BarcodeTextFactory.validate(editText);
                     if (!validationStatus.isValid()) {
                         return validationStatus;
                     }
-                    Date date = DateUtils.parseDate(editText.getText().toString(), (String) editText.getTag(R.id.v_pattern));
-                    if(JsonFormConstants.EDIT_GROUP.equals(type)){
-                        String parentKey = (String) childAt.getTag(R.id.key);
-                        String childKey = (String) childAt.getTag(R.id.childKey);
-                        getView().writeValue(mStepName, parentKey, JsonFormConstants.FIELDS_FIELD_NAME,
-                                childKey, DateUtils.toJSONDateFormat(date));
+                    if (JsonFormConstants.EDIT_GROUP.equals(type)) {
+                        String parentKey = (String) mainView.getTag(R.id.key);
+                        String childKey = (String) childAt.getTag(R.id.key);
+                        getView().writeValue(mStepName, parentKey, JsonFormConstants.FIELDS_FIELD_NAME, childKey,
+                            editText.getText().toString());
                     } else {
-                        getView().writeValue(mStepName, key, DateUtils.toJSONDateFormat(date));
+                        getView().writeValue(mStepName, key, editText.getText().toString());
+                    }
+                } else if (editText.getTag(R.id.type).equals(JsonFormConstants.TIME_PICKER)) {
+                    ValidationStatus validationStatus = BarcodeTextFactory.validate(editText);
+                    if (!validationStatus.isValid()) {
+                        return validationStatus;
+                    }
+                    if (JsonFormConstants.EDIT_GROUP.equals(type)) {
+                        String parentKey = (String) mainView.getTag(R.id.key);
+                        String childKey = (String) childAt.getTag(R.id.key);
+                        getView().writeValue(mStepName, parentKey, JsonFormConstants.FIELDS_FIELD_NAME, childKey,
+                            editText.getText().toString());
+                    } else {
+                        getView().writeValue(mStepName, key, editText.getText().toString());
                     }
                 }
+
+
             } else if (childAt instanceof ImageView) {
                 ValidationStatus validationStatus = ImagePickerFactory.validate((ImageView) childAt);
                 if (!validationStatus.isValid()) {
@@ -270,7 +291,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                 String parentKey = (String) childAt.getTag(R.id.key);
                 String childKey = (String) childAt.getTag(R.id.childKey);
                 getView().writeValue(mStepName, parentKey, JsonFormConstants.OPTIONS_FIELD_NAME, childKey,
-                        String.valueOf(((CheckBox) childAt).isChecked()));
+                    String.valueOf(((CheckBox) childAt).isChecked()));
             } else if (childAt instanceof RadioButton) {
                 String parentKey = (String) childAt.getTag(R.id.key);
                 String childKey = (String) childAt.getTag(R.id.childKey);
@@ -287,13 +308,16 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                     spinner.setError(null);
                 }
             } else if (childAt instanceof DiscreteScrollView) {
-            DiscreteScrollView dsv = (DiscreteScrollView) childAt;
-            ValidationStatus validationStatus = CarouselFactory.validate(dsv);
-            if (!validationStatus.isValid()) {
-                return validationStatus;
-            }
-        }  else if (childAt instanceof LinearLayout) {
-                writeValuesAndValidate((LinearLayout) childAt);
+                DiscreteScrollView dsv = (DiscreteScrollView) childAt;
+                ValidationStatus validationStatus = CarouselFactory.validate(dsv);
+                if (!validationStatus.isValid()) {
+                    return validationStatus;
+                }
+            } else if (childAt instanceof LinearLayout) {
+                ValidationStatus validationStatus = writeValuesAndValidate((LinearLayout) childAt);
+                if (!validationStatus.isValid()) {
+                    return validationStatus;
+                }
             }
         }
         return new ValidationStatus(true, null);
@@ -306,7 +330,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
             returnIntent.putExtra("json", getView().getCurrentJsonState());
             getView().finishWithResult(returnIntent);
         } else {
-            Toast.makeText(getView().getContext(), validationStatus.getErrorMessage(), Toast.LENGTH_LONG);
+            Toast.makeText(getView().getContext(), validationStatus.getErrorMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -315,26 +339,47 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
             Context context = getView().getContext();
             Bitmap bitmap = ImagePicker.getImageFromResult(context, resultCode, data);
             //
-            if(bitmap!=null) {
-                File image = new File(context.getExternalCacheDir(), System.currentTimeMillis()+".jpg");
+            if (bitmap != null) {
+                File image = new File(context.getExternalCacheDir(), System.currentTimeMillis() + ".jpg");
                 ImageUtils.saveToFile(bitmap, image);
                 getView().updateRelevantImageView(bitmap, image.getAbsolutePath(), mCurrentKey);
+            }
+        }
+
+        if (requestCode == RESULT_LOAD_BARCODE) {
+            if (data != null && data.hasExtra(PARAM_BARCODE)) {
+
+                String value = data.getStringExtra(PARAM_BARCODE);
+                mStepName = getView().getArguments().getString("stepName");
+                getView().writeValue(mStepName, mCurrentKey, value);
+                getView().updateRelevantEditText(mCurrentKey, value);
+            }
+            if (data != null && data.hasExtra(PARAM_ERROR)) {
+                Toast.makeText(getView().getContext(), R.string.mlkit_not_found, Toast.LENGTH_LONG).show();
             }
         }
     }
 
     public void onClick(View v) {
 
-        if(checkFormPermissions()) {
+        if (checkFormPermissions()) {
             String key = (String) v.getTag(R.id.key);
             String type = (String) v.getTag(R.id.type);
             if (JsonFormConstants.CHOOSE_IMAGE.equals(type)) {
                 getView().hideKeyBoard();
-           /*Intent galleryIntent = new Intent(Intent.ACTION_PICK,
-                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);*/
+                /*Intent galleryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media
+                .EXTERNAL_CONTENT_URI);*/
                 Intent pickerIntent = ImagePicker.getPickImageIntent(v.getContext());
                 mCurrentKey = key;
                 getView().startActivityForResult(pickerIntent, RESULT_LOAD_IMG);
+            }
+
+            if (JsonFormConstants.BARCODE_TEXT.equals(type)) {
+                Log.d(TAG, "onClick: barcode");
+                getView().hideKeyBoard();
+                Intent barcodeIntent = new Intent(v.getContext(), LivePreviewActivity.class);
+                mCurrentKey = key;
+                getView().startActivityForResult(barcodeIntent, RESULT_LOAD_BARCODE);
             }
         }
     }
@@ -344,7 +389,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
             String parentKey = (String) compoundButton.getTag(R.id.key);
             String childKey = (String) compoundButton.getTag(R.id.childKey);
             getView().writeValue(mStepName, parentKey, JsonFormConstants.OPTIONS_FIELD_NAME, childKey,
-                    String.valueOf(((CheckBox) compoundButton).isChecked()));
+                String.valueOf(((CheckBox) compoundButton).isChecked()));
         } else if (compoundButton instanceof RadioButton) {
             if (isChecked) {
                 String parentKey = (String) compoundButton.getTag(R.id.key);
@@ -366,15 +411,15 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
     public void onCurrentItemChanged(@Nullable CarouselAdapter.ViewHolder holder, int position) {
         if (holder != null) {
             ViewParent parent = holder.itemView.getParent();
-            if (parent !=null && parent instanceof DiscreteScrollView){
+            if (parent != null && parent instanceof DiscreteScrollView) {
                 DiscreteScrollView dsvParent = (DiscreteScrollView) parent;
                 String parentKey = (String) dsvParent.getTag(R.id.key);
                 View view = holder.itemView.findViewById(R.id.value);
-                if(view != null && view instanceof TextView){
+                if (view != null && view instanceof TextView) {
                     TextView textView = (TextView) view;
                     String value = textView.getText().toString();
                     JsonFormFragmentView jffview = getView();
-                    if(jffview!=null) {
+                    if (jffview != null) {
                         jffview.writeValue(mStepName, parentKey, value);
                     }
                 }
@@ -387,34 +432,31 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         getView().writeValue(mStepName, key, String.valueOf(checked));
     }
 
-    public void setCurrentKey(String key) {
-        this.mCurrentKey = key;
-    }
-
     public String getCurrentKey() {
         return mCurrentKey;
+    }
+
+    public void setCurrentKey(String key) {
+        this.mCurrentKey = key;
     }
 
     public String getStepName() {
         return mStepName;
     }
 
-    public void setVisualizationMode(int visualizationMode){
+    public void setVisualizationMode(int visualizationMode) {
         this.mVisualizationMode = visualizationMode;
     }
 
-    private boolean checkFormPermissions(){
+    private boolean checkFormPermissions() {
 
         int PERMISSION_ALL = 1;
-        String[] PERMISSIONS = {
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.CAMERA
-        };
+        String[] PERMISSIONS = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA};
 
-        if(!hasPermissions(getView().getContext(), PERMISSIONS)){
+        if (!hasPermissions(getView().getContext(), PERMISSIONS)) {
             JsonFormFragment formFragment = (JsonFormFragment) getView();
             ActivityCompat.requestPermissions(formFragment.getActivity(), PERMISSIONS, PERMISSION_ALL);
-        }else{
+        } else {
             return true;
         }
         return false;
@@ -422,7 +464,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
 
     private boolean hasPermissions(Context context, String... permissions) {
         if (context != null && permissions != null) {
-            for (String permission : permissions) {
+            for (String permission: permissions) {
                 if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
                     return false;
                 }

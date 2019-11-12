@@ -15,10 +15,10 @@ public class ExternalContentResolverFactory {
                 Log.e(TAG, "Instance should be an instance of ExternalContentResolver");
                 throw new InstantiationException();
             }
-            ((ExternalContentResolver)instance).setContext(context);
+            ((ExternalContentResolver) instance).setContext(context);
             return (ExternalContentResolver) instance;
         } catch (Exception e) {
-            Log.e(TAG, "Error creating ExternalContentResolver instance",e);
+            Log.e(TAG, "Error creating ExternalContentResolver instance", e);
         }
         return null;
     }

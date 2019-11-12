@@ -19,7 +19,7 @@ public class DateUtils {
     private static final String JSON_DATE_PATTERN = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'";
 
     public static String toJSONDateFormat(Date date) {
-        if(date == null){
+        if (date == null) {
             return null;
         }
         final DateFormat jsonSdf = new SimpleDateFormat(JSON_DATE_PATTERN);
@@ -38,10 +38,10 @@ public class DateUtils {
 
     public static Date parseDate(String date, String pattern) {
         DateFormat sdf;
-        try{
-            if(pattern == null || "".equals(pattern)){
+        try {
+            if (pattern == null || "".equals(pattern)) {
                 sdf = new SimpleDateFormat(DEFAULT_DATE_PATTERN);
-            }else{
+            } else {
                 sdf = new SimpleDateFormat(pattern);
             }
             return sdf.parse(date);
@@ -53,9 +53,9 @@ public class DateUtils {
 
     public static String formatDate(Date date, String pattern) {
         DateFormat sdf;
-        if(pattern == null || "".equals(pattern)){
+        if (pattern == null || "".equals(pattern)) {
             sdf = new SimpleDateFormat(DEFAULT_DATE_PATTERN);
-        }else{
+        } else {
             sdf = new SimpleDateFormat(pattern);
         }
         return sdf.format(date);

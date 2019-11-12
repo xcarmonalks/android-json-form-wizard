@@ -5,4 +5,5 @@
     <string name="save">Guardar</string>
     <string name="summary">Resumen</string>
     <string name="image_picker">Seleccionar imagen</string>
+    <string name="mlkit_not_found">Módulo MLkit no encontrado. Espere a que se complete la descarga</string>
 </resources>

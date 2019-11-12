@@ -1,11 +1,12 @@
 package com.vijay.jsonwizard.mvp;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 /**
  * Created by vijay on 4/19/15.
@@ -38,8 +39,8 @@ public abstract class BaseFragment<VS extends ViewState> extends Fragment {
         int layoutRes = getLayoutRes();
         if (layoutRes == 0) {
             throw new IllegalArgumentException("getLayoutRes() returned 0, which is not allowed. "
-                    + "If you don't want to use getLayoutRes() but implement your own view for this "
-                    + "fragment manually, then you have to override onCreateView();");
+                + "If you don't want to use getLayoutRes() but implement your own view for this "
+                + "fragment manually, then you have to override onCreateView();");
         } else {
             View v = inflater.inflate(layoutRes, container, false);
             return v;
