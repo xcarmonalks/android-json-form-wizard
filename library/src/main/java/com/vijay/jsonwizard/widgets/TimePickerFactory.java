@@ -82,7 +82,7 @@ public class TimePickerFactory implements FormWidgetFactory {
         final String value = jsonObject.optString("value");
         if (!TextUtils.isEmpty(value)) {
             try {
-                Date date = DateUtils.parseJSONDate(value);
+                Date date = DateUtils.parseDate(value, widgetPattern);
                 SimpleDateFormat dateFormatter = new SimpleDateFormat(widgetPattern);
                 editText.setText(dateFormatter.format(date));
             } catch (IllegalArgumentException e) {
