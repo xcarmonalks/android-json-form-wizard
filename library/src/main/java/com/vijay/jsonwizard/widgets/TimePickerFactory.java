@@ -18,8 +18,11 @@ import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
+import com.vijay.jsonwizard.interfaces.JsonApi;
 import com.vijay.jsonwizard.utils.DateUtils;
+import com.vijay.jsonwizard.utils.JsonFormUtils;
 import com.vijay.jsonwizard.utils.ValidationStatus;
+import com.vijay.jsonwizard.validators.edittext.RequiredValidator;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,6 +33,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
+import androidx.annotation.Nullable;
 
 public class TimePickerFactory implements FormWidgetFactory {
 
@@ -53,12 +58,12 @@ public class TimePickerFactory implements FormWidgetFactory {
                 views = getReadOnlyViewsFromJson(context, jsonObject, bundle);
                 break;
             default:
-                views = getEditableViewsFromJson(context, jsonObject, bundle);
+                views = getEditableViewsFromJson(context, jsonObject, bundle, resolver);
         }
         return views;
     }
 
-    private List<View> getEditableViewsFromJson(Context context, JSONObject jsonObject, JsonFormBundle bundle)
+    private List<View> getEditableViewsFromJson(Context context, JSONObject jsonObject, JsonFormBundle bundle, JsonExpressionResolver resolver)
         throws JSONException {
         List<View> views = new ArrayList<>(1);
         final MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(
@@ -82,6 +87,25 @@ public class TimePickerFactory implements FormWidgetFactory {
                 editText.setText(dateFormatter.format(date));
             } catch (IllegalArgumentException e) {
                 Log.e(TAG, "Error parsing " + value + ": " + e.getMessage());
+            }
+        }
+
+        //add validators
+        JSONObject requiredObject = jsonObject.optJSONObject("v_required");
+        if (requiredObject != null) {
+            String requiredValue = requiredObject.getString("value");
+            if (!TextUtils.isEmpty(requiredValue)) {
+                boolean required = false;
+                if (resolver.isValidExpression(requiredValue)) {
+                    JSONObject currentValues = getCurrentValues(context);
+                    required = resolver.existsExpression(requiredValue, currentValues);
+                } else {
+                    required = Boolean.TRUE.toString().equalsIgnoreCase(requiredValue);
+                }
+
+                if (required) {
+                    editText.addValidator(new RequiredValidator(bundle.resolveKey(requiredObject.getString("err"))));
+                }
             }
         }
 
@@ -192,8 +216,17 @@ public class TimePickerFactory implements FormWidgetFactory {
             d.positiveAction("OK").negativeAction("CANCEL");
             d.show();
         }
-
     }
 
+    @Nullable
+    private JSONObject getCurrentValues(Context context) throws JSONException {
+        JSONObject currentValues = null;
+        if (context instanceof JsonApi) {
+            String currentJsonState = ((JsonApi) context).currentJsonState();
+            JSONObject currentJsonObject = new JSONObject(currentJsonState);
+            currentValues = JsonFormUtils.extractDataFromForm(currentJsonObject, false);
+        }
+        return currentValues;
+    }
 }
 
