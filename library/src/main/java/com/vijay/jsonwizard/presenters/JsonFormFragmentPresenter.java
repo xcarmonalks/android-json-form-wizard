@@ -204,9 +204,13 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         ValidationStatus validationStatus = writeValuesAndValidate(mainView);
         if (validationStatus.isValid()) {
             String nextStep = resolveNextStep(mStepDetails);
-            JsonFormFragment next = JsonFormFragment.getFormFragment(nextStep);
-            getView().hideKeyBoard();
-            getView().transactThis(next);
+            if(JsonFormConstants.END_STEP_NAME.equals(nextStep)) {
+                onSaveClick(mainView);
+            }else {
+                JsonFormFragment next = JsonFormFragment.getFormFragment(nextStep);
+                getView().hideKeyBoard();
+                getView().transactThis(next);
+            }
         } else {
             getView().showToast(validationStatus.getErrorMessage());
         }
