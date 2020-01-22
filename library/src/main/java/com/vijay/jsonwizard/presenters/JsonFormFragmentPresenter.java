@@ -55,6 +55,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.Date;
 import java.util.List;
+import java.util.prefs.Preferences;
 
 import fr.ganfra.materialspinner.MaterialSpinner;
 
@@ -156,7 +157,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         getView().backClick();
     }
 
-    private String resolveNextStep(JSONObject mStepDetails) {
+    /*private String resolveNextStep(JSONObject mStepDetails) {
         try {
             JSONObject nextObject = mStepDetails.optJSONObject("next");
             if (nextObject != null) {
@@ -185,12 +186,6 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         return mStepDetails.optString("next");
     }
 
-    private JSONObject getCurrentValues() throws JSONException {
-        String currentJsonState = getView().getCurrentJsonState();
-        JSONObject currentJsonObject = new JSONObject(currentJsonState);
-        JSONObject currentValues = JsonFormUtils.extractDataFromForm(currentJsonObject);
-        return currentValues;
-    }
 
     private boolean isDefaultStep(JSONObject steps, String key) {
         try {
@@ -198,21 +193,25 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         } catch (JSONException e) {
             return false;
         }
-    }
+    }*/
 
     public void onNextClick(LinearLayout mainView) {
-        ValidationStatus validationStatus = writeValuesAndValidate(mainView);
-        if (validationStatus.isValid()) {
-            String nextStep = resolveNextStep(mStepDetails);
-            if(JsonFormConstants.END_STEP_NAME.equals(nextStep)) {
-                onSaveClick(mainView);
-            }else {
-                JsonFormFragment next = JsonFormFragment.getFormFragment(nextStep);
-                getView().hideKeyBoard();
-                getView().transactThis(next);
+        try {
+            ValidationStatus validationStatus = writeValuesAndValidate(mainView);
+            if (validationStatus.isValid()) {
+                String nextStep = JsonFormUtils.resolveNextStep(mStepDetails, getView().getExpressionResolver(), new JSONObject(getView().getCurrentJsonState()));
+                if(JsonFormConstants.END_STEP_NAME.equals(nextStep)) {
+                    onSaveClick(mainView);
+                }else {
+                    JsonFormFragment next = JsonFormFragment.getFormFragment(nextStep);
+                    getView().hideKeyBoard();
+                    getView().transactThis(next);
+                }
+            } else {
+                getView().showToast(validationStatus.getErrorMessage());
             }
-        } else {
-            getView().showToast(validationStatus.getErrorMessage());
+        } catch (JSONException e) {
+            Log.e(TAG, "onNextClick: Error evaluating next step", e);
         }
     }
 

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +15,7 @@ import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.demo.R;
 import com.vijay.jsonwizard.demo.utils.CommonUtils;
 import com.vijay.jsonwizard.utils.JsonFormUtils;
+import com.vijay.jsonwizard.utils.PropertiesUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_GET_JSON = 1;
 
     private static final String TAG = "MainActivity";
-    private static final String DATA_JSON_PATH = "data.json";
+    private static final String DATA_JSON_PATH = "form.json";
     private static final String COMPLETE_JSON_PATH = "complete.json";
 
     private static JSONObject extractDataFromForm(String form) {
@@ -48,8 +50,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, JsonFormActivity.class);
-                String json = CommonUtils.loadJSONFromAsset(getApplicationContext(),
-                    DATA_JSON_PATH);
+                String json = null;
+                if("testFormId".equals(PropertiesUtils.getInstance(v.getContext()).getFormId())) {
+                    json = PropertiesUtils.getInstance(v.getContext()).getFormJson();
+                    Toast.makeText(v.getContext(), "Form restored form previous state", Toast.LENGTH_LONG).show();
+                    intent.putExtra("pausedStep", PropertiesUtils.getInstance(v.getContext()).getPausedStep());
+                } else {
+                    json = CommonUtils.loadJSONFromAsset(getApplicationContext(), DATA_JSON_PATH);
+                }
+
                 intent.putExtra("json", json);
                 intent.putExtra("resolver",
                     "com.vijay.jsonwizard.demo.expressions.AssetsContentResolver");
@@ -72,6 +81,27 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(intent, REQUEST_CODE_GET_JSON);
             }
         });
+        /*findViewById(R.id.button_multi).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, JsonFormActivity.class);
+                String json = CommonUtils.loadJSONFromAsset(getApplicationContext(),
+                        COMPLETE_JSON_PATH);
+                try {
+                    JSONObject multiForm = new JSONObject(json);
+                    String preForm = multiForm.getString("pre");
+                    CommonUtils.loadJSONFromAsset(getApplicationContext(),
+                            COMPLETE_JSON_PATH);
+
+                    intent.putExtra("json", json);
+                    intent.putExtra(JsonFormConstants.VISUALIZATION_MODE_EXTRA,
+                            JsonFormConstants.VISUALIZATION_MODE_READ_ONLY);
+                    startActivityForResult(intent, REQUEST_CODE_GET_JSON);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });*/
     }
 
     @Override
@@ -81,6 +111,14 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, json);
             JSONObject result = extractDataFromForm(json);
             Log.d(TAG, result.toString());
+            /*if(data.getBooleanExtra("pause", false)) {
+                PropertiesUtils.getInstance(this).setFormJson(json);
+                PropertiesUtils.getInstance(this).setFormId("testFormId");
+            }else{*/
+                PropertiesUtils.getInstance(this).setFormJson(null);
+                PropertiesUtils.getInstance(this).setFormId(null);
+                PropertiesUtils.getInstance(this).setPausedStep(null);
+            //}
         } else if (requestCode == REQUEST_CODE_GET_JSON
             && resultCode == JsonFormConstants.RESULT_JSON_PARSE_ERROR) {
             AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();

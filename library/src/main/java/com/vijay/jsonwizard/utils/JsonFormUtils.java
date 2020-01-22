@@ -2,6 +2,9 @@ package com.vijay.jsonwizard.utils;
 
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
+
+import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -133,4 +136,43 @@ public class JsonFormUtils {
         return "choose_image".equals(field.getString("type"));
     }
 
+    public static String resolveNextStep(JSONObject mStepDetails, JsonExpressionResolver resolver, JSONObject completeDoc) {
+        try {
+            JSONObject nextObject = mStepDetails.optJSONObject("next");
+            if (nextObject != null) {
+                JSONArray names = nextObject.names();
+                for (int i = 0; i < names.length(); i++) {
+                    if (isDefaultStep(nextObject, names.optString(i))) {
+                        return names.optString(i);
+                    } else {
+                        String expression = nextObject.optString(names.optString(i));
+                        if (resolver.isValidExpression(expression)) {
+                            boolean eval = resolver.existsExpression(nextObject.optString(names.optString(i)),
+                                    getCurrentValues(completeDoc));
+                            if (eval) {
+                                return names.optString(i);
+                            }
+                        } else {
+                            Log.e(TAG, "resolveNextStep: Error evaluating next step - Expression is not valid");
+                        }
+                    }
+                }
+            }
+        } catch (JSONException e) {
+            Log.e(TAG, "resolveNextStep: Error evaluating next step", e);
+        }
+        return mStepDetails.optString("next");
+    }
+
+    private static boolean isDefaultStep(JSONObject steps, String key) {
+        try {
+            return steps.getBoolean(key);
+        } catch (JSONException e) {
+            return false;
+        }
+    }
+
+    public static JSONObject getCurrentValues(JSONObject currentJSON) throws JSONException {
+        return JsonFormUtils.extractDataFromForm(currentJSON);
+    }
 }

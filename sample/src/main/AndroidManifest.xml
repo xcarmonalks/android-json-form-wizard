@@ -29,6 +29,12 @@
             android:name="com.vijay.jsonwizard.activities.JsonFormActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:label="@string/library_name" />
+
+        <receiver android:name="com.vijay.jsonwizard.demo.receivers.FormPausedReceiver">
+            <intent-filter>
+                <action android:name="jsonFormPaused"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

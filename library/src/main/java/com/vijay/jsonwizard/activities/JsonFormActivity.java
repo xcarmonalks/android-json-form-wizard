@@ -1,5 +1,6 @@
 package com.vijay.jsonwizard.activities;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
@@ -23,6 +24,8 @@ import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.fragments.JsonFormFragment;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.JsonApi;
+import com.vijay.jsonwizard.utils.JsonFormUtils;
+import com.vijay.jsonwizard.utils.PropertiesUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -96,8 +99,23 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
                     .getIntExtra(JsonFormConstants.VISUALIZATION_MODE_EXTRA, JsonFormConstants.VISUALIZATION_MODE_EDIT),
                 contentResolver, resourceResolver);
             if (mJSONObject != null) {
+                String step = JsonFormConstants.FIRST_STEP_NAME;
+                String pausedStep = getIntent().getStringExtra("pausedStep");
+
                 getSupportFragmentManager().beginTransaction().add(R.id.container,
-                    JsonFormFragment.getFormFragment(JsonFormConstants.FIRST_STEP_NAME)).commit();
+                        JsonFormFragment.getFormFragment(step)).commit();
+                try {
+                    if(pausedStep != null && !"".equals(pausedStep)){
+                        while(!pausedStep.equals(step)) {
+                            step = JsonFormUtils.resolveNextStep(mJSONObject.getJSONObject(step), getExpressionResolver(), mJSONObject);
+                            JsonFormFragment nStep = JsonFormFragment.getFormFragment(step);
+                            getSupportFragmentManager().beginTransaction().replace(R.id.container, nStep)
+                                    .addToBackStack(nStep.getClass().getSimpleName()).commit();
+                        }
+                    }
+                } catch (JSONException e) {
+                    Log.e(TAG, "onNextClick: Error evaluating next step", e);
+                }
             }
         } else {
             init(savedInstanceState.getString("jsonState"),
@@ -270,6 +288,18 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             }
             getIntent().removeExtra(JsonFormConstants.ORIENTATION_EXTRA);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if(!isFinishing()){
+            Intent intent = new Intent("jsonFormPaused");
+            intent.putExtra("json", mJSONObject.toString());
+            intent.putExtra("pausedStep", PropertiesUtils.getInstance(getBaseContext()).getPausedStep());
+            PropertiesUtils.getInstance(getBaseContext()).setPausedStep(null);
+            sendBroadcast(intent);
         }
     }
 }

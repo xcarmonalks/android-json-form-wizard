@@ -37,6 +37,7 @@ import com.vijay.jsonwizard.interfaces.JsonApi;
 import com.vijay.jsonwizard.mvp.MvpFragment;
 import com.vijay.jsonwizard.presenters.JsonFormFragmentPresenter;
 import com.vijay.jsonwizard.utils.CarouselAdapter;
+import com.vijay.jsonwizard.utils.PropertiesUtils;
 import com.vijay.jsonwizard.views.JsonFormFragmentView;
 import com.vijay.jsonwizard.viewstates.JsonFormFragmentViewState;
 
@@ -405,5 +406,14 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
     public void onScroll(float scrollPosition, int currentPosition, int newPosition,
         @Nullable CarouselAdapter.ViewHolder currentHolder, @Nullable CarouselAdapter.ViewHolder newCurrent) {
 
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if(!getActivity().isFinishing()) {
+            presenter.writeValuesAndValidate(mMainView);
+            PropertiesUtils.getInstance(getContext()).setPausedStep(presenter.getStepName());
+        }
     }
 }
