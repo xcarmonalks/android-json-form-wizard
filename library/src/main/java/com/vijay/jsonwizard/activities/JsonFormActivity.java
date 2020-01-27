@@ -294,12 +294,10 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
     @Override
     public void onPause() {
         super.onPause();
-        if(!isFinishing()){
-            Intent intent = new Intent("jsonFormPaused");
-            intent.putExtra("json", mJSONObject.toString());
-            intent.putExtra("pausedStep", PropertiesUtils.getInstance(getBaseContext()).getPausedStep());
-            PropertiesUtils.getInstance(getBaseContext()).setPausedStep(null);
-            sendBroadcast(intent);
-        }
+        Intent intent = new Intent("jsonFormPaused");
+        intent.putExtra("json", mJSONObject.toString());
+        intent.putExtra("pausedStep", PropertiesUtils.getInstance(getBaseContext()).getPausedStep());
+        PropertiesUtils.getInstance(getBaseContext()).setPausedStep(null);
+        sendBroadcast(intent);
     }
 }
