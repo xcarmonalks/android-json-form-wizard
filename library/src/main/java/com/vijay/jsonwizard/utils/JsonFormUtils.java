@@ -74,7 +74,20 @@ public class JsonFormUtils {
             JSONObject field = (JSONObject) fields.get(i);
             if (isContainer(field)) {
                 field = findInJSON(field, key);
+            } else if (isCheckbox(field)) {
+                JSONArray options = field.getJSONArray("options");
+                return findInJSONOptions(options, key);
             }
+            if (field != null && field.has("key") && field.getString("key").equals(key)) {
+                return field;
+            }
+        }
+        return null;
+    }
+
+    private static JSONObject findInJSONOptions(JSONArray fields, String key) throws JSONException {
+        for (int i = 0; i < fields.length(); i++) {
+            JSONObject field = (JSONObject) fields.get(i);
             if (field != null && field.has("key") && field.getString("key").equals(key)) {
                 return field;
             }
