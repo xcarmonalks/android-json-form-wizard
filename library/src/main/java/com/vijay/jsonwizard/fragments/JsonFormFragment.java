@@ -411,9 +411,7 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
     @Override
     public void onPause() {
         super.onPause();
-        if(!getActivity().isFinishing()) {
-            presenter.writeValuesAndValidate(mMainView);
-            PropertiesUtils.getInstance(getContext()).setPausedStep(presenter.getStepName());
-        }
+        presenter.writeValuesAndValidate(mMainView);
+        PropertiesUtils.getInstance(getContext()).setPausedStep(presenter.getStepName());
     }
 }
