@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(v.getContext(), "Form restored form previous state", Toast.LENGTH_LONG).show();
                     intent.putExtra("pausedStep", PropertiesUtils.getInstance(v.getContext()).getPausedStep());
                 } else {
-                    json = CommonUtils.loadJSONFromAsset(getApplicationContext(), DATA_JSON_PATH);
+                    json = CommonUtils.loadJSONFromAsset(getApplicationContext(), COMPLETE_JSON_PATH);
                 }
 
                 intent.putExtra("json", json);
