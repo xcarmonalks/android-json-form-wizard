@@ -103,7 +103,7 @@ public class SpinnerFactory implements FormWidgetFactory {
 
         JSONArray labelsJson = resolveOptJSONArray("labels", context, jsonObject, resolver);
 
-        ValueLabelPair[] values = getValues(valuesJson, labelsJson);
+        ValueLabelPair[] values = getValues(valuesJson, labelsJson, bundle);
         String otherOption = bundle.resolveKey(jsonObject.optString("other"));
         if (!TextUtils.isEmpty(otherOption)) {
             List<ValueLabelPair> valuesWithOther = new ArrayList<>(Arrays.asList(values));
@@ -133,7 +133,7 @@ public class SpinnerFactory implements FormWidgetFactory {
         return currentValues;
     }
 
-    private ValueLabelPair[] getValues(JSONArray valuesJson, JSONArray labelsJson) {
+    private ValueLabelPair[] getValues(JSONArray valuesJson, JSONArray labelsJson, JsonFormBundle bundle) {
         ValueLabelPair[] values = null;
         if (valuesJson != null && valuesJson.length() > 0) {
             final int valuesJsonLength = valuesJson.length();
@@ -142,7 +142,7 @@ public class SpinnerFactory implements FormWidgetFactory {
                 String value = valuesJson.optString(i);
                 if (labelsJson != null) {
                     String label = labelsJson.optString(i);
-                    values[i] = new ValueLabelPair(value, label);
+                    values[i] = new ValueLabelPair(value, bundle.resolveKey(label));
                 } else {
                     values[i] = new ValueLabelPair(value, value);
                 }
@@ -190,9 +190,9 @@ public class SpinnerFactory implements FormWidgetFactory {
         if (labelsJson != null) {
             JSONArray valuesJson = resolveOptJSONArray("values", context, jsonObject, resolver);
 
-            ValueLabelPair[] values = getValues(valuesJson, labelsJson);
+            ValueLabelPair[] values = getValues(valuesJson, labelsJson, bundle);
 
-            editText.setText(labelsJson.optString(getSelectedIdx(values, value)));
+            editText.setText(bundle.resolveKey(labelsJson.optString(getSelectedIdx(values, value))));
         } else {
             editText.setText(value);
         }
