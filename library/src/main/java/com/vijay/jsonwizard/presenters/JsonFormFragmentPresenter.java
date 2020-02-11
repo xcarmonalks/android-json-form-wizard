@@ -406,8 +406,13 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         String parentKey = (String) parent.getTag(R.id.key);
         if (position >= 0) {
-            String value = (String) parent.getItemAtPosition(position + 1);
-            getView().writeValue(mStepName, parentKey, value);
+            Object value = parent.getItemAtPosition(position + 1);
+            if (value instanceof SpinnerFactory.ValueLabelPair) {
+                getView().writeValue(mStepName, parentKey,
+                    ((SpinnerFactory.ValueLabelPair) value).getValue());
+            } else {
+                getView().writeValue(mStepName, parentKey, (String) value);
+            }
         }
     }
 

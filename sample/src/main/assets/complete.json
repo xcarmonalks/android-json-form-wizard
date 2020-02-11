@@ -104,6 +104,26 @@
           "err": "Please choose a value to proceed."
         },
         "value":"Lannister"
+      },
+      {
+        "key": "age",
+        "type": "spinner",
+        "hint": "Give Thy Age",
+        "values": [
+          "5-12",
+          "12-19",
+          ">20"
+        ],
+        "labels": [
+          "Child",
+          "Teen",
+          "Adult"
+        ],
+        "v_required": {
+          "value": "true",
+          "err": "Please choose a value to proceed."
+        },
+        "value":"12-19"
       }
     ],
     "title": "Step 1 of 2",

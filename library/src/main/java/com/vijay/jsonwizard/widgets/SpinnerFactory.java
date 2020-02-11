@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.rengwuxian.materialedittext.MaterialEditText;
@@ -58,7 +59,7 @@ public class SpinnerFactory implements FormWidgetFactory {
         List<View> views = null;
         switch (visualizationMode) {
             case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY:
-                views = getReadOnlyViewsFromJson(context, jsonObject, bundle);
+                views = getReadOnlyViewsFromJson(context, jsonObject, bundle, resolver);
                 break;
             default:
                 views = getEditableViewsFromJson(context, jsonObject, listener, bundle, resolver);
@@ -98,21 +99,15 @@ public class SpinnerFactory implements FormWidgetFactory {
             valueToSelect = value;
         }
 
-        String valuesExpression = getValuesAsJsonExpression(jsonObject, resolver);
+        JSONArray valuesJson = resolveOptJSONArray("values", context, jsonObject, resolver);
 
-        JSONArray valuesJson = null;
-        if (valuesExpression == null) {
-            valuesJson = jsonObject.optJSONArray("values");
-        } else {
-            JSONObject currentValues = getCurrentValues(context);
-            valuesJson = resolver.resolveAsArray(valuesExpression, currentValues);
-        }
+        JSONArray labelsJson = resolveOptJSONArray("labels", context, jsonObject, resolver);
 
-        String[] values = getValues(valuesJson);
+        ValueLabelPair[] values = getValues(valuesJson, labelsJson);
         String otherOption = bundle.resolveKey(jsonObject.optString("other"));
         if (!TextUtils.isEmpty(otherOption)) {
-            List<String> valuesWithOther = new ArrayList<>(Arrays.asList(values));
-            valuesWithOther.add(otherOption);
+            List<ValueLabelPair> valuesWithOther = new ArrayList<>(Arrays.asList(values));
+            valuesWithOther.add(new ValueLabelPair(otherOption, otherOption));
             values = valuesWithOther.toArray(values);
         }
 
@@ -138,23 +133,29 @@ public class SpinnerFactory implements FormWidgetFactory {
         return currentValues;
     }
 
-    private String[] getValues(JSONArray valuesJson) {
-        String[] values = null;
+    private ValueLabelPair[] getValues(JSONArray valuesJson, JSONArray labelsJson) {
+        ValueLabelPair[] values = null;
         if (valuesJson != null && valuesJson.length() > 0) {
             final int valuesJsonLength = valuesJson.length();
-            values = new String[valuesJsonLength];
+            values = new ValueLabelPair[valuesJsonLength];
             for (int i = 0; i < valuesJsonLength; i++) {
-                values[i] = valuesJson.optString(i);
+                String value = valuesJson.optString(i);
+                if (labelsJson != null) {
+                    String label = labelsJson.optString(i);
+                    values[i] = new ValueLabelPair(value, label);
+                } else {
+                    values[i] = new ValueLabelPair(value, value);
+                }
             }
         }
         return values;
     }
 
-    private int getSelectedIdx(String[] values, String valueToSelect) {
+    private int getSelectedIdx(ValueLabelPair[] values, String valueToSelect) {
         int indexToSelect = -1;
         if (values != null && values.length > 0) {
             for (int i = 0; i < values.length; i++) {
-                if (valueToSelect.equals(values[i])) {
+                if (valueToSelect.equals(values[i].value)) {
                     indexToSelect = i;
                     break;
                 }
@@ -171,7 +172,7 @@ public class SpinnerFactory implements FormWidgetFactory {
         return null;
     }
 
-    private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject, JsonFormBundle bundle)
+    private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject, JsonFormBundle bundle, JsonExpressionResolver resolver)
         throws JSONException {
         List<View> views = new ArrayList<>(1);
         MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(R.layout.item_edit_text,
@@ -183,9 +184,59 @@ public class SpinnerFactory implements FormWidgetFactory {
         editText.setTag(R.id.key, jsonObject.getString("key"));
         editText.setTag(R.id.type, jsonObject.getString("type"));
 
-        editText.setText(jsonObject.optString("value"));
+        String value = jsonObject.optString("value");
+
+        JSONArray labelsJson = resolveOptJSONArray("labels", context, jsonObject, resolver);
+        if (labelsJson != null) {
+            JSONArray valuesJson = resolveOptJSONArray("values", context, jsonObject, resolver);
+
+            ValueLabelPair[] values = getValues(valuesJson, labelsJson);
+
+            editText.setText(labelsJson.optString(getSelectedIdx(values, value)));
+        } else {
+            editText.setText(value);
+        }
+
         editText.setEnabled(false);
         views.add(editText);
         return views;
+    }
+
+    private JSONArray resolveOptJSONArray(String key, Context context, JSONObject jsonObject,
+        JsonExpressionResolver resolver) throws JSONException {
+
+        String jsonExpression = jsonObject.optString(key);
+        JSONArray array;
+        if (resolver.isValidExpression(jsonExpression)) {
+            JSONObject currentValues = getCurrentValues(context);
+            array = resolver.resolveAsArray(jsonExpression, currentValues);
+        } else {
+            array = jsonObject.optJSONArray(key);
+        }
+        return array;
+    }
+
+    public static class ValueLabelPair {
+        private String value;
+        private String label;
+
+        public ValueLabelPair(String value, String label) {
+            this.value = value;
+            this.label = label;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        @NonNull
+        @Override
+        public String toString() {
+            return this.label != null ? this.label : this.value;
+        }
     }
 }
