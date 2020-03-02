@@ -112,6 +112,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
             try {
                 stepName = step.getString("next");
                 if (JsonFormConstants.END_STEP_NAME.equals(stepName)) {
+                    mStepDetails = step;
                     break;
                 } else {
                     step = getView().getStep(stepName);
@@ -148,7 +149,12 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
             }
         } else {
             getView().setActionBarTitle(getView().getContext().getResources().getString(R.string.summary));
-            getView().updateVisibilityOfNextAndSave(false, false);
+            if (mStepDetails != null && mStepDetails.has("next")) {
+                // Special case: form with next step "end" should show "next" option
+                getView().updateVisibilityOfNextAndSave(true, false);
+            } else {
+                getView().updateVisibilityOfNextAndSave(false, false);
+            }
         }
         setUpToolBarTitleColor();
     }
@@ -201,6 +207,12 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
     }*/
 
     public void onNextClick(LinearLayout mainView) {
+        // Special case, when form has a next step "end", we allow visualization mode to have a next menu option
+        if (mVisualizationMode == JsonFormConstants.VISUALIZATION_MODE_READ_ONLY) {
+            Intent returnIntent = new Intent();
+            getView().finishWithResult(returnIntent);
+            return;
+        }
         try {
             ValidationStatus validationStatus = writeValuesAndValidate(mainView);
             if (validationStatus.isValid()) {
