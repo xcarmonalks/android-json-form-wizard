@@ -111,8 +111,13 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         while (step.has("next")) {
             try {
                 stepName = step.getString("next");
-                step = getView().getStep(stepName);
-                views.addAll(getStepFormElements(stepName, step, bundle, resolver, resourceResolver));
+                if (JsonFormConstants.END_STEP_NAME.equals(stepName)) {
+                    break;
+                } else {
+                    step = getView().getStep(stepName);
+                    views.addAll(
+                        getStepFormElements(stepName, step, bundle, resolver, resourceResolver));
+                }
             } catch (JSONException e) {
                 Log.e(TAG, e.getMessage(), e);
             }
