@@ -48,14 +48,12 @@ import com.vijay.jsonwizard.widgets.ImagePickerFactory;
 import com.vijay.jsonwizard.widgets.SpinnerFactory;
 import com.yarolegovich.discretescrollview.DiscreteScrollView;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.util.Date;
 import java.util.List;
-import java.util.prefs.Preferences;
 
 import fr.ganfra.materialspinner.MaterialSpinner;
 
@@ -79,25 +77,39 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
             case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY:
                 addFormReadOnlylements();
                 break;
+            case JsonFormConstants.VISUALIZATION_MODE_EDIT_PAUSABLE:
+                loadStepNameAndDetails();
+                addNavigationTopbar();
+                addFormEditionElements();
+                break;
             default:
+                loadStepNameAndDetails();
                 addFormEditionElements();
         }
     }
 
+    private void addNavigationTopbar() {
+        getView().setUpTopNavigationRow(!mStepName.equals(JsonFormConstants.FIRST_STEP_NAME),
+            mStepDetails.has("next"));
+    }
+
     private void addFormEditionElements() {
-        mStepName = getView().getArguments().getString("stepName");
-        JSONObject step = getView().getStep(mStepName);
         JsonFormBundle bundle = getView().getBundle(getView().getContext().getResources().getConfiguration().locale);
         JsonExpressionResolver resolver = getView().getExpressionResolver();
         ResourceResolver resourceResolver = getView().getResourceResolver();
 
+        List<View> views = getStepFormElements(mStepName, mStepDetails, bundle, resolver, resourceResolver);
+        getView().addFormElements(views);
+    }
+
+    private void loadStepNameAndDetails() {
+        mStepName = getView().getArguments().getString("stepName");
+        JSONObject step = getView().getStep(mStepName);
         try {
             mStepDetails = new JSONObject(step.toString());
         } catch (JSONException e) {
             Log.e(TAG, e.getMessage(), e);
         }
-        List<View> views = getStepFormElements(mStepName, mStepDetails, bundle, resolver, resourceResolver);
-        getView().addFormElements(views);
     }
 
     private void addFormReadOnlylements() {
@@ -147,6 +159,13 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
             } else {
                 getView().updateVisibilityOfNextAndSave(false, true);
             }
+            getView().updateVisibilityOfResume(false);
+        } else if (mVisualizationMode == JsonFormConstants.VISUALIZATION_MODE_EDIT_PAUSABLE) {
+            JsonFormBundle bundle = getView().getBundle(
+                getView().getContext().getResources().getConfiguration().locale);
+            getView().setActionBarTitle(bundle.resolveKey(mStepDetails.optString("title")));
+            getView().updateVisibilityOfNextAndSave(false, false);
+            getView().updateVisibilityOfResume(true);
         } else {
             getView().setActionBarTitle(getView().getContext().getResources().getString(R.string.summary));
             if (mStepDetails != null && mStepDetails.has("next")) {
@@ -155,6 +174,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
             } else {
                 getView().updateVisibilityOfNextAndSave(false, false);
             }
+            getView().updateVisibilityOfResume(false);
         }
         setUpToolBarTitleColor();
     }
@@ -352,6 +372,13 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         } else {
             Toast.makeText(getView().getContext(), validationStatus.getErrorMessage(), Toast.LENGTH_LONG).show();
         }
+    }
+
+    public void onPauseClick() {
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra("json", getView().getCurrentJsonState());
+        returnIntent.putExtra(JsonFormConstants.PAUSED_STEP_EXTRA, mStepName);
+        getView().pauseWithResult(returnIntent);
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

@@ -14,4 +14,9 @@
         android:title="@string/save"
         app:showAsAction="always"
     />
+    <item
+        android:id="@+id/action_resume_later"
+        android:orderInCategory="100"
+        android:title="@string/resume_later"
+        app:showAsAction="collapseActionView" />
 </menu>

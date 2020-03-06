@@ -46,6 +46,8 @@ public interface JsonFormFragmentView<VS extends ViewState> extends MvpView {
 
     void updateVisibilityOfNextAndSave(boolean next, boolean save);
 
+    void updateVisibilityOfResume(boolean resume);
+
     void hideKeyBoard();
 
     void transactThis(JsonFormFragment next);
@@ -79,4 +81,8 @@ public interface JsonFormFragmentView<VS extends ViewState> extends MvpView {
     JsonExpressionResolver getExpressionResolver();
 
     ResourceResolver getResourceResolver();
+
+    void setUpTopNavigationRow(boolean hasPrevious, boolean hasNext);
+
+    void pauseWithResult(Intent returnIntent);
 }

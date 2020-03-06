@@ -81,6 +81,27 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(intent, REQUEST_CODE_GET_JSON);
             }
         });
+        findViewById(R.id.button_start_pausable).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, JsonFormActivity.class);
+                String json = null;
+                if("testFormId".equals(PropertiesUtils.getInstance(v.getContext()).getFormId())) {
+                    json = PropertiesUtils.getInstance(v.getContext()).getFormJson();
+                    Toast.makeText(v.getContext(), "Form restored form previous state", Toast.LENGTH_LONG).show();
+                    intent.putExtra("pausedStep", PropertiesUtils.getInstance(v.getContext()).getPausedStep());
+                } else {
+                    json = CommonUtils.loadJSONFromAsset(getApplicationContext(), COMPLETE_JSON_PATH);
+                }
+
+                intent.putExtra("json", json);
+                intent.putExtra("resolver",
+                    "com.vijay.jsonwizard.demo.expressions.AssetsContentResolver");
+                intent.putExtra(JsonFormConstants.VISUALIZATION_MODE_EXTRA,
+                    JsonFormConstants.VISUALIZATION_MODE_EDIT_PAUSABLE);
+                startActivityForResult(intent, REQUEST_CODE_GET_JSON);
+            }
+        });
         /*findViewById(R.id.button_multi).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -119,6 +140,12 @@ public class MainActivity extends AppCompatActivity {
                 PropertiesUtils.getInstance(this).setFormId(null);
                 PropertiesUtils.getInstance(this).setPausedStep(null);
             //}
+
+        } else if (requestCode == REQUEST_CODE_GET_JSON && resultCode == JsonFormConstants.RESULT_PAUSE) {
+            Toast.makeText(this, "Saved form state", Toast.LENGTH_SHORT).show();
+            PropertiesUtils.getInstance(this).setFormId("testFormId");
+            PropertiesUtils.getInstance(this).setFormJson(data.getStringExtra("json"));
+            PropertiesUtils.getInstance(this).setPausedStep(data.getStringExtra(JsonFormConstants.PAUSED_STEP_EXTRA));
         } else if (requestCode == REQUEST_CODE_GET_JSON
             && resultCode == JsonFormConstants.RESULT_JSON_PARSE_ERROR) {
             AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();

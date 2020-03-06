@@ -28,6 +28,7 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rey.material.widget.Switch;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.activities.JsonFormActivity;
+import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.customviews.RadioButton;
 import com.vijay.jsonwizard.demo.resources.ResourceResolver;
 import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
@@ -56,6 +57,7 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
     private LinearLayout mMainView;
     private Menu mMenu;
     private JsonApi mJsonApi;
+    private View mTopNavigationBar;
 
     public static JsonFormFragment getFormFragment(String stepName) {
         JsonFormFragment jsonFormFragment = new JsonFormFragment();
@@ -92,6 +94,12 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
         @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_json_wizard, null);
         mMainView = (LinearLayout) rootView.findViewById(R.id.main_layout);
+        if (container != null) {
+            mTopNavigationBar = container.getRootView().findViewById(R.id.layout_navigation_bar);
+        }
+        if (mTopNavigationBar == null) {
+            Log.w(TAG, "Could not load top nav bar");
+        }
         return rootView;
     }
 
@@ -130,6 +138,9 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
             return true;
         } else if (item.getItemId() == R.id.action_save) {
             presenter.onSaveClick(mMainView);
+            return true;
+        } else if (item.getItemId() == R.id.action_resume_later) {
+            presenter.onPauseClick();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -282,6 +293,11 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
     }
 
     @Override
+    public void updateVisibilityOfResume(boolean resume) {
+        mMenu.findItem(R.id.action_resume_later).setVisible(resume);
+    }
+
+    @Override
     public void hideKeyBoard() {
         super.hideSoftKeyboard();
     }
@@ -385,6 +401,54 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
     @Override
     public ResourceResolver getResourceResolver() {
         return mJsonApi.getResourceResolver();
+    }
+
+    @Override
+    public void setUpTopNavigationRow(boolean hasPrevious, boolean hasNext) {
+        if (mTopNavigationBar == null) {
+            return;
+        }
+        mTopNavigationBar.setVisibility(View.VISIBLE);
+
+        View btnBack = mTopNavigationBar.findViewById(R.id.action_back);
+        if (hasPrevious) {
+            btnBack.setEnabled(true);
+            btnBack.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    presenter.onBackClick();
+                }
+            });
+        } else {
+            btnBack.setEnabled(false);
+        }
+        View btnNext = mTopNavigationBar.findViewById(R.id.action_next);
+        View btnSave = mTopNavigationBar.findViewById(R.id.action_save);
+        if (hasNext) {
+            btnNext.setVisibility(View.VISIBLE);
+            btnSave.setVisibility(View.GONE);
+            btnNext.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    presenter.onNextClick(mMainView);
+                }
+            });
+        } else {
+            btnNext.setVisibility(View.GONE);
+            btnSave.setVisibility(View.VISIBLE);
+            btnSave.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    presenter.onSaveClick(mMainView);
+                }
+            });
+        }
+    }
+
+    @Override
+    public void pauseWithResult(Intent returnIntent) {
+        getActivity().setResult(JsonFormConstants.RESULT_PAUSE, returnIntent);
+        getActivity().finish();
     }
 
     @Override

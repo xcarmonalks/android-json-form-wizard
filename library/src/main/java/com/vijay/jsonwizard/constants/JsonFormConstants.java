@@ -1,5 +1,7 @@
 package com.vijay.jsonwizard.constants;
 
+import static android.app.Activity.RESULT_FIRST_USER;
+
 /**
  * Created by vijay on 5/7/15.
  */
@@ -37,7 +39,11 @@ public class JsonFormConstants {
     public static final int VISUALIZATION_MODE_READ_ONLY = 2;
     public static final int VISUALIZATION_MODE_PRINT = 3;
     public static final int VISUALIZATION_MODE_SIGNATURE_VISUALIZATION = 4;
+    public static final int VISUALIZATION_MODE_EDIT_PAUSABLE = 5;
 
     public static final int RESULT_JSON_PARSE_ERROR = -2;
 
+    public static final String PAUSED_STEP_EXTRA = "pausedStep";
+
+    public static final int RESULT_PAUSE = RESULT_FIRST_USER;
 }

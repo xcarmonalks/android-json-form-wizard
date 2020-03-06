@@ -1,6 +1,5 @@
 package com.vijay.jsonwizard.activities;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
@@ -100,7 +99,7 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
                 contentResolver, resourceResolver);
             if (mJSONObject != null) {
                 String step = JsonFormConstants.FIRST_STEP_NAME;
-                String pausedStep = getIntent().getStringExtra("pausedStep");
+                String pausedStep = getIntent().getStringExtra(JsonFormConstants.PAUSED_STEP_EXTRA);
 
                 getSupportFragmentManager().beginTransaction().add(R.id.container,
                         JsonFormFragment.getFormFragment(step)).commit();
