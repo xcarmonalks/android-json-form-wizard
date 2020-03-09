@@ -5,6 +5,6 @@
     <string name="summary">Summary</string>
     <string name="image_picker">Choose image</string>
     <string name="mlkit_not_found">Module MLkit manquant. Attendez que le téléchargement soit terminé</string>
-    <string name="resume_later">Resume later</string>
+    <string name="abort_form">Abort</string>
     <string name="back">Back</string>
 </resources>

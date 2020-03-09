@@ -99,7 +99,7 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
                 contentResolver, resourceResolver);
             if (mJSONObject != null) {
                 String step = JsonFormConstants.FIRST_STEP_NAME;
-                String pausedStep = getIntent().getStringExtra(JsonFormConstants.PAUSED_STEP_EXTRA);
+                String pausedStep = getIntent().getStringExtra(JsonFormConstants.ABORTED_STEP_EXTRA);
 
                 getSupportFragmentManager().beginTransaction().add(R.id.container,
                         JsonFormFragment.getFormFragment(step)).commit();

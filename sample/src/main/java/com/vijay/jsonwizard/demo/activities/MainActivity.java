@@ -141,11 +141,11 @@ public class MainActivity extends AppCompatActivity {
                 PropertiesUtils.getInstance(this).setPausedStep(null);
             //}
 
-        } else if (requestCode == REQUEST_CODE_GET_JSON && resultCode == JsonFormConstants.RESULT_PAUSE) {
+        } else if (requestCode == REQUEST_CODE_GET_JSON && resultCode == JsonFormConstants.RESULT_ABORT) {
             Toast.makeText(this, "Saved form state", Toast.LENGTH_SHORT).show();
             PropertiesUtils.getInstance(this).setFormId("testFormId");
             PropertiesUtils.getInstance(this).setFormJson(data.getStringExtra("json"));
-            PropertiesUtils.getInstance(this).setPausedStep(data.getStringExtra(JsonFormConstants.PAUSED_STEP_EXTRA));
+            PropertiesUtils.getInstance(this).setPausedStep(data.getStringExtra(JsonFormConstants.ABORTED_STEP_EXTRA));
         } else if (requestCode == REQUEST_CODE_GET_JSON
             && resultCode == JsonFormConstants.RESULT_JSON_PARSE_ERROR) {
             AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();

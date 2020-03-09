@@ -6,6 +6,6 @@
     <string name="summary">Récapitulatif</string>
     <string name="image_picker">Sélectionner l\'image</string>
     <string name="mlkit_not_found">Módulo MLkit no encontrado. Espere a que se complete la descarga</string>
-    <string name="resume_later">Reprendre plus tard</string>
+    <string name="abort_form">Interrompre</string>
     <string name="back">Derrière</string>
 </resources>

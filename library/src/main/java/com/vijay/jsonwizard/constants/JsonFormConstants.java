@@ -43,7 +43,7 @@ public class JsonFormConstants {
 
     public static final int RESULT_JSON_PARSE_ERROR = -2;
 
-    public static final String PAUSED_STEP_EXTRA = "pausedStep";
+    public static final String ABORTED_STEP_EXTRA = "abortedStep";
 
-    public static final int RESULT_PAUSE = RESULT_FIRST_USER;
+    public static final int RESULT_ABORT = RESULT_FIRST_USER;
 }

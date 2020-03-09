@@ -374,11 +374,11 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         }
     }
 
-    public void onPauseClick() {
+    public void onAbortClick() {
         Intent returnIntent = new Intent();
         returnIntent.putExtra("json", getView().getCurrentJsonState());
-        returnIntent.putExtra(JsonFormConstants.PAUSED_STEP_EXTRA, mStepName);
-        getView().pauseWithResult(returnIntent);
+        returnIntent.putExtra(JsonFormConstants.ABORTED_STEP_EXTRA, mStepName);
+        getView().exitWithResult(returnIntent);
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

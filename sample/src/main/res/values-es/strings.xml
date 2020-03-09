@@ -1,7 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Android Json Wizard Demo</string>
     <string name="click_to_launch">Click to launch JsonActivity</string>
     <string name="click_to_launch_ro">Click to launch ReadOnly</string>
     <string name="click_to_launch_pausable">Click to launch Pausable</string>
-    <string name="abort_form">Resume later</string>
+    <string name="abort_form">Continuar luego</string>
 </resources>

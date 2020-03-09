@@ -84,5 +84,5 @@ public interface JsonFormFragmentView<VS extends ViewState> extends MvpView {
 
     void setUpTopNavigationRow(boolean hasPrevious, boolean hasNext);
 
-    void pauseWithResult(Intent returnIntent);
+    void exitWithResult(Intent returnIntent);
 }

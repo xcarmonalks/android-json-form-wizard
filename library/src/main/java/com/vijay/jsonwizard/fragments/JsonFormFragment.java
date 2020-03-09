@@ -139,8 +139,8 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
         } else if (item.getItemId() == R.id.action_save) {
             presenter.onSaveClick(mMainView);
             return true;
-        } else if (item.getItemId() == R.id.action_resume_later) {
-            presenter.onPauseClick();
+        } else if (item.getItemId() == R.id.action_abort) {
+            presenter.onAbortClick();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -294,7 +294,7 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
 
     @Override
     public void updateVisibilityOfResume(boolean resume) {
-        mMenu.findItem(R.id.action_resume_later).setVisible(resume);
+        mMenu.findItem(R.id.action_abort).setVisible(resume);
     }
 
     @Override
@@ -446,8 +446,8 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
     }
 
     @Override
-    public void pauseWithResult(Intent returnIntent) {
-        getActivity().setResult(JsonFormConstants.RESULT_PAUSE, returnIntent);
+    public void exitWithResult(Intent returnIntent) {
+        getActivity().setResult(JsonFormConstants.RESULT_ABORT, returnIntent);
         getActivity().finish();
     }
 
