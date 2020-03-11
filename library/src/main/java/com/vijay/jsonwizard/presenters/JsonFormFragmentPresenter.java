@@ -48,14 +48,12 @@ import com.vijay.jsonwizard.widgets.ImagePickerFactory;
 import com.vijay.jsonwizard.widgets.SpinnerFactory;
 import com.yarolegovich.discretescrollview.DiscreteScrollView;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.util.Date;
 import java.util.List;
-import java.util.prefs.Preferences;
 
 import fr.ganfra.materialspinner.MaterialSpinner;
 
@@ -110,12 +108,14 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         List<View> views = getStepFormElements(stepName, step, bundle, resolver, resourceResolver);
         while (step.has("next")) {
             try {
-                stepName = step.getString("next");
-                if (JsonFormConstants.END_STEP_NAME.equals(stepName)) {
+                String nextStep = JsonFormUtils.resolveNextStep(step, resolver,
+                    new JSONObject(getView().getCurrentJsonState()));
+                if (JsonFormConstants.END_STEP_NAME.equals(nextStep)) {
+                    // Break while loop, "next" step is fake
                     mStepDetails = step;
                     break;
                 } else {
-                    step = getView().getStep(stepName);
+                    step = getView().getStep(nextStep);
                     views.addAll(
                         getStepFormElements(stepName, step, bundle, resolver, resourceResolver));
                 }

@@ -127,7 +127,9 @@
       }
     ],
     "title": "Step 1 of 2",
-    "next": "step2"
+    "next": {
+      "step2": "$.current-values[?(@.age=='12-19')]"
+    }
   },
   "step2": {
     "fields": [
