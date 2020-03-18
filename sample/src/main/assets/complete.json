@@ -1,177 +1,188 @@
 {
-  "count": "2",
-  "step1": {
-    "fields": [
-      {
-        "key": "name",
-        "type": "edit_text",
-        "hint": "${step1.name}",
-        "v_min_length": {
-          "value": "3",
-          "err": "Min length should be at least 3"
-        },
-        "v_max_length": {
-          "value": "10",
-          "err": "Max length can be at most 10."
-        },
-        "value":"name_val"
-      },
-      {
-        "key": "editGroup",
-        "type": "edit_group",
-        "optNumber": "3",
-        "title": "Group title",
+    "count": "2",
+    "step1": {
         "fields": [
-          {
-            "key": "editText1",
-            "type": "edit_text",
-            "hint": "Enter value 1",
-            "value":"editText1_val"
-          },
-          {
-            "key": "editText2",
-            "type": "edit_text",
-            "hint": "Enter value 2",
-            "value":"editText2_val"
-          },
-          {
-            "key": "editText3",
-            "type": "edit_text",
-            "hint": "Enter value 3",
-            "value": "editText3_val"
-          }
-        ]
-      },
-      {
-        "key": "radioData",
-        "type": "radio",
-        "label": "${step1.radioData}",
-        "orientation": "vertical",
-        "options": [
-          {
-            "key": "areYouPro",
-            "text": "Are you pro?"
-          },
-          {
-            "key": "areYouAmature",
-            "text": "Are you amature?"
-          },
-          {
-            "key": "areYouNovice",
-            "text": "Are you novice?"
-          }
+            {
+                "key": "name",
+                "type": "edit_text",
+                "hint": "${step1.name}",
+                "v_min_length": {
+                    "value": "3",
+                    "err": "Min length should be at least 3"
+                },
+                "v_max_length": {
+                    "value": "10",
+                    "err": "Max length can be at most 10."
+                },
+                "value": "name_val"
+            },
+            {
+                "key": "editGroup",
+                "type": "edit_group",
+                "optNumber": "3",
+                "title": "Group title",
+                "fields": [
+                    {
+                        "key": "editText1",
+                        "type": "edit_text",
+                        "hint": "Enter value 1",
+                        "value": "editText1_val"
+                    },
+                    {
+                        "key": "editText2",
+                        "type": "edit_text",
+                        "hint": "Enter value 2",
+                        "value": "editText2_val"
+                    },
+                    {
+                        "key": "editText3",
+                        "type": "edit_text",
+                        "hint": "Enter value 3",
+                        "value": "editText3_val"
+                    }
+                ]
+            },
+            {
+                "key": "radioData",
+                "type": "radio",
+                "label": "${step1.radioData}",
+                "orientation": "vertical",
+                "options": [
+                    {
+                        "key": "areYouPro",
+                        "text": "Are you pro?"
+                    },
+                    {
+                        "key": "areYouAmature",
+                        "text": "Are you amature?"
+                    },
+                    {
+                        "key": "areYouNovice",
+                        "text": "Are you novice?"
+                    }
+                ],
+                "value": "areYouPro"
+            },
+            {
+                "type": "separator"
+            },
+            {
+                "key": "email",
+                "type": "edit_text",
+                "hint": "Enter Your Email",
+                "v_email": {
+                    "value": "true",
+                    "err": "Not an email."
+                },
+                "value": "email@v.al"
+            },
+            {
+                "key": "multi",
+                "type": "edit_text",
+                "hint": "Enter Multi Line Data",
+                "lines": "3",
+                "value": "multi_val"
+            },
+            {
+                "key": "date",
+                "type": "date_picker",
+                "pattern": "dd/MM/yyyy",
+                "hint": "Enter date",
+                "value": "2017-12-11T10:15:43.511Z"
+            },
+            {
+                "key": "house",
+                "type": "spinner",
+                "hint": "Name Thy House",
+                "values": [
+                    "Stark",
+                    "Targeriyan",
+                    "Lannister"
+                ],
+                "v_required": {
+                    "value": "true",
+                    "err": "Please choose a value to proceed."
+                },
+                "value": "Lannister"
+            },
+            {
+                "key": "age",
+                "type": "spinner",
+                "hint": "Give Thy Age",
+                "values": [
+                    "5-12",
+                    "12-19",
+                    ">20"
+                ],
+                "labels": [
+                    "Child",
+                    "Teen",
+                    "Adult"
+                ],
+                "v_required": {
+                    "value": "true",
+                    "err": "Please choose a value to proceed."
+                },
+                "value": "12-19"
+            }
         ],
-        "value": "areYouPro"
-      },
-      {
-        "type": "separator"
-      },
-      {
-        "key": "email",
-        "type": "edit_text",
-        "hint": "Enter Your Email",
-        "v_email": {
-          "value": "true",
-          "err": "Not an email."
-        },
-        "value": "email_val"
-      },
-      {
-        "key": "multi",
-        "type": "edit_text",
-        "hint": "Enter Multi Line Data",
-        "lines": "3",
-        "value":"multi_val"
-      },
-      {
-        "key": "date",
-        "type": "date_picker",
-        "pattern": "dd/MM/yyyy",
-        "hint": "Enter date",
-        "value": "2017-12-11T10:15:43.511Z"
-      },
-      {
-        "key": "house",
-        "type": "spinner",
-        "hint": "Name Thy House",
-        "values": [
-          "Stark",
-          "Targeriyan",
-          "Lannister"
-        ],
-        "v_required": {
-          "value": "true",
-          "err": "Please choose a value to proceed."
-        },
-        "value":"Lannister"
-      },
-      {
-        "key": "age",
-        "type": "spinner",
-        "hint": "Give Thy Age",
-        "values": [
-          "5-12",
-          "12-19",
-          ">20"
-        ],
-        "labels": [
-          "Child",
-          "Teen",
-          "Adult"
-        ],
-        "v_required": {
-          "value": "true",
-          "err": "Please choose a value to proceed."
-        },
-        "value":"12-19"
-      }
-    ],
-    "title": "Step 1 of 2",
-    "next": {
-      "step2": "$.current-values[?(@.age=='12-19')]"
-    }
-  },
-  "step2": {
-    "fields": [
-      {
-        "key": "name2",
-        "type": "edit_text",
-        "hint": "${step2.name}",
-        "value": "name2_val"
-      },
-      {
-        "key": "checkData",
-        "type": "check_box",
-        "label": "Select multiple preferences",
-        "options": [
-          {
-            "key": "awesomeness",
-            "text": "Are you willing for some awesomeness?",
-            "value": "true"
-          },
-          {
-            "key": "newsletter",
-            "text": "Do you really want to opt out from my newsletter?",
-            "value": "true"
-          },
-          {
-            "key": "thirdval",
-            "text": "Do you really like third value?",
-            "value": "false"
-          }
-        ]
-      }
-    ],
-    "title": "Step 2 of 2"
-  },
-  "bundle": {
-    "es": {
-      "step1.name": "Introduzca su nombre",
-      "step1.radioData": "Seleccione un elemento"
+        "title": "Step 1 of 2",
+        "next": {
+            "step2": "$.current-values[?(@.age=='12-19')]"
+        }
     },
-    "en": {
-      "step1.name": "Enter Your Name",
-      "step1.radioData": "Select one item from below"
+    "step2": {
+        "fields": [
+            {
+                "key": "name2",
+                "type": "edit_text",
+                "hint": "${step2.name}",
+                "value": "name2_val"
+            },
+            {
+                "key": "time",
+                "type": "time_picker",
+                "pattern": "HH:mm",
+                "value": "15:01",
+                "hint": "Current time",
+                "v_required": {
+                    "value": "true",
+                    "err": "Select the current time"
+                }
+            },
+            {
+                "key": "checkData",
+                "type": "check_box",
+                "label": "Select multiple preferences",
+                "options": [
+                    {
+                        "key": "awesomeness",
+                        "text": "Are you willing for some awesomeness?",
+                        "value": "true"
+                    },
+                    {
+                        "key": "newsletter",
+                        "text": "Do you really want to opt out from my newsletter?",
+                        "value": "true"
+                    },
+                    {
+                        "key": "thirdval",
+                        "text": "Do you really like third value?",
+                        "value": "false"
+                    }
+                ]
+            }
+        ],
+        "title": "Step 2 of 2"
+    },
+    "bundle": {
+        "es": {
+            "step1.name": "Introduzca su nombre",
+            "step1.radioData": "Seleccione un elemento"
+        },
+        "en": {
+            "step1.name": "Enter Your Name",
+            "step1.radioData": "Select one item from below"
+        }
     }
-  }
 }

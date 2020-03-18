@@ -109,7 +109,7 @@ public class TimePickerFactory implements FormWidgetFactory {
             }
         }
 
-        TimePickerListener timePickerListener = new TimePickerListener(editText);
+        TimePickerListener timePickerListener = new TimePickerListener(editText, widgetPattern);
         editText.setOnFocusChangeListener(timePickerListener);
         editText.setOnClickListener(timePickerListener);
         editText.setInputType(InputType.TYPE_NULL);
@@ -136,9 +136,7 @@ public class TimePickerFactory implements FormWidgetFactory {
         final String value = jsonObject.optString("value");
         if (!TextUtils.isEmpty(value)) {
             try {
-                Date date = DateUtils.parseJSONDate(value);
-                SimpleDateFormat widgetDateFormat = new SimpleDateFormat(widgetPattern);
-                editText.setText(widgetDateFormat.format(date));
+                editText.setText(value);
             } catch (IllegalArgumentException e) {
                 Log.e(TAG, "Error parsing " + value + ": " + e.getMessage());
             }
@@ -153,9 +151,11 @@ public class TimePickerFactory implements FormWidgetFactory {
 
         private Dialog d;
         private MaterialEditText timeText;
+        private String formatString;
 
-        public TimePickerListener(MaterialEditText editText) {
+        public TimePickerListener(MaterialEditText editText, String formatString) {
             this.timeText = editText;
+            this.formatString = formatString;
         }
 
         @Override
@@ -199,9 +199,7 @@ public class TimePickerFactory implements FormWidgetFactory {
             d.positiveActionClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    int selectedHour = ((TimePickerDialog) d).getHour();
-                    int selectedMinute = ((TimePickerDialog) d).getMinute();
-                    timeText.setText(String.format("%02d:%02d", selectedHour, selectedMinute));
+                    timeText.setText(((TimePickerDialog) d).getFormattedTime(new SimpleDateFormat(formatString)));
                     d.hide();
                 }
             });
