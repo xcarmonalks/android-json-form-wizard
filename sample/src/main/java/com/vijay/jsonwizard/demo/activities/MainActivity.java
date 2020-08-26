@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final String DATA_JSON_PATH = "form.json";
     private static final String COMPLETE_JSON_PATH = "complete.json";
+    private static final String MAPS_SAMPLE = "maps.json";
 
     private static JSONObject extractDataFromForm(String form) {
         try {
@@ -78,6 +79,15 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("json", json);
                 intent.putExtra(JsonFormConstants.VISUALIZATION_MODE_EXTRA,
                     JsonFormConstants.VISUALIZATION_MODE_READ_ONLY);
+                startActivityForResult(intent, REQUEST_CODE_GET_JSON);
+            }
+        });
+        findViewById(R.id.button_launch_maps).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, JsonFormActivity.class);
+                String json = CommonUtils.loadJSONFromAsset(getApplicationContext(), MAPS_SAMPLE);
+                intent.putExtra("json", json);
                 startActivityForResult(intent, REQUEST_CODE_GET_JSON);
             }
         });

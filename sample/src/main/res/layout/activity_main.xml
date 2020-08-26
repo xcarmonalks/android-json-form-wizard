@@ -1,20 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/button_start"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="@string/click_to_launch"/>
-    <Button
-        android:id="@+id/button_start_ro"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/button_start"
-        android:layout_alignStart="@+id/button_start"
-        android:layout_alignEnd="@+id/button_start"
-        android:text="@string/click_to_launch_ro"/>
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/button_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/click_to_launch" />
+
+        <Button
+            android:id="@+id/button_start_ro"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/click_to_launch_ro" />
+
+        <Button
+            android:id="@+id/button_launch_maps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/click_to_launch_maps_sample" />
+
+    </LinearLayout>
+
 </RelativeLayout>

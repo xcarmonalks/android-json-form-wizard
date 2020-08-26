@@ -22,6 +22,7 @@ public class JsonFormConstants {
     public static final String EDIT_GROUP = "edit_group";
     public static final String SEPARATOR = "separator";
     public static final String CAROUSEL = "carousel";
+    public static final String LOCATION_PICKER = "location";
 
     public static final String ORIENTATION_EXTRA = "screen_orientation";
     public static final String CURRENT_ORIENTATION_EXTRA = "current_orientation";

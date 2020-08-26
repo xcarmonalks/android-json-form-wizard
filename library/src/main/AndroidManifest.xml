@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.vijay.jsonwizard">
 
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <application>
 
         <provider
@@ -14,7 +15,9 @@
                 android:resource="@xml/provider_paths"/>
         </provider>
 
-        <activity android:name=".barcode.LivePreviewActivity" android:exported="true"/>m
+        <activity android:name=".barcode.LivePreviewActivity" android:exported="true"/>
+
+        <activity android:name=".maps.MapsActivity" android:exported="true" />
 
     </application>
 

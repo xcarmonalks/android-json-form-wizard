@@ -1,7 +1,11 @@
 package com.vijay.jsonwizard.presenters;
 
+import static com.vijay.jsonwizard.maps.MapsActivity.EXTRA_INITIAL_LOCATION;
+import static com.vijay.jsonwizard.maps.MapsActivity.EXTRA_RESULT_LOCATION;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -31,6 +35,7 @@ import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.fragments.JsonFormFragment;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interactors.JsonFormInteractor;
+import com.vijay.jsonwizard.maps.MapsActivity;
 import com.vijay.jsonwizard.mvp.MvpBasePresenter;
 import com.vijay.jsonwizard.utils.CarouselAdapter;
 import com.vijay.jsonwizard.utils.DateUtils;
@@ -64,6 +69,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
     private static final String TAG = "FormFragmentPresenter";
     private static final int RESULT_LOAD_IMG = 1;
     private static final int RESULT_LOAD_BARCODE = 2;
+    private static final int RESULT_LOAD_LOCATION = 3;
     private static final String PARAM_BARCODE = "barcode";
     private static final String PARAM_ERROR = "error";
     private String mStepName;
@@ -378,6 +384,22 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                 Toast.makeText(getView().getContext(), R.string.mlkit_not_found, Toast.LENGTH_LONG).show();
             }
         }
+
+        if (requestCode == RESULT_LOAD_LOCATION) {
+            handleResultLocation(resultCode, data);
+        }
+    }
+
+    private void handleResultLocation(int resultCode, Intent data) {
+        Log.i(TAG, "LOCATION RESULT: " + resultCode);
+        if (resultCode == Activity.RESULT_OK && data != null) {
+            String location = data.getStringExtra(EXTRA_RESULT_LOCATION);
+            Log.i(TAG, "LOCATION RESULT: " + location);
+            mStepName = getView().getArguments().getString("stepName");
+            getView().writeValue(mStepName, mCurrentKey, location);
+            getView().updateRelevantEditText(mCurrentKey, location);
+            getView().updateRelevantMap(mCurrentKey, location);
+        }
     }
 
     public void onClick(View v) {
@@ -400,6 +422,16 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                 Intent barcodeIntent = new Intent(v.getContext(), LivePreviewActivity.class);
                 mCurrentKey = key;
                 getView().startActivityForResult(barcodeIntent, RESULT_LOAD_BARCODE);
+            }
+
+            if (JsonFormConstants.LOCATION_PICKER.equals(type)) {
+                Log.d(TAG, "onClick: location");
+                getView().hideKeyBoard();
+                Intent intent = new Intent(v.getContext(), MapsActivity.class);
+                String value = (String) v.getTag(R.id.value);
+                intent.putExtra(EXTRA_INITIAL_LOCATION, value);
+                mCurrentKey = key;
+                getView().startActivityForResult(intent, RESULT_LOAD_LOCATION);
             }
         }
     }

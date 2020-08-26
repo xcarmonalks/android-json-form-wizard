@@ -1,0 +1,12 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".maps.MapsActivity">
+    <item
+        android:id="@+id/action_choose"
+        android:orderInCategory="100"
+        android:title="@string/choose"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_location_18dp" />
+
+</menu>

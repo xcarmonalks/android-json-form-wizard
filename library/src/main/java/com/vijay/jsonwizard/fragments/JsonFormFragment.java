@@ -1,5 +1,7 @@
 package com.vijay.jsonwizard.fragments;
 
+import static android.view.View.VISIBLE;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -34,6 +36,7 @@ import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.JsonApi;
+import com.vijay.jsonwizard.maps.MapsUtils;
 import com.vijay.jsonwizard.mvp.MvpFragment;
 import com.vijay.jsonwizard.presenters.JsonFormFragmentPresenter;
 import com.vijay.jsonwizard.utils.CarouselAdapter;
@@ -162,7 +165,7 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
                 String key = (String) imageView.getTag(R.id.key);
                 if (key.equals(currentKey)) {
                     imageView.setImageBitmap(bitmap);
-                    imageView.setVisibility(View.VISIBLE);
+                    imageView.setVisibility(VISIBLE);
                     imageView.setTag(R.id.imagePath, imagePath);
                     //imageView.setAdjustViewBounds(true);
                     imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
@@ -201,6 +204,11 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
         if (editText != null) {
             editText.setText(value);
         }
+    }
+
+    @Override
+    public void updateRelevantMap(String key, String value) {
+        MapsUtils.loadStaticMap(this, key, value);
     }
 
     @Override
