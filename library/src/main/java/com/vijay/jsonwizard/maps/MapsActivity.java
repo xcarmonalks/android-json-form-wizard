@@ -37,7 +37,7 @@ import com.vijay.jsonwizard.R;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    public static final String EXTRA_INITIAL_LOCATION = "INITIAL_LATITUDE";
+    public static final String EXTRA_INITIAL_LOCATION = "INITIAL_LOCATION";
     public static final String EXTRA_USE_ACCURACY = "USE_ACCURACY";
     public static final String EXTRA_RESULT_LOCATION = "RESULT_LOCATION";
 

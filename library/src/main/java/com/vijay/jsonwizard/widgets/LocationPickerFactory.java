@@ -106,11 +106,8 @@ public class LocationPickerFactory implements FormWidgetFactory {
             } else {
                 Log.w(TAG, "Context is not a FragmentActivity");
             }
-        }
+        } else {
 
-        if (!TextUtils.isEmpty(jsonObject.optString("lines"))) {
-            editText.setSingleLine(false);
-            editText.setLines(jsonObject.optInt("lines"));
         }
 
         //add validators
@@ -132,16 +129,6 @@ public class LocationPickerFactory implements FormWidgetFactory {
                 }
             }
         }
-
-        // edit type check
-        String editType = jsonObject.optString("edit_type");
-        if (!TextUtils.isEmpty(editType)) {
-            if (editType.equals("number")) {
-                editText.setRawInputType(
-                    InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-            }
-        }
-
         editText.addTextChangedListener(new GenericTextWatcher(stepName, editText));
         views.add(parentView);
         return views;
@@ -153,6 +140,7 @@ public class LocationPickerFactory implements FormWidgetFactory {
         JsonFormBundle bundle) throws JSONException {
         List<View> views = new ArrayList<>(1);
         View parentView = LayoutInflater.from(context).inflate(R.layout.item_location_text, null);
+
         final MaterialEditText editText = parentView.findViewById(R.id.edit_text);
         editText.setId(ViewUtil.generateViewId());
         final String hint = bundle.resolveKey(jsonObject.getString("hint"));
@@ -160,13 +148,21 @@ public class LocationPickerFactory implements FormWidgetFactory {
         editText.setFloatingLabelText(hint);
         editText.setTag(R.id.key, jsonObject.getString("key"));
         editText.setTag(R.id.type, jsonObject.getString("type"));
-        editText.setText(jsonObject.optString("value"));
-
-        if (!TextUtils.isEmpty(jsonObject.optString("lines"))) {
-            editText.setSingleLine(false);
-            editText.setLines(jsonObject.optInt("lines"));
-        }
+        String value = jsonObject.optString("value");
+        editText.setText(value);
         editText.setEnabled(false);
+
+        if (!TextUtils.isEmpty(value)) {
+            if (context instanceof FragmentActivity) {
+                MapsUtils.loadStaticMap((FragmentActivity) context, jsonObject.getString("key"),
+                    jsonObject.getString("value"));
+            } else {
+                Log.w(TAG, "Context is not a FragmentActivity");
+                parentView.findViewById(R.id.map_container).setVisibility(View.GONE);
+            }
+        } else {
+            parentView.findViewById(R.id.map_container).setVisibility(View.GONE);
+        }
 
         final ImageView imageView = parentView.findViewById(R.id.icon);
         imageView.setClickable(false);

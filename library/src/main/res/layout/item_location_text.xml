@@ -5,9 +5,9 @@
     android:orientation="vertical">
 
     <FrameLayout
-        android:visibility="gone"
         android:id="@+id/map_container"
         android:layout_width="match_parent"
+        android:background="@drawable/textview_border"
         android:layout_height="255dp" />
 
     <LinearLayout

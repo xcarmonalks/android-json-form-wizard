@@ -1,7 +1,6 @@
 package com.vijay.jsonwizard.maps;
 
 import android.util.Log;
-import android.view.View;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -25,8 +24,10 @@ public class MapsUtils {
 
     private static final String TAG = "JsonFormsActivity";
 
+    private static final String COORD_SEPARATOR = ",";
+
     public static LatLng parse(String latLng) {
-        String[] parts = latLng.split(",");
+        String[] parts = latLng.split(COORD_SEPARATOR);
         if (parts.length != 2 && parts.length != 3) {
             throw new IllegalArgumentException("Invalid coordinate string: " + latLng);
         }
@@ -43,18 +44,15 @@ public class MapsUtils {
 
     public static void loadStaticMap(FragmentActivity activity, String key, String value) {
         FragmentManager fragmentManager = activity.getSupportFragmentManager();
-        View container = activity.findViewById(R.id.map_container);
-        loadStaticMap(fragmentManager, container, key, value);
+        loadStaticMap(fragmentManager, key, value);
     }
 
     public static void loadStaticMap(Fragment fragment, String key, String value) {
         FragmentManager fragmentManager = fragment.getFragmentManager();
-        View container = fragment.getView().findViewById(R.id.map_container);
-        loadStaticMap(fragmentManager, container, key, value);
+        loadStaticMap(fragmentManager, key, value);
     }
 
-    private static void loadStaticMap(FragmentManager fragmentManager, View container, String key,
-        String value) {
+    private static void loadStaticMap(FragmentManager fragmentManager, String key, String value) {
         try {
             Log.d(TAG, "Updating map");
             final LatLng position = MapsUtils.parse(value);
@@ -73,7 +71,7 @@ public class MapsUtils {
 
                 mapFragment = SupportMapFragment.newInstance(options);
 
-                transaction.replace(container.getId(), mapFragment, key);
+                transaction.replace(R.id.map_container, mapFragment, key);
                 transaction.commit();
             }
 
@@ -88,11 +86,8 @@ public class MapsUtils {
                     googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(pos));
                 }
             });
-
-            container.setVisibility(VISIBLE);
         } catch (Exception e) {
-            Log.w(TAG, "Invalid GPS value: " + value);
-            container.setVisibility(GONE);
+            Log.w(TAG, "Invalid GPS value: " + value, e);
         }
     }
 
@@ -102,7 +97,7 @@ public class MapsUtils {
             return false;
         }
 
-        String[] parts = value.split(", ");
+        String[] parts = value.split(COORD_SEPARATOR);
         if (parts.length != 2 && parts.length != 3) {
             return false;
         }
