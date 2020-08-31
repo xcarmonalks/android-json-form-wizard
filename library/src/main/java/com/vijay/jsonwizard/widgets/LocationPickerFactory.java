@@ -74,9 +74,12 @@ public class LocationPickerFactory implements FormWidgetFactory {
         final View parentView = LayoutInflater.from(context).inflate(R.layout.item_location_text, null);
         parentView.setTag(R.id.key, jsonObject.getString("key"));
         parentView.setTag(R.id.type, jsonObject.getString("type"));
+        parentView.setTag(R.id.accuracy, jsonObject.has("accuracy") && jsonObject.getBoolean("accuracy"));
 
         final MaterialEditText editText = parentView.findViewById(R.id.edit_text);
         final String hint = bundle.resolveKey(jsonObject.getString("hint"));
+        editText.setRawInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL
+            | InputType.TYPE_NUMBER_FLAG_SIGNED);
         editText.setTag(R.id.key, jsonObject.getString("key"));
         editText.setTag(R.id.type, jsonObject.getString("type"));
         editText.setHint(hint);

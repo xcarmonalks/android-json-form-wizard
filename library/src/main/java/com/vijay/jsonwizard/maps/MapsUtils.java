@@ -30,7 +30,7 @@ public class MapsUtils {
 
     public static LatLng parse(String latLng) {
         String[] parts = latLng.split(", ");
-        if (parts.length != 2) {
+        if (parts.length != 2 && parts.length != 3) {
             throw new IllegalArgumentException("Invalid coordinate string: " + latLng);
         }
         return new LatLng(Double.parseDouble(parts[0]), Double.parseDouble(parts[1]));
@@ -38,6 +38,10 @@ public class MapsUtils {
 
     public static String toString(LatLng latLng) {
         return String.format("%s, %s", latLng.latitude, latLng.longitude);
+    }
+
+    public static String toString(LatLng latLng, float accuracy) {
+        return String.format("%s, %s, %s", latLng.latitude, latLng.longitude, accuracy);
     }
 
     public static void loadStaticMap(FragmentActivity activity, String key, String value) {
@@ -96,5 +100,22 @@ public class MapsUtils {
     }
 
 
+    public static boolean isValidPositionString(String value) {
+        if (value == null) {
+            return false;
+        }
 
+        String[] parts = value.split(", ");
+        if (parts.length != 2 && parts.length != 3) {
+            return false;
+        }
+
+        try {
+            Double.parseDouble(parts[0]);
+            Double.parseDouble(parts[1]);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
 }

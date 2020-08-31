@@ -5,7 +5,8 @@
             {
                 "key": "map",
                 "type": "location",
-                "hint": "Location"
+                "hint": "Location",
+                "accuracy": true
             }
         ],
         "title": "Maps sample form"

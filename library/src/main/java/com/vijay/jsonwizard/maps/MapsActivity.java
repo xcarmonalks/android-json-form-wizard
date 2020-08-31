@@ -38,14 +38,18 @@ import com.vijay.jsonwizard.R;
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     public static final String EXTRA_INITIAL_LOCATION = "INITIAL_LATITUDE";
+    public static final String EXTRA_USE_ACCURACY = "USE_ACCURACY";
     public static final String EXTRA_RESULT_LOCATION = "RESULT_LOCATION";
 
     private static final String TAG = "JsonFormActivity";
     private static final int REQUEST_CODE_LOCATION = 80;
 
     private GoogleMap mMap;
-    private LatLng mInitialPos;
-    private LatLng mMarkerPosition;
+    private String mInitialPos;
+    private String mMarkerPosition;
+    private Marker mMarker;
+
+    private boolean mIncludeAccuracy;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,9 +63,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Load extra datas
         Intent intent = getIntent();
+        mIncludeAccuracy = intent.getBooleanExtra(EXTRA_USE_ACCURACY, false);
+
         if (intent.hasExtra(EXTRA_INITIAL_LOCATION)) {
             try {
-                mInitialPos = MapsUtils.parse(intent.getStringExtra(EXTRA_INITIAL_LOCATION));
+                mInitialPos = intent.getStringExtra(EXTRA_INITIAL_LOCATION);
             } catch (IllegalArgumentException e) {
                 Log.w(TAG, "Invalid initial position", e);
                 attemptMarkCurrentLocation();
@@ -88,7 +94,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_choose) {
             Intent data = new Intent();
-            data.putExtra(EXTRA_RESULT_LOCATION, MapsUtils.toString(mMarkerPosition));
+            data.putExtra(EXTRA_RESULT_LOCATION, mMarkerPosition);
             setResult(RESULT_OK, data);
             finish();
             return true;
@@ -112,7 +118,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 attemptMarkCurrentLocation();
             } else {
                 Log.w(TAG, "Current location permission not granted");
-                updateMapMarker(new LatLng(0, 0));
+                String position = getPositionWithOptionalAccuracy(new LatLng(0, 0), 0);
+                updateMapMarker(position, true);
             }
         }
     }
@@ -123,22 +130,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.setMinZoomPreference(MIN_ZOOM_LEVEL);
         mMap.setMaxZoomPreference(MAX_ZOOM_LEVEL);
 
-        // Add a marker in Sydney and move the camera
         if (mInitialPos != null) {
-            updateMapMarker(mInitialPos);
+            updateMapMarker(mInitialPos, true);
         }
-        mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+        mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
             @Override
-            public void onMarkerDragStart(Marker marker) {
-            }
-
-            @Override
-            public void onMarkerDrag(Marker marker) {
-            }
-
-            @Override
-            public void onMarkerDragEnd(Marker marker) {
-                mMarkerPosition = marker.getPosition();
+            public void onCameraMove() {
+                mMarkerPosition = getPositionWithOptionalAccuracy(mMap.getCameraPosition().target,
+                    -1);
+                updateMapMarker(mMarkerPosition, false);
             }
         });
     }
@@ -152,7 +152,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_CODE_LOCATION);
             } else {
                 // Put marker in default position
-                updateMapMarker(new LatLng(0, 0));
+                String position = getPositionWithOptionalAccuracy(new LatLng(0, 0), 0);
+                updateMapMarker(position, true);
             }
         } else {
             FusedLocationProviderClient fusedLocationClient =
@@ -162,11 +163,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 new OnCompleteListener<Location>() {
                     @Override
                     public void onComplete(@NonNull Task<Location> task) {
-                        double lat = task.getResult().getLatitude();
-                        double lng = task.getResult().getLongitude();
-                        mInitialPos = new LatLng(lat, lng);
+                        if (task.getResult() != null) {
+                            double lat = task.getResult().getLatitude();
+                            double lng = task.getResult().getLongitude();
+                            LatLng latLng = new LatLng(lat, lng);
+                            float accuracy = task.getResult().getAccuracy();
 
-                        updateMapMarker(mInitialPos);
+                            mInitialPos = getPositionWithOptionalAccuracy(latLng, accuracy);
+                            updateMapMarker(mInitialPos, true);
+                        } else {
+                            Log.w(TAG, "Could not obtain last location", task.getException());
+                            String position = getPositionWithOptionalAccuracy(new LatLng(0, 0), 0);
+                            updateMapMarker(position, true);
+                        }
                     }
                 });
         }
@@ -177,13 +186,30 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             == PackageManager.PERMISSION_GRANTED;
     }
 
-    private void updateMapMarker(LatLng markerPosition) {
+    private void updateMapMarker(String markerPosition, boolean repositionCamera) {
         if (mMap != null) {
-            mMap.clear();
-            mMap.addMarker(new MarkerOptions().position(markerPosition).draggable(true));
-            CameraPosition pos = CameraPosition.builder().target(markerPosition).zoom(
-                MAX_ZOOM_LEVEL).build();
-            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(pos));
+            LatLng latLng = MapsUtils.parse(markerPosition);
+            if (mMarker == null) {
+                mMap.clear();
+                mMarker = mMap.addMarker(new MarkerOptions().position(latLng));
+            } else {
+                mMarker.setPosition(latLng);
+            }
+            if (repositionCamera) {
+                CameraPosition pos = CameraPosition.builder().target(latLng).zoom(MAX_ZOOM_LEVEL)
+                                                   .build();
+                mMap.moveCamera(CameraUpdateFactory.newCameraPosition(pos));
+            }
+
+            mMarkerPosition = markerPosition;
+        }
+    }
+
+    private String getPositionWithOptionalAccuracy(LatLng latLng, float accuracy) {
+        if (mIncludeAccuracy) {
+            return MapsUtils.toString(latLng, accuracy);
+        } else {
+            return MapsUtils.toString(latLng);
         }
     }
 

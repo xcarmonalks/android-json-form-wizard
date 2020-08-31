@@ -2,6 +2,7 @@ package com.vijay.jsonwizard.presenters;
 
 import static com.vijay.jsonwizard.maps.MapsActivity.EXTRA_INITIAL_LOCATION;
 import static com.vijay.jsonwizard.maps.MapsActivity.EXTRA_RESULT_LOCATION;
+import static com.vijay.jsonwizard.maps.MapsActivity.EXTRA_USE_ACCURACY;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -36,6 +37,7 @@ import com.vijay.jsonwizard.fragments.JsonFormFragment;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interactors.JsonFormInteractor;
 import com.vijay.jsonwizard.maps.MapsActivity;
+import com.vijay.jsonwizard.maps.MapsUtils;
 import com.vijay.jsonwizard.mvp.MvpBasePresenter;
 import com.vijay.jsonwizard.utils.CarouselAdapter;
 import com.vijay.jsonwizard.utils.DateUtils;
@@ -429,7 +431,11 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                 getView().hideKeyBoard();
                 Intent intent = new Intent(v.getContext(), MapsActivity.class);
                 String value = (String) v.getTag(R.id.value);
-                intent.putExtra(EXTRA_INITIAL_LOCATION, value);
+                boolean useAccuracy = (boolean) v.getTag(R.id.accuracy);
+                if (value != null && MapsUtils.isValidPositionString(value)) {
+                    intent.putExtra(EXTRA_INITIAL_LOCATION, value);
+                }
+                intent.putExtra(EXTRA_USE_ACCURACY, useAccuracy);
                 mCurrentKey = key;
                 getView().startActivityForResult(intent, RESULT_LOAD_LOCATION);
             }

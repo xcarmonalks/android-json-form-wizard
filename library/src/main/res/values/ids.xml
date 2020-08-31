@@ -13,4 +13,7 @@
 
     <!-- signle, multiple -->
     <item name="valueType" type="id"/>
+
+    <!-- true, false : used with widget type location -->
+    <item name="accuracy" type="id" />
 </resources>
