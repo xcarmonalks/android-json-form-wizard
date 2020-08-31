@@ -6,7 +6,11 @@
                 "key": "map",
                 "type": "location",
                 "hint": "Location",
-                "accuracy": true
+                "accuracy": true,
+                "v_required": {
+                    "value": "true",
+                    "err": "Pick a location"
+                }
             }
         ],
         "title": "Maps sample form"

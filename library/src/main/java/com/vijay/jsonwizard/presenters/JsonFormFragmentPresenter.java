@@ -52,6 +52,7 @@ import com.vijay.jsonwizard.widgets.CarouselFactory;
 import com.vijay.jsonwizard.widgets.DatePickerFactory;
 import com.vijay.jsonwizard.widgets.EditTextFactory;
 import com.vijay.jsonwizard.widgets.ImagePickerFactory;
+import com.vijay.jsonwizard.widgets.LocationPickerFactory;
 import com.vijay.jsonwizard.widgets.SpinnerFactory;
 import com.yarolegovich.discretescrollview.DiscreteScrollView;
 
@@ -292,6 +293,19 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                     }
                 } else if (editText.getTag(R.id.type).equals(JsonFormConstants.TIME_PICKER)) {
                     ValidationStatus validationStatus = BarcodeTextFactory.validate(editText);
+                    if (!validationStatus.isValid()) {
+                        return validationStatus;
+                    }
+                    if (JsonFormConstants.EDIT_GROUP.equals(type)) {
+                        String parentKey = (String) mainView.getTag(R.id.key);
+                        String childKey = (String) childAt.getTag(R.id.key);
+                        getView().writeValue(mStepName, parentKey, JsonFormConstants.FIELDS_FIELD_NAME, childKey,
+                            editText.getText().toString());
+                    } else {
+                        getView().writeValue(mStepName, key, editText.getText().toString());
+                    }
+                } else if (editText.getTag(R.id.type).equals(JsonFormConstants.LOCATION_PICKER)) {
+                    ValidationStatus validationStatus = LocationPickerFactory.validate(editText);
                     if (!validationStatus.isValid()) {
                         return validationStatus;
                     }

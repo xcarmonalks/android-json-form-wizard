@@ -24,6 +24,7 @@ import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
 import com.vijay.jsonwizard.interfaces.JsonApi;
 import com.vijay.jsonwizard.maps.MapsUtils;
 import com.vijay.jsonwizard.utils.JsonFormUtils;
+import com.vijay.jsonwizard.utils.ValidationStatus;
 import com.vijay.jsonwizard.validators.edittext.RequiredValidator;
 
 import org.json.JSONException;
@@ -35,6 +36,14 @@ import java.util.List;
 public class LocationPickerFactory implements FormWidgetFactory {
 
     private static final String TAG = "JsonFormActivity";
+
+    public static ValidationStatus validate(MaterialEditText editText) {
+        boolean validate = editText.validate();
+        if (!validate) {
+            return new ValidationStatus(false, editText.getError().toString());
+        }
+        return new ValidationStatus(true, null);
+    }
 
     @Override
     public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject,
@@ -71,10 +80,12 @@ public class LocationPickerFactory implements FormWidgetFactory {
         }
 
         List<View> views = new ArrayList<>(1);
-        final View parentView = LayoutInflater.from(context).inflate(R.layout.item_location_text, null);
+        final View parentView = LayoutInflater.from(context).inflate(R.layout.item_location_text,
+            null);
         parentView.setTag(R.id.key, jsonObject.getString("key"));
         parentView.setTag(R.id.type, jsonObject.getString("type"));
-        parentView.setTag(R.id.accuracy, jsonObject.has("accuracy") && jsonObject.getBoolean("accuracy"));
+        parentView.setTag(R.id.accuracy,
+            jsonObject.has("accuracy") && jsonObject.getBoolean("accuracy"));
 
         final MaterialEditText editText = parentView.findViewById(R.id.edit_text);
         final String hint = bundle.resolveKey(jsonObject.getString("hint"));
@@ -133,7 +144,6 @@ public class LocationPickerFactory implements FormWidgetFactory {
         views.add(parentView);
         return views;
     }
-
 
 
     private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject,
