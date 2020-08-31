@@ -1,8 +1,5 @@
 package com.vijay.jsonwizard.maps;
 
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
-
 import android.util.Log;
 import android.view.View;
 
@@ -29,11 +26,11 @@ public class MapsUtils {
     private static final String TAG = "JsonFormsActivity";
 
     public static LatLng parse(String latLng) {
-        String[] parts = latLng.split(", ");
+        String[] parts = latLng.split(",");
         if (parts.length != 2 && parts.length != 3) {
             throw new IllegalArgumentException("Invalid coordinate string: " + latLng);
         }
-        return new LatLng(Double.parseDouble(parts[0]), Double.parseDouble(parts[1]));
+        return new LatLng(Double.parseDouble(parts[0].trim()), Double.parseDouble(parts[1].trim()));
     }
 
     public static String toString(LatLng latLng) {
