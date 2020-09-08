@@ -1,6 +1,20 @@
 {
-    "count": "1",
+    "count": "2",
     "step1": {
+        "fields": [
+            {
+                "key": "name",
+                "type": "edit_text",
+                "hint": "Sample",
+                "value": "name_val"
+            }
+        ],
+        "title": "Pre-Map",
+        "next": {
+            "step2": true
+        }
+    },
+    "step2": {
         "fields": [
             {
                 "key": "map",

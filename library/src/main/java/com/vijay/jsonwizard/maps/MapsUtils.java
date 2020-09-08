@@ -57,23 +57,19 @@ public class MapsUtils {
             Log.d(TAG, "Updating map");
             final LatLng position = MapsUtils.parse(value);
 
-            SupportMapFragment mapFragment = (SupportMapFragment) fragmentManager.findFragmentByTag(
-                key);
-            if (mapFragment == null) {
-                // New map fragment
-                Log.d(TAG, "Creating new map");
-                FragmentTransaction transaction = fragmentManager.beginTransaction();
 
-                GoogleMapOptions options = new GoogleMapOptions();
-                options.scrollGesturesEnabled(false);
-                options.zoomGesturesEnabled(false);
-                options.rotateGesturesEnabled(false);
+            Log.d(TAG, "Creating new map");
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
 
-                mapFragment = SupportMapFragment.newInstance(options);
+            GoogleMapOptions options = new GoogleMapOptions();
+            options.scrollGesturesEnabled(false);
+            options.zoomGesturesEnabled(false);
+            options.rotateGesturesEnabled(false);
 
-                transaction.replace(R.id.map_container, mapFragment, key);
-                transaction.commit();
-            }
+            SupportMapFragment mapFragment = SupportMapFragment.newInstance(options);
+
+            transaction.replace(R.id.map_container, mapFragment, key);
+            transaction.commit();
 
             mapFragment.getMapAsync(new OnMapReadyCallback() {
                 @Override
