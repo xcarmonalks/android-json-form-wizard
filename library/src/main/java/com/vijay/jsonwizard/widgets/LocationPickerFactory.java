@@ -30,6 +30,7 @@ import com.vijay.jsonwizard.maps.LocationValueReporter;
 import com.vijay.jsonwizard.maps.MapsUtils;
 import com.vijay.jsonwizard.utils.JsonFormUtils;
 import com.vijay.jsonwizard.utils.ValidationStatus;
+import com.vijay.jsonwizard.validators.edittext.EqualsValidator;
 import com.vijay.jsonwizard.validators.edittext.RequiredValidator;
 
 import org.json.JSONException;
@@ -186,6 +187,12 @@ public class LocationPickerFactory implements FormWidgetFactory {
                     }
                 }
             }
+        }
+
+        JSONObject accuracyValidator = jsonObject.optJSONObject("v_exact_position");
+        if (accuracyEnabled && accuracyValidator != null) {
+            etAccuracy.addValidator(
+                    new EqualsValidator("-1", bundle.resolveKey(accuracyValidator.getString("err")), true));
         }
 
         LocationValueReporter valueReporter;

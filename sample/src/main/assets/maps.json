@@ -25,6 +25,9 @@
                 "v_required": {
                     "value": "true",
                     "err": "Pick a location"
+                },
+                "v_exact_position": {
+                    "err": "Select an exact location (acc -1)"
                 }
             },
             {
