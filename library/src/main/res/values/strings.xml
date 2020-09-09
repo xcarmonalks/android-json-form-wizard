@@ -7,4 +7,7 @@
     <string name="mlkit_not_found">Module MLkit manquant. Attendez que le téléchargement soit terminé</string>
     <string name="choose">OK</string>
     <string name="choose_a_location">Location</string>
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
+    <string name="accuracy">Accuracy</string>
 </resources>

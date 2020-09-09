@@ -21,6 +21,7 @@
                 "type": "location",
                 "hint": "Location",
                 "accuracy": true,
+                "value": "48.858370, 2.294481",
                 "v_required": {
                     "value": "true",
                     "err": "Pick a location"

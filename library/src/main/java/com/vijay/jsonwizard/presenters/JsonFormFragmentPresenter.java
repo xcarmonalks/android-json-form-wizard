@@ -3,6 +3,9 @@ package com.vijay.jsonwizard.presenters;
 import static com.vijay.jsonwizard.maps.MapsActivity.EXTRA_INITIAL_LOCATION;
 import static com.vijay.jsonwizard.maps.MapsActivity.EXTRA_RESULT_LOCATION;
 import static com.vijay.jsonwizard.maps.MapsActivity.EXTRA_USE_ACCURACY;
+import static com.vijay.jsonwizard.widgets.LocationPickerFactory.KEY_SUFFIX_ACCURACY;
+import static com.vijay.jsonwizard.widgets.LocationPickerFactory.KEY_SUFFIX_LATITUDE;
+import static com.vijay.jsonwizard.widgets.LocationPickerFactory.KEY_SUFFIX_LONGITUDE;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -413,7 +416,16 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
             Log.i(TAG, "LOCATION RESULT: " + location);
             mStepName = getView().getArguments().getString("stepName");
             getView().writeValue(mStepName, mCurrentKey, location);
-            getView().updateRelevantEditText(mCurrentKey, location);
+            String[] parts = location.split(MapsUtils.COORD_SEPARATOR);
+            if (parts.length > 0) {
+                getView().updateRelevantEditText(mCurrentKey + KEY_SUFFIX_LATITUDE, parts[0].trim());
+            }
+            if (parts.length > 1) {
+                getView().updateRelevantEditText(mCurrentKey + KEY_SUFFIX_LONGITUDE, parts[1].trim());
+            }
+            if (parts.length > 2) {
+                getView().updateRelevantEditText(mCurrentKey + KEY_SUFFIX_ACCURACY, parts[2].trim());
+            }
             getView().updateRelevantMap(mCurrentKey, location);
         }
     }

@@ -22,9 +22,9 @@ public class MapsUtils {
     public static final float MAX_ZOOM_LEVEL = 18f;
     public static final float MIN_ZOOM_LEVEL = 8f;
 
-    private static final String TAG = "JsonFormsActivity";
+    public static final String COORD_SEPARATOR = ",";
 
-    private static final String COORD_SEPARATOR = ",";
+    private static final String TAG = "JsonFormsActivity";
 
     public static LatLng parse(String latLng) {
         String[] parts = latLng.split(COORD_SEPARATOR);
@@ -40,6 +40,14 @@ public class MapsUtils {
 
     public static String toString(LatLng latLng, float accuracy) {
         return String.format("%s, %s, %s", latLng.latitude, latLng.longitude, accuracy);
+    }
+
+    public static String toString(String latitude, String longitude) {
+        return String.format("%s, %s", latitude, longitude);
+    }
+
+    public static String toString(String latitude, String longitude, String accuracy) {
+        return String.format("%s, %s, %s", latitude, longitude, accuracy);
     }
 
     public static void loadStaticMap(FragmentActivity activity, String key, String value) {

@@ -6,7 +6,10 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
@@ -15,13 +18,15 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rey.material.util.ViewUtil;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
-import com.vijay.jsonwizard.customviews.GenericTextWatcher;
 import com.vijay.jsonwizard.demo.resources.ResourceResolver;
 import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
 import com.vijay.jsonwizard.interfaces.JsonApi;
+import com.vijay.jsonwizard.maps.LocationPart;
+import com.vijay.jsonwizard.maps.LocationTextWatcher;
+import com.vijay.jsonwizard.maps.LocationValueReporter;
 import com.vijay.jsonwizard.maps.MapsUtils;
 import com.vijay.jsonwizard.utils.JsonFormUtils;
 import com.vijay.jsonwizard.utils.ValidationStatus;
@@ -35,7 +40,14 @@ import java.util.List;
 
 public class LocationPickerFactory implements FormWidgetFactory {
 
+    public static final String KEY_SUFFIX_LATITUDE = "_latitude";
+    public static final String KEY_SUFFIX_LONGITUDE = "_longitude";
+    public static final String KEY_SUFFIX_ACCURACY = "_accuracy";
+
     private static final String TAG = "JsonFormActivity";
+
+    private static final int INPUT_TYPE_DECIMAL_NUMBER = InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL
+            | InputType.TYPE_NUMBER_FLAG_SIGNED;
 
     public static ValidationStatus validate(MaterialEditText editText) {
         boolean validate = editText.validate();
@@ -79,46 +91,60 @@ public class LocationPickerFactory implements FormWidgetFactory {
             return getReadOnlyViewsFromJson(context, jsonObject, bundle);
         }
 
+        String jsonKey = jsonObject.getString("key");
+        String jsonInputType = jsonObject.getString("type");
+
         List<View> views = new ArrayList<>(1);
         final View parentView = LayoutInflater.from(context).inflate(R.layout.item_location_text,
             null);
-        parentView.setTag(R.id.key, jsonObject.getString("key"));
-        parentView.setTag(R.id.type, jsonObject.getString("type"));
-        parentView.setTag(R.id.accuracy,
-            jsonObject.has("accuracy") && jsonObject.getBoolean("accuracy"));
+        parentView.setTag(R.id.key, jsonKey);
+        parentView.setTag(R.id.type, jsonInputType);
+        boolean accuracyEnabled = jsonObject.has("accuracy") && jsonObject.getBoolean("accuracy");
+        parentView.setTag(R.id.accuracy, accuracyEnabled);
 
-        final MaterialEditText editText = parentView.findViewById(R.id.edit_text);
+
         final String hint = bundle.resolveKey(jsonObject.getString("hint"));
-        editText.setRawInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL
-            | InputType.TYPE_NUMBER_FLAG_SIGNED);
-        editText.setTag(R.id.key, jsonObject.getString("key"));
-        editText.setTag(R.id.type, jsonObject.getString("type"));
-        editText.setHint(hint);
-        editText.setFloatingLabelText(hint);
-        editText.setId(ViewUtil.generateViewId());
+        final TextView label = parentView.findViewById(R.id.location_label);
+        label.setText(hint);
+
+        View inputContainer = parentView.findViewById(R.id.value_container);
+        inputContainer.setTag(R.id.key, jsonKey);
+        inputContainer.setTag(R.id.type, jsonInputType);
+
+        MaterialEditText etLatitude = parentView.findViewById(R.id.location_latitude);
+        etLatitude.setInputType(INPUT_TYPE_DECIMAL_NUMBER);
+        etLatitude.setTag(R.id.key, jsonKey + KEY_SUFFIX_LATITUDE);
+        etLatitude.setTag(R.id.type, jsonInputType);
+
+        MaterialEditText etLongitude = parentView.findViewById(R.id.location_longitude);
+        etLongitude.setInputType(INPUT_TYPE_DECIMAL_NUMBER);
+        etLongitude.setTag(R.id.key, jsonKey + KEY_SUFFIX_LONGITUDE);
+        etLongitude.setTag(R.id.type, jsonInputType);
+
+        MaterialEditText etAccuracy = parentView.findViewById(R.id.location_accuracy);
+        etAccuracy.setInputType(INPUT_TYPE_DECIMAL_NUMBER);
+        etAccuracy.setTag(R.id.key, jsonKey + KEY_SUFFIX_ACCURACY);
+        etAccuracy.setTag(R.id.type, jsonInputType);
+
+        if (accuracyEnabled) {
+            etAccuracy.setVisibility(View.VISIBLE);
+        } else {
+            parentView.findViewById(R.id.location_accuracy).setVisibility(View.GONE);
+        }
 
         final ImageView imageView = parentView.findViewById(R.id.icon);
-        imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                parentView.setTag(R.id.value, editText.getText().toString());
-                listener.onClick(parentView);
-            }
-        });
-        String key = jsonObject.getString("key");
-        imageView.setTag(R.id.key, jsonObject.getString("key"));
-        imageView.setTag(R.id.type, jsonObject.getString("type"));
+        String key = jsonKey;
+        imageView.setTag(R.id.key, jsonKey);
+        imageView.setTag(R.id.type, jsonInputType);
+        final View.OnClickListener onClickListenerWithValue = getOnClickListenerWithValue(
+            parentView, listener, accuracyEnabled);
+        imageView.setOnClickListener(onClickListenerWithValue);
+        final FrameLayout frameLayout = parentView.findViewById(R.id.map_container);
+        frameLayout.setOnClickListener(onClickListenerWithValue);
 
         final String value = jsonObject.optString("value");
         if (!TextUtils.isEmpty(value)) {
-            editText.setText(value);
-            if (context instanceof FragmentActivity) {
-                MapsUtils.loadStaticMap((FragmentActivity) context, key, value);
-            } else {
-                Log.w(TAG, "Context is not a FragmentActivity");
-            }
-        } else {
-
+            fillDefaultValue(context, etLatitude, etLongitude, etAccuracy, key, value);
         }
 
         //add validators
@@ -135,41 +161,69 @@ public class LocationPickerFactory implements FormWidgetFactory {
                 }
 
                 if (required) {
-                    editText.addValidator(
+                    etLatitude.addValidator(
                         new RequiredValidator(bundle.resolveKey(requiredObject.getString("err"))));
+                    etLongitude.addValidator(
+                            new RequiredValidator(bundle.resolveKey(requiredObject.getString("err"))));
+                    if (accuracyEnabled) {
+                        etAccuracy.addValidator(
+                                new RequiredValidator(bundle.resolveKey(requiredObject.getString("err"))));
+                    }
                 }
             }
         }
-        editText.addTextChangedListener(new GenericTextWatcher(stepName, editText));
+
+        LocationValueReporter valueReporter;
+        if (TextUtils.isEmpty(value)) {
+            valueReporter = new LocationValueReporter(stepName, parentView, accuracyEnabled);
+        } else {
+            valueReporter = new LocationValueReporter(stepName, parentView, value, accuracyEnabled);
+        }
+        etLatitude.addTextChangedListener(new LocationTextWatcher(LocationPart.LATITUDE, valueReporter));
+        etLongitude.addTextChangedListener(new LocationTextWatcher(LocationPart.LONGITUDE, valueReporter));
+        if (accuracyEnabled) {
+            etAccuracy.addTextChangedListener(new LocationTextWatcher(LocationPart.ACCURACY, valueReporter));
+        }
         views.add(parentView);
         return views;
     }
-
 
     private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject,
         JsonFormBundle bundle) throws JSONException {
         List<View> views = new ArrayList<>(1);
         View parentView = LayoutInflater.from(context).inflate(R.layout.item_location_text, null);
 
-        final MaterialEditText editText = parentView.findViewById(R.id.edit_text);
-        editText.setId(ViewUtil.generateViewId());
         final String hint = bundle.resolveKey(jsonObject.getString("hint"));
-        editText.setHint(hint);
-        editText.setFloatingLabelText(hint);
-        editText.setTag(R.id.key, jsonObject.getString("key"));
-        editText.setTag(R.id.type, jsonObject.getString("type"));
+        final TextView label = parentView.findViewById(R.id.location_label);
+        label.setText(hint);
+
+        String jsonKey = jsonObject.getString("key");
+        String jsonType = jsonObject.getString("type");
+        final MaterialEditText etLatitude = parentView.findViewById(R.id.location_latitude);
+        etLatitude.setId(ViewUtil.generateViewId());
+        etLatitude.setTag(R.id.key, jsonKey + KEY_SUFFIX_LATITUDE);
+        etLatitude.setTag(R.id.type, jsonType);
+        etLatitude.setEnabled(false);
+        final MaterialEditText etLongitude = parentView.findViewById(R.id.location_longitude);
+        etLongitude.setId(ViewUtil.generateViewId());
+        etLongitude.setTag(R.id.key, jsonKey + KEY_SUFFIX_LONGITUDE);
+        etLongitude.setTag(R.id.type, jsonType);
+        etLongitude.setEnabled(false);
+
+        final MaterialEditText etAccuracy = parentView.findViewById(R.id.location_accuracy);
+        etAccuracy.setId(ViewUtil.generateViewId());
+        etAccuracy.setTag(R.id.key, jsonKey + KEY_SUFFIX_ACCURACY);
+        etAccuracy.setTag(R.id.type, jsonType);
+        etAccuracy.setEnabled(false);
+        boolean accuracyEnabled = jsonObject.getBoolean("accuracy");
+        if (accuracyEnabled) {
+            etAccuracy.setVisibility(View.VISIBLE);
+        }
+
         String value = jsonObject.optString("value");
-        editText.setText(value);
-        editText.setEnabled(false);
 
         if (!TextUtils.isEmpty(value)) {
-            if (context instanceof FragmentActivity) {
-                MapsUtils.loadStaticMap((FragmentActivity) context, jsonObject.getString("key"),
-                    jsonObject.getString("value"));
-            } else {
-                Log.w(TAG, "Context is not a FragmentActivity");
-                parentView.findViewById(R.id.map_container).setVisibility(View.GONE);
-            }
+            fillDefaultValue(context, etLatitude, etLongitude, etAccuracy, jsonKey, value);
         } else {
             parentView.findViewById(R.id.map_container).setVisibility(View.GONE);
         }
@@ -183,6 +237,49 @@ public class LocationPickerFactory implements FormWidgetFactory {
         return views;
     }
 
+
+    private void fillDefaultValue(Context context, MaterialEditText etLatitude, MaterialEditText etLongitude,
+                                  MaterialEditText etAccuracy, String key, String value) {
+        String[] parts = value.split(MapsUtils.COORD_SEPARATOR);
+        if (parts.length > 0) {
+            etLatitude.setText(parts[0].trim());
+        }
+        if (parts.length > 1) {
+            etLongitude.setText(parts[1].trim());
+        }
+        if (parts.length > 2) {
+            etAccuracy.setText(parts[2].trim());
+        }
+        if (context instanceof FragmentActivity) {
+            MapsUtils.loadStaticMap((FragmentActivity) context, key, value);
+        } else {
+            Log.w(TAG, "Context is not a FragmentActivity");
+        }
+    }
+
+    private View.OnClickListener getOnClickListenerWithValue(final View parentView, final CommonListener listener,
+                                                             final boolean accuracy) {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText etLatitude = parentView.findViewById(R.id.location_latitude);
+                EditText etLongitude = parentView.findViewById(R.id.location_longitude);
+                String value;
+                if (accuracy) {
+                    EditText etAccuracy = parentView.findViewById(R.id.location_accuracy);
+                    value = MapsUtils.toString(etLatitude.getText().toString(),
+                            etLongitude.getText().toString(),
+                            etAccuracy.getText().toString());
+                } else {
+                    value = MapsUtils.toString(etLatitude.getText().toString(),
+                            etLongitude.getText().toString());
+                }
+                parentView.setTag(R.id.value, value);
+                listener.onClick(parentView);
+            }
+        };
+    }
+
     @Nullable
     private JSONObject getCurrentValues(Context context) throws JSONException {
         JSONObject currentValues = null;
@@ -193,4 +290,8 @@ public class LocationPickerFactory implements FormWidgetFactory {
         }
         return currentValues;
     }
+
+
+
+
 }

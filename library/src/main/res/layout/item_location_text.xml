@@ -4,37 +4,87 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
+
+    <com.rey.material.widget.TextView
+        android:id="@+id/location_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp" />
+
     <FrameLayout
         android:id="@+id/map_container"
         android:layout_width="match_parent"
-        android:background="@drawable/textview_border"
-        android:layout_height="255dp" />
+        android:background="@drawable/location_placeholder"
+        android:layout_height="255dp">
+
+        <ImageView
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_map_black_18dp"
+            android:tint="@color/secondary_text" />
+    </FrameLayout>
 
     <LinearLayout
+        android:id="@+id/value_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp"
+        android:layout_height="wrap_content">
 
         <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/edit_text"
-            android:layout_width="match_parent"
+            android:id="@+id/location_latitude"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:textSize="@dimen/default_text_size"
+            android:layout_weight="4"
             app:met_floatingLabel="highlight"
-            app:met_floatingLabelText=""
+            app:met_floatingLabelText="@string/latitude"
+            android:hint="@string/latitude"
             app:met_primaryColor="?colorAccent"
             app:met_singleLineEllipsis="true"
             app:met_typeface="font/Roboto-Regular.ttf" />
 
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/location_longitude"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="4"
+            android:layout_marginStart="8dp"
+            android:textSize="@dimen/default_text_size"
+            android:hint="@string/longitude"
+            app:met_floatingLabel="highlight"
+            app:met_floatingLabelText="@string/longitude"
+            app:met_primaryColor="?colorAccent"
+            app:met_singleLineEllipsis="true"
+            app:met_typeface="font/Roboto-Regular.ttf" />
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/location_accuracy"
+            android:layout_width="wrap_content"
+            android:visibility="gone"
+            android:layout_marginStart="8dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="@dimen/default_text_size"
+            android:hint="@string/accuracy"
+            app:met_floatingLabel="highlight"
+            app:met_floatingLabelText="@string/accuracy"
+            app:met_primaryColor="?colorAccent"
+            app:met_singleLineEllipsis="true"
+            app:met_typeface="font/Roboto-Regular.ttf" />
+
+
         <ImageView
             android:id="@+id/icon"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:layout_gravity="center_vertical"
             android:layout_weight="0"
             android:clickable="true"
-            android:paddingLeft="10dp"
+            android:focusable="true"
+            android:layout_marginStart="12dp"
+            android:background="?selectableItemBackgroundBorderless"
             android:src="@drawable/ic_map_black_18dp"
             android:tint="@color/primary_text" />
 
