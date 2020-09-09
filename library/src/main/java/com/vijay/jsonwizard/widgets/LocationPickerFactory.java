@@ -234,7 +234,7 @@ public class LocationPickerFactory implements FormWidgetFactory {
         etAccuracy.setTag(R.id.key, jsonKey + KEY_SUFFIX_ACCURACY);
         etAccuracy.setTag(R.id.type, jsonType);
         etAccuracy.setEnabled(false);
-        boolean accuracyEnabled = jsonObject.getBoolean("accuracy");
+        boolean accuracyEnabled = jsonObject.has("accuracy") && jsonObject.getBoolean("accuracy");
         if (accuracyEnabled) {
             etAccuracy.setVisibility(View.VISIBLE);
         }
