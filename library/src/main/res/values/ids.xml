@@ -16,4 +16,5 @@
 
     <!-- true, false : used with widget type location -->
     <item name="accuracy" type="id" />
+    <item name="custom_icon" type="id" />
 </resources>

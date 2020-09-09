@@ -1,5 +1,6 @@
 package com.vijay.jsonwizard.presenters;
 
+import static com.vijay.jsonwizard.maps.MapsActivity.EXTRA_CUSTOM_MARKER_ICON;
 import static com.vijay.jsonwizard.maps.MapsActivity.EXTRA_INITIAL_LOCATION;
 import static com.vijay.jsonwizard.maps.MapsActivity.EXTRA_RESULT_LOCATION;
 import static com.vijay.jsonwizard.maps.MapsActivity.EXTRA_USE_ACCURACY;
@@ -460,6 +461,10 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                 boolean useAccuracy = (boolean) v.getTag(R.id.accuracy);
                 if (value != null && MapsUtils.isValidPositionString(value)) {
                     intent.putExtra(EXTRA_INITIAL_LOCATION, value);
+                }
+                String customIcon = (String) v.getTag(R.id.custom_icon);
+                if (customIcon != null) {
+                    intent.putExtra(EXTRA_CUSTOM_MARKER_ICON, customIcon);
                 }
                 intent.putExtra(EXTRA_USE_ACCURACY, useAccuracy);
                 mCurrentKey = key;

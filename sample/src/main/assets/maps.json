@@ -20,13 +20,37 @@
                 "key": "map",
                 "type": "location",
                 "hint": "Location",
+                "icon": "marker.png",
                 "accuracy": true,
                 "v_required": {
                     "value": "true",
                     "err": "Pick a location"
                 }
+            },
+            {
+                "key": "map-2",
+                "type": "location",
+                "hint": "GPS",
+                "value": "42.9829, -1.5442"
             }
         ],
-        "title": "Maps sample form"
+        "title": "Maps sample form",
+        "next": {
+            "step3": true
+        }
+    },
+    "step3": {
+        "fields": [
+            {
+                "key": "map-3",
+                "type": "location",
+                "hint": "GPS",
+                "value": "42.1829,-1.2442",
+                "v_required": {
+                    "value": "true",
+                    "err": "Pick a location"
+                }
+            }
+        ]
     }
 }

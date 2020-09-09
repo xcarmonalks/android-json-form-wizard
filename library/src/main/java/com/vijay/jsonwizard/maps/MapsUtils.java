@@ -12,10 +12,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.vijay.jsonwizard.R;
 
 public class MapsUtils {
 
@@ -50,17 +50,17 @@ public class MapsUtils {
         return String.format("%s, %s, %s", latitude, longitude, accuracy);
     }
 
-    public static void loadStaticMap(FragmentActivity activity, String key, String value) {
+    public static void loadStaticMap(FragmentActivity activity, int containerId, String key, String value, String customIcon) {
         FragmentManager fragmentManager = activity.getSupportFragmentManager();
-        loadStaticMap(fragmentManager, key, value);
+        loadStaticMap(fragmentManager, containerId, key, value, customIcon);
     }
 
-    public static void loadStaticMap(Fragment fragment, String key, String value) {
+    public static void loadStaticMap(Fragment fragment, int containerId, String key, String value, String customIcon) {
         FragmentManager fragmentManager = fragment.getFragmentManager();
-        loadStaticMap(fragmentManager, key, value);
+        loadStaticMap(fragmentManager, containerId, key, value, customIcon);
     }
 
-    private static void loadStaticMap(FragmentManager fragmentManager, String key, String value) {
+    private static void loadStaticMap(FragmentManager fragmentManager, int containerId, String key, String value, final String customIcon) {
         try {
             Log.d(TAG, "Updating map");
             final LatLng position = MapsUtils.parse(value);
@@ -76,7 +76,7 @@ public class MapsUtils {
 
             SupportMapFragment mapFragment = SupportMapFragment.newInstance(options);
 
-            transaction.replace(R.id.map_container, mapFragment, key);
+            transaction.replace(containerId, mapFragment, key);
             transaction.commit();
 
             mapFragment.getMapAsync(new OnMapReadyCallback() {
@@ -84,7 +84,11 @@ public class MapsUtils {
                 public void onMapReady(GoogleMap googleMap) {
                     Log.d(TAG, "Map ready, adding marker in : " + position.toString());
                     googleMap.clear();
-                    googleMap.addMarker(new MarkerOptions().position(position));
+                    MarkerOptions markerOptions = new MarkerOptions().position(position);
+                    if (customIcon != null) {
+                        markerOptions.icon(BitmapDescriptorFactory.fromPath(customIcon));
+                    }
+                    googleMap.addMarker(markerOptions);
                     CameraPosition pos = CameraPosition.builder().target(position).zoom(
                         MapsUtils.MAX_ZOOM_LEVEL).build();
                     googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(pos));

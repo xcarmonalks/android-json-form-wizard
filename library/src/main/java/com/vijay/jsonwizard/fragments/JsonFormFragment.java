@@ -208,7 +208,27 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
 
     @Override
     public void updateRelevantMap(String key, String value) {
-        MapsUtils.loadStaticMap(this, key, value);
+        View view = getView();
+        View inputView = findViewWithTagKeyValue(view, key);
+        String customIcon = (String) inputView.getTag(R.id.custom_icon);
+        View mapContainer = inputView.findViewWithTag(R.id.map_container);
+        MapsUtils.loadStaticMap(this, mapContainer.getId(), key, value, customIcon);
+    }
+
+    private View findViewWithTagKeyValue(View view, String key) {
+        if (key.equals(view.getTag(R.id.key))) {
+            return view;
+        } else if (view instanceof ViewGroup) {
+            ViewGroup v = (ViewGroup) view;
+            for (int i = 0; i < v.getChildCount(); i++) {
+                View child = v.getChildAt(i);
+                View result = findViewWithTagKeyValue(child, key);
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+        return null;
     }
 
     @Override

@@ -39,6 +39,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -54,6 +55,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static final String EXTRA_INITIAL_LOCATION = "INITIAL_LOCATION";
     public static final String EXTRA_USE_ACCURACY = "USE_ACCURACY";
     public static final String EXTRA_RESULT_LOCATION = "RESULT_LOCATION";
+    public static final String EXTRA_CUSTOM_MARKER_ICON = "CUSTOM_MARKER_ICON";
 
     private static final String TAG = "JsonFormActivity";
     private static final int REQUEST_CODE_LOCATION = 80;
@@ -65,6 +67,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Marker mMarker;
 
     private boolean mIncludeAccuracy;
+    private String mMarkerIcon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +93,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         } else {
             // Get current location
             attemptMarkCurrentLocation();
+        }
+
+        if (intent.hasExtra(EXTRA_CUSTOM_MARKER_ICON)) {
+            mMarkerIcon = intent.getStringExtra(EXTRA_CUSTOM_MARKER_ICON);
         }
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -302,7 +309,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             LatLng latLng = MapsUtils.parse(markerPosition);
             if (mMarker == null) {
                 mMap.clear();
-                mMarker = mMap.addMarker(new MarkerOptions().position(latLng));
+                MarkerOptions markerOptions = new MarkerOptions()
+                        .position(latLng);
+                if (mMarkerIcon != null) {
+                    markerOptions
+                            .icon(BitmapDescriptorFactory.fromPath(mMarkerIcon));
+                }
+                mMarker = mMap.addMarker(markerOptions);
             } else {
                 mMarker.setPosition(latLng);
             }
