@@ -30,6 +30,7 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rey.material.widget.Switch;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.activities.JsonFormActivity;
+import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.customviews.RadioButton;
 import com.vijay.jsonwizard.demo.resources.ResourceResolver;
 import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
@@ -439,7 +440,9 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
     @Override
     public void onPause() {
         super.onPause();
-        presenter.writeValuesAndValidate(mMainView);
-        PropertiesUtils.getInstance(getContext()).setPausedStep(presenter.getStepName());
+        if (mJsonApi.getVisualizationMode() == JsonFormConstants.VISUALIZATION_MODE_EDIT) {
+            presenter.writeValuesAndValidate(mMainView);
+            PropertiesUtils.getInstance(getContext()).setPausedStep(presenter.getStepName());
+        }
     }
 }
