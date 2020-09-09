@@ -6,23 +6,35 @@ import static com.vijay.jsonwizard.maps.MapsUtils.MAX_ZOOM_LEVEL;
 import static com.vijay.jsonwizard.maps.MapsUtils.MIN_ZOOM_LEVEL;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 
+import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationAvailability;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -32,6 +44,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.vijay.jsonwizard.R;
 
@@ -43,6 +57,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private static final String TAG = "JsonFormActivity";
     private static final int REQUEST_CODE_LOCATION = 80;
+    private static final int REQUEST_CHECK_SETTINGS = 801;
 
     private GoogleMap mMap;
     private String mInitialPos;
@@ -79,8 +94,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment =
-            (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+                (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == REQUEST_CHECK_SETTINGS) {
+            if (resultCode == RESULT_OK) {
+                attemptMarkCurrentLocation();
+            } else {
+                markDefaultPosition();
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -104,11 +131,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-        @NonNull int[] grantResults) {
+                                           @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_CODE_LOCATION) {
             boolean grantedAny = false;
-            for (int grantResult: grantResults) {
+            for (int grantResult : grantResults) {
                 if (grantResult == PERMISSION_GRANTED) {
                     grantedAny = true;
                     break;
@@ -118,8 +145,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 attemptMarkCurrentLocation();
             } else {
                 Log.w(TAG, "Current location permission not granted");
-                String position = getPositionWithOptionalAccuracy(new LatLng(0, 0), 0);
-                updateMapMarker(position, true);
+                markDefaultPosition();
             }
         }
     }
@@ -136,8 +162,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
             @Override
             public void onCameraMove() {
-                mMarkerPosition = getPositionWithOptionalAccuracy(mMap.getCameraPosition().target,
-                    -1);
+                mMarkerPosition = getPositionWithOptionalAccuracy(mMap.getCameraPosition().target, -1);
                 updateMapMarker(mMarkerPosition, false);
             }
         });
@@ -145,45 +170,131 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void attemptMarkCurrentLocation() {
         if (!checkPermission(Manifest.permission.ACCESS_FINE_LOCATION) && !checkPermission(
-            Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                Manifest.permission.ACCESS_COARSE_LOCATION)) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 // Request Location permission
                 requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_CODE_LOCATION);
+                        Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_CODE_LOCATION);
             } else {
                 // Put marker in default position
-                String position = getPositionWithOptionalAccuracy(new LatLng(0, 0), 0);
-                updateMapMarker(position, true);
+                markDefaultPosition();
             }
         } else {
-            FusedLocationProviderClient fusedLocationClient =
-                LocationServices.getFusedLocationProviderClient(this);
+            final FusedLocationProviderClient fusedLocationClient =
+                    LocationServices.getFusedLocationProviderClient(this);
 
             fusedLocationClient.getLastLocation().addOnCompleteListener(
-                new OnCompleteListener<Location>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Location> task) {
-                        if (task.getResult() != null) {
-                            double lat = task.getResult().getLatitude();
-                            double lng = task.getResult().getLongitude();
-                            LatLng latLng = new LatLng(lat, lng);
-                            float accuracy = task.getResult().getAccuracy();
+                    new OnCompleteListener<Location>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Location> task) {
+                            Location location = task.getResult();
+                            if (location != null) {
+                                updateMarkerLocation(location);
+                            } else {
+                                Log.w(TAG, "Could not obtain last location", task.getException());
+                                initLocationRequest();
+                            }
+                        }
+                    });
+        }
+    }
 
-                            mInitialPos = getPositionWithOptionalAccuracy(latLng, accuracy);
-                            updateMapMarker(mInitialPos, true);
-                        } else {
-                            Log.w(TAG, "Could not obtain last location", task.getException());
-                            String position = getPositionWithOptionalAccuracy(new LatLng(0, 0), 0);
-                            updateMapMarker(position, true);
+    private void markDefaultPosition() {
+        String defaultLocation = getResources().getString(R.string.default_location);
+        String position;
+        if (MapsUtils.isValidPositionString(defaultLocation)) {
+            LatLng latLng = MapsUtils.parse(defaultLocation);
+            position = getPositionWithOptionalAccuracy(latLng, 0);
+        } else {
+            position = getPositionWithOptionalAccuracy(new LatLng(0, 0), 0);
+        }
+        updateMapMarker(position, true);
+    }
+
+    private void updateMarkerLocation(Location location) {
+        double lat = location.getLatitude();
+        double lng = location.getLongitude();
+        LatLng latLng = new LatLng(lat, lng);
+        float accuracy = location.getAccuracy();
+
+        mInitialPos = getPositionWithOptionalAccuracy(latLng, accuracy);
+        updateMapMarker(mInitialPos, true);
+    }
+
+    private void initLocationRequest() {
+        final LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setInterval(5000);
+        locationRequest.setFastestInterval(500);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(locationRequest);
+
+        SettingsClient client = LocationServices.getSettingsClient(MapsActivity.this);
+        client.checkLocationSettings(builder.build())
+                .addOnSuccessListener(new OnSuccessListener<LocationSettingsResponse>() {
+                    @SuppressLint("MissingPermission")
+                    @Override
+                    public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
+                        Log.e(TAG, "Location settings OK");
+                        requestCurrentLocation(locationRequest);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, "Invalid location settings", e);
+                        if (e instanceof ResolvableApiException) {
+                            try {
+                                // Show the dialog by calling startResolutionForResult(),
+                                // and check the result in onActivityResult().
+                                ResolvableApiException resolvable = (ResolvableApiException) e;
+                                resolvable.startResolutionForResult(MapsActivity.this, REQUEST_CHECK_SETTINGS);
+                            } catch (IntentSender.SendIntentException sendEx) {
+                                // Ignore the error.
+                            }
                         }
                     }
                 });
-        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private void requestCurrentLocation(final LocationRequest locationRequest) {
+        final FusedLocationProviderClient fusedLocationClient =
+                LocationServices.getFusedLocationProviderClient(MapsActivity.this);
+        LocationCallback locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationAvailability(LocationAvailability locationAvailability) {
+                Log.d(TAG, "location available: " + locationAvailability.isLocationAvailable());
+            }
+
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                Log.d(TAG, "Obtained location result");
+                if (locationResult != null) {
+                    updateMarkerLocation(locationResult.getLastLocation());
+                    fusedLocationClient.removeLocationUpdates(this);
+                }
+            }
+        };
+        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "Location request updates started");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, "Location request updates failed to start", e);
+                    }
+                });
     }
 
     private boolean checkPermission(String permission) {
         return ActivityCompat.checkSelfPermission(this, permission)
-            == PackageManager.PERMISSION_GRANTED;
+                == PackageManager.PERMISSION_GRANTED;
     }
 
     private void updateMapMarker(String markerPosition, boolean repositionCamera) {
@@ -197,7 +308,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
             if (repositionCamera) {
                 CameraPosition pos = CameraPosition.builder().target(latLng).zoom(MAX_ZOOM_LEVEL)
-                                                   .build();
+                        .build();
                 mMap.moveCamera(CameraUpdateFactory.newCameraPosition(pos));
             }
 
