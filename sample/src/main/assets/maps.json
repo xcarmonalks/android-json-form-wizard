@@ -7,6 +7,12 @@
                 "type": "edit_text",
                 "hint": "Sample",
                 "value": "name_val"
+            },
+            {
+                "key": "map-0",
+                "type": "location",
+                "hint": "GPS",
+                "value": "45.9829, -1.5442"
             }
         ],
         "title": "Pre-Map",
@@ -43,6 +49,20 @@
         }
     },
     "step3": {
+        "fields": [
+            {
+                "key": "name-2",
+                "type": "edit_text",
+                "hint": "Sample",
+                "value": "name_val"
+            }
+        ],
+        "title": "Post-Map",
+        "next": {
+            "step4": true
+        }
+    },
+    "step4": {
         "fields": [
             {
                 "key": "map-3",

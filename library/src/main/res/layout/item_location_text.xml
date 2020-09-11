@@ -18,6 +18,7 @@
         android:layout_height="255dp">
 
         <ImageView
+            android:id="@+id/map_placeholder"
             android:layout_width="72dp"
             android:layout_height="72dp"
             android:layout_gravity="center"

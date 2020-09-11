@@ -155,12 +155,10 @@ public class LocationPickerFactory implements FormWidgetFactory {
 
         final String value = jsonObject.optString("value");
         if (!TextUtils.isEmpty(value)) {
-            String customIcon = null;
-            if (jsonObject.has("icon")) {
-                customIcon = jsonObject.getString("icon");
-                customIcon = resourceResolver.resolvePath(context, customIcon);
-            }
-            fillDefaultValue(context, etLatitude, etLongitude, etAccuracy, mapContainer.getId(), key, value, customIcon);
+            fillDefaultValue(parentView, etLatitude, etLongitude, etAccuracy, value);
+            mapContainer.findViewById(R.id.map_placeholder).setVisibility(View.GONE);
+        } else {
+            mapContainer.findViewById(R.id.map_placeholder).setVisibility(View.VISIBLE);
         }
 
         //add validators
@@ -215,6 +213,11 @@ public class LocationPickerFactory implements FormWidgetFactory {
         List<View> views = new ArrayList<>(1);
         View parentView = LayoutInflater.from(context).inflate(R.layout.item_location_text, null);
 
+        String jsonKey = jsonObject.getString("key");
+        String jsonType = jsonObject.getString("type");
+        parentView.setTag(R.id.key, jsonKey);
+        parentView.setTag(R.id.type, jsonType);
+
         View mapContainer = parentView.findViewById(R.id.map_container);
         mapContainer.setId(View.generateViewId());
         mapContainer.setTag(R.id.map_container);
@@ -223,8 +226,6 @@ public class LocationPickerFactory implements FormWidgetFactory {
         final TextView label = parentView.findViewById(R.id.location_label);
         label.setText(hint);
 
-        String jsonKey = jsonObject.getString("key");
-        String jsonType = jsonObject.getString("type");
         final MaterialEditText etLatitude = parentView.findViewById(R.id.location_latitude);
         etLatitude.setId(ViewUtil.generateViewId());
         etLatitude.setTag(R.id.key, jsonKey + KEY_SUFFIX_LATITUDE);
@@ -249,12 +250,7 @@ public class LocationPickerFactory implements FormWidgetFactory {
         String value = jsonObject.optString("value");
 
         if (!TextUtils.isEmpty(value)) {
-            String customIcon = null;
-            if (jsonObject.has("icon")) {
-                customIcon = jsonObject.getString("icon");
-                customIcon = resourceResolver.resolvePath(context, customIcon);
-            }
-            fillDefaultValue(context, etLatitude, etLongitude, etAccuracy, mapContainer.getId(), jsonKey, value, customIcon);
+            fillDefaultValue(parentView, etLatitude, etLongitude, etAccuracy, value);
         } else {
             mapContainer.setVisibility(View.GONE);
         }
@@ -269,8 +265,9 @@ public class LocationPickerFactory implements FormWidgetFactory {
     }
 
 
-    private void fillDefaultValue(Context context, MaterialEditText etLatitude, MaterialEditText etLongitude,
-                                  MaterialEditText etAccuracy, int mapContainerId, String key, String value, String customIcon) {
+    private void fillDefaultValue(View parentView, MaterialEditText etLatitude, MaterialEditText etLongitude,
+                                  MaterialEditText etAccuracy, String value) {
+        parentView.setTag(R.id.value, value);
         String[] parts = value.split(MapsUtils.COORD_SEPARATOR);
         if (parts.length > 0) {
             etLatitude.setText(parts[0].trim());
@@ -280,11 +277,6 @@ public class LocationPickerFactory implements FormWidgetFactory {
         }
         if (parts.length > 2) {
             etAccuracy.setText(parts[2].trim());
-        }
-        if (context instanceof FragmentActivity) {
-            MapsUtils.loadStaticMap((FragmentActivity) context, mapContainerId, key, value, customIcon);
-        } else {
-            Log.w(TAG, "Context is not a FragmentActivity");
         }
     }
 

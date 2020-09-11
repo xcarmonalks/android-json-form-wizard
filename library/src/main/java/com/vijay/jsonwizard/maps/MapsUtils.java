@@ -50,23 +50,15 @@ public class MapsUtils {
         return String.format("%s, %s, %s", latitude, longitude, accuracy);
     }
 
-    public static void loadStaticMap(FragmentActivity activity, int containerId, String key, String value, String customIcon) {
-        FragmentManager fragmentManager = activity.getSupportFragmentManager();
-        loadStaticMap(fragmentManager, containerId, key, value, customIcon);
-    }
-
     public static void loadStaticMap(Fragment fragment, int containerId, String key, String value, String customIcon) {
-        FragmentManager fragmentManager = fragment.getFragmentManager();
+        FragmentManager fragmentManager = fragment.getActivity().getSupportFragmentManager();
         loadStaticMap(fragmentManager, containerId, key, value, customIcon);
     }
 
     private static void loadStaticMap(FragmentManager fragmentManager, int containerId, String key, String value, final String customIcon) {
         try {
-            Log.d(TAG, "Updating map");
             final LatLng position = MapsUtils.parse(value);
 
-
-            Log.d(TAG, "Creating new map");
             FragmentTransaction transaction = fragmentManager.beginTransaction();
 
             GoogleMapOptions options = new GoogleMapOptions();

@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -103,6 +104,24 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         presenter.addFormElements();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        int childCount = mMainView.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            View view = mMainView.getChildAt(i);
+            if (JsonFormConstants.LOCATION_PICKER.equals(view.getTag(R.id.type))) {
+                // init map if value available
+                String value = (String) view.getTag(R.id.value);
+                if (!TextUtils.isEmpty(value)) {
+                    String key = (String) view.getTag(R.id.key);
+                    updateRelevantMap(key, value);
+                }
+            }
+        }
     }
 
     @Override
