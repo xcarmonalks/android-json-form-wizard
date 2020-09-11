@@ -54,6 +54,11 @@ public class ImageFileUtils {
         return Base64.encodeToString(byteArray, Base64.NO_WRAP);
     }
 
+    public static Bitmap decodeFromBase64(String base64) {
+        byte[] bytes = Base64.decode(base64, Base64.NO_WRAP);
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+    }
+
     public static Bitmap scaleToFit(Bitmap unscaledBitmap, int maxSize) {
 
         Bitmap scaledBitmap = null;

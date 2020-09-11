@@ -1,17 +1,17 @@
 package com.vijay.jsonwizard.widgets;
 
-import static com.vijay.jsonwizard.utils.FormUtils.MATCH_PARENT;
-import static com.vijay.jsonwizard.utils.FormUtils.WRAP_CONTENT;
 import static com.vijay.jsonwizard.utils.FormUtils.dpToPixels;
-import static com.vijay.jsonwizard.utils.FormUtils.getLayoutParams;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
 import com.vijay.jsonwizard.R;
+import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.demo.resources.ResourceResolver;
 import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
@@ -24,6 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -48,12 +49,45 @@ public class ImagePickerFactory implements FormWidgetFactory {
     }
 
     @Override
-    public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener,
-        JsonFormBundle bundle, JsonExpressionResolver resolver, ResourceResolver resourceResolver,
-        int visualizationMode) throws JSONException {
+    public List<View> getViewsFromJson(String stepName, final Context context, JSONObject jsonObject, CommonListener listener,
+                                       JsonFormBundle bundle, JsonExpressionResolver resolver, ResourceResolver resourceResolver,
+                                       int visualizationMode) throws JSONException {
+        if (visualizationMode == JsonFormConstants.VISUALIZATION_MODE_READ_ONLY) {
+            return getReadOnlyViews(context, jsonObject, bundle);
+        } else {
+            return getEditableViews(context, jsonObject, listener, bundle);
+        }
+    }
+
+    private List<View> getReadOnlyViews(Context context, JSONObject jsonObject, JsonFormBundle bundle) throws JSONException {
+        String imagePath = jsonObject.optString("value");
+        if (!TextUtils.isEmpty(imagePath)) {
+            List<View> views = new ArrayList<>(1);
+            View rootView = LayoutInflater.from(context).inflate(R.layout.item_image_picker, null);
+            final ImageView imageView = rootView.findViewById(R.id.image_preview);
+            Bitmap bitmap = ImageUtils.loadBitmapFromFile(imagePath, ImageUtils.getDeviceWidth(context), dpToPixels(context, 200));
+            if (bitmap != null) {
+                imageView.setImageBitmap(bitmap);
+            } else {
+                imageView.setImageResource(R.mipmap.grey_bg);
+            }
+            Button btn = rootView.findViewById(R.id.btn_upload);
+            btn.setEnabled(false);
+            btn.setText(bundle.resolveKey(jsonObject.getString("uploadButtonText")));
+            views.add(rootView);
+            return views;
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    private List<View> getEditableViews(final Context context, JSONObject jsonObject, CommonListener listener,
+                                        JsonFormBundle bundle) throws JSONException {
         List<View> views = new ArrayList<>(1);
-        ImageView imageView = new ImageView(context);
-        imageView.setImageDrawable(context.getResources().getDrawable(R.mipmap.grey_bg));
+        View rootView = LayoutInflater.from(context).inflate(R.layout.item_image_picker, null);
+        rootView.setTag(R.id.type, jsonObject.getString("type"));
+
+        final ImageView imageView = rootView.findViewById(R.id.image_preview);
         imageView.setTag(R.id.key, jsonObject.getString("key"));
         imageView.setTag(R.id.type, jsonObject.getString("type"));
 
@@ -65,25 +99,31 @@ public class ImagePickerFactory implements FormWidgetFactory {
                 imageView.setTag(R.id.error, bundle.resolveKey(requiredObject.optString("err")));
             }
         }
+        final Button clearBtn = rootView.findViewById(R.id.btn_clear);
+        clearBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imageView.setImageResource(R.mipmap.grey_bg);
+                imageView.setTag(R.id.imagePath, null);
+                clearBtn.setVisibility(View.GONE);
+            }
+        });
 
-        imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-        imageView.setLayoutParams(getLayoutParams(MATCH_PARENT, dpToPixels(context, 200), 0, 0, 0,
-            (int) context.getResources().getDimension(R.dimen.default_bottom_margin)));
         String imagePath = jsonObject.optString("value");
         if (!TextUtils.isEmpty(imagePath)) {
             imageView.setTag(R.id.imagePath, imagePath);
             imageView.setImageBitmap(
-                ImageUtils.loadBitmapFromFile(imagePath, ImageUtils.getDeviceWidth(context), dpToPixels(context, 200)));
+                    ImageUtils.loadBitmapFromFile(imagePath, ImageUtils.getDeviceWidth(context), dpToPixels(context, 200)));
+
+            clearBtn.setVisibility(View.VISIBLE);
         }
-        views.add(imageView);
-        Button uploadButton = new Button(context);
+        Button uploadButton = rootView.findViewById(R.id.btn_upload);
         uploadButton.setText(bundle.resolveKey(jsonObject.getString("uploadButtonText")));
-        uploadButton.setLayoutParams(getLayoutParams(WRAP_CONTENT, WRAP_CONTENT, 0, 0, 0,
-            (int) context.getResources().getDimension(R.dimen.default_bottom_margin)));
         uploadButton.setOnClickListener(listener);
         uploadButton.setTag(R.id.key, jsonObject.getString("key"));
         uploadButton.setTag(R.id.type, jsonObject.getString("type"));
-        views.add(uploadButton);
+
+        views.add(rootView);
         return views;
     }
 }

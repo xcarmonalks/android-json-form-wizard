@@ -332,6 +332,8 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                 Object path = childAt.getTag(R.id.imagePath);
                 if (path instanceof String) {
                     getView().writeValue(mStepName, key, (String) path);
+                } else {
+                    getView().writeValue(mStepName, key, null);
                 }
             } else if (childAt instanceof CheckBox) {
                 String parentKey = (String) childAt.getTag(R.id.key);
@@ -437,12 +439,15 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
             String key = (String) v.getTag(R.id.key);
             String type = (String) v.getTag(R.id.type);
             if (JsonFormConstants.CHOOSE_IMAGE.equals(type)) {
-                getView().hideKeyBoard();
-                /*Intent galleryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media
-                .EXTERNAL_CONTENT_URI);*/
-                Intent pickerIntent = ImagePicker.getPickImageIntent(v.getContext());
                 mCurrentKey = key;
-                getView().startActivityForResult(pickerIntent, RESULT_LOAD_IMG);
+                if (v.getTag(R.id.btn_clear) != null) {
+                    getView().updateRelevantImageView(null, null, key);
+                    v.setVisibility(View.GONE);
+                } else {
+                    getView().hideKeyBoard();
+                    Intent pickerIntent = ImagePicker.getPickImageIntent(v.getContext());
+                    getView().startActivityForResult(pickerIntent, RESULT_LOAD_IMG);
+                }
             }
 
             if (JsonFormConstants.BARCODE_TEXT.equals(type)) {

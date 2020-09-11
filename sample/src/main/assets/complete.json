@@ -3,6 +3,11 @@
     "step1": {
         "fields": [
             {
+                "key": "image",
+                "type": "choose_image",
+                "uploadButtonText": "Upload"
+            },
+            {
                 "key": "name",
                 "type": "edit_text",
                 "hint": "${step1.name}",

@@ -180,8 +180,8 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
         int childCount = mMainView.getChildCount();
         for (int i = 0; i < childCount; i++) {
             View view = mMainView.getChildAt(i);
-            if (view instanceof ImageView) {
-                ImageView imageView = (ImageView) view;
+            if (JsonFormConstants.CHOOSE_IMAGE.equals(view.getTag(R.id.type))) {
+                ImageView imageView = view.findViewById(R.id.image_preview);
                 String key = (String) imageView.getTag(R.id.key);
                 if (key.equals(currentKey)) {
                     imageView.setImageBitmap(bitmap);
@@ -189,6 +189,8 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
                     imageView.setTag(R.id.imagePath, imagePath);
                     //imageView.setAdjustViewBounds(true);
                     imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+
+                    view.findViewById(R.id.btn_clear).setVisibility(VISIBLE);
                 }
             }
         }
