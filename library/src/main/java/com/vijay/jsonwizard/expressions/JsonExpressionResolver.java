@@ -109,6 +109,18 @@ public class JsonExpressionResolver {
         return array;
     }
 
+    public JSONObject resolveAsObject(String expression, JSONObject instance) {
+        JSONArray array = resolveExpression(expression, instance);
+        if (array == null || array.length() == 0) {
+            return null;
+        }
+        Object item = array.opt(0);
+        if (item instanceof JSONObject) {
+            return (JSONObject) item;
+        }
+        return null;
+    }
+
     private JSONArray resolveExpression(String expression, JSONObject instance) {
         String localExpression = expression;
         String externalReference = extractExternalContentReference(expression);

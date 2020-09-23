@@ -1,5 +1,8 @@
 package com.vijay.jsonwizard.presenters;
 
+import static com.vijay.jsonwizard.maps.MapsActivity.EXTRA_CONFIG_DEFAULT_ZOOM;
+import static com.vijay.jsonwizard.maps.MapsActivity.EXTRA_CONFIG_MAX_ZOOM;
+import static com.vijay.jsonwizard.maps.MapsActivity.EXTRA_CONFIG_MIN_ZOOM;
 import static com.vijay.jsonwizard.maps.MapsActivity.EXTRA_CUSTOM_MARKER_ICON;
 import static com.vijay.jsonwizard.maps.MapsActivity.EXTRA_INITIAL_LOCATION;
 import static com.vijay.jsonwizard.maps.MapsActivity.EXTRA_RESULT_LOCATION;
@@ -501,6 +504,12 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                     intent.putExtra(EXTRA_CUSTOM_MARKER_ICON, customIcon);
                 }
                 intent.putExtra(EXTRA_USE_ACCURACY, useAccuracy);
+                intent.putExtra(EXTRA_CONFIG_MIN_ZOOM, (Double) v.getTag(R.id.map_min_zoom));
+                intent.putExtra(EXTRA_CONFIG_MAX_ZOOM, (Double) v.getTag(R.id.map_max_zoom));
+                Double defaultZoom = (Double) v.getTag(R.id.map_max_zoom);
+                if (defaultZoom != Double.NaN) {
+                    intent.putExtra(EXTRA_CONFIG_DEFAULT_ZOOM, defaultZoom);
+                }
                 mCurrentKey = key;
                 getView().startActivityForResult(intent, RESULT_LOAD_LOCATION);
             }

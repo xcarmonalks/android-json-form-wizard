@@ -249,7 +249,9 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
         View inputView = findViewWithTagKeyValue(view, key);
         String customIcon = (String) inputView.getTag(R.id.custom_icon);
         View mapContainer = inputView.findViewWithTag(R.id.map_container);
-        MapsUtils.loadStaticMap(this, mapContainer.getId(), key, value, customIcon);
+        Double zoomLevel = (Double) inputView.getTag(R.id.map_default_zoom);
+        Float zoomLevelF = zoomLevel != null ? zoomLevel.floatValue() : null;
+        MapsUtils.loadStaticMap(this, mapContainer.getId(), key, value, customIcon, zoomLevelF);
     }
 
     private View findViewWithTagKeyValue(View view, String key) {

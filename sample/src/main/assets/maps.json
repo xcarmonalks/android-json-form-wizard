@@ -12,7 +12,12 @@
                 "key": "map-0",
                 "type": "location",
                 "hint": "GPS",
-                "value": "45.9829, -1.5442"
+                "value": "45.9829, -1.5442",
+                "map_config": {
+                    "min_zoom": 1,
+                    "max_zoom": 50,
+                    "default_zoom": 1
+                }
             }
         ],
         "title": "Pre-Map",
@@ -29,6 +34,11 @@
                 "icon": "marker.png",
                 "icon_input": "marker.png",
                 "accuracy": true,
+                "map_config": {
+                    "min_zoom": 1,
+                    "max_zoom": 50,
+                    "default_zoom": 25
+                },
                 "v_required": {
                     "value": "true",
                     "err": "Pick a location"

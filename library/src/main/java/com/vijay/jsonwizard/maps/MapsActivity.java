@@ -56,6 +56,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static final String EXTRA_USE_ACCURACY = "USE_ACCURACY";
     public static final String EXTRA_RESULT_LOCATION = "RESULT_LOCATION";
     public static final String EXTRA_CUSTOM_MARKER_ICON = "CUSTOM_MARKER_ICON";
+    public static final String EXTRA_CONFIG_MIN_ZOOM = "CONFIG_MIN_ZOOM";
+    public static final String EXTRA_CONFIG_MAX_ZOOM = "CONFIG_MAX_ZOOM";
+    public static final String EXTRA_CONFIG_DEFAULT_ZOOM = "CONFIG_DEFAULT_ZOOM";
 
     private static final String TAG = "JsonFormActivity";
     private static final int REQUEST_CODE_LOCATION = 80;
@@ -68,6 +71,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private boolean mIncludeAccuracy;
     private String mMarkerIcon;
+    private double mMinZoom;
+    private double mMaxZoom;
+    private double mDefaultZoom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +103,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         if (intent.hasExtra(EXTRA_CUSTOM_MARKER_ICON)) {
             mMarkerIcon = intent.getStringExtra(EXTRA_CUSTOM_MARKER_ICON);
+        }
+
+        mMinZoom = intent.getDoubleExtra(EXTRA_CONFIG_MIN_ZOOM, MIN_ZOOM_LEVEL);
+        if (mMinZoom < 0) {
+            mMinZoom = 0;
+        }
+        mMaxZoom = intent.getDoubleExtra(EXTRA_CONFIG_MAX_ZOOM, MAX_ZOOM_LEVEL);
+        if (mMaxZoom < 0) {
+            mMaxZoom = 0;
+        }
+        mDefaultZoom = intent.getDoubleExtra(EXTRA_CONFIG_DEFAULT_ZOOM, MAX_ZOOM_LEVEL);
+        if (mDefaultZoom < 0) {
+            mMaxZoom = 0;
         }
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -160,8 +179,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.setMinZoomPreference(MIN_ZOOM_LEVEL);
-        mMap.setMaxZoomPreference(MAX_ZOOM_LEVEL);
+        mMap.setMinZoomPreference((float) mMinZoom);
+        mMap.setMaxZoomPreference((float) mMaxZoom);
 
         if (mInitialPos != null) {
             updateMapMarker(mInitialPos, true);
@@ -320,7 +339,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 mMarker.setPosition(latLng);
             }
             if (repositionCamera) {
-                CameraPosition pos = CameraPosition.builder().target(latLng).zoom(MAX_ZOOM_LEVEL)
+                CameraPosition pos = CameraPosition.builder().target(latLng).zoom((float) mDefaultZoom)
                         .build();
                 mMap.moveCamera(CameraUpdateFactory.newCameraPosition(pos));
             }

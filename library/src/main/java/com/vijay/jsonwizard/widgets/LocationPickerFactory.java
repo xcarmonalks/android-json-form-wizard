@@ -64,7 +64,7 @@ public class LocationPickerFactory implements FormWidgetFactory {
         List<View> views;
         switch (visualizationMode) {
             case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY:
-                views = getReadOnlyViewsFromJson(context, jsonObject, bundle, resourceResolver);
+                views = getReadOnlyViewsFromJson(context, jsonObject, bundle, resolver, resourceResolver);
                 break;
             default:
                 views = getEditableViewsFromJson(stepName, context, jsonObject, listener, bundle,
@@ -88,7 +88,7 @@ public class LocationPickerFactory implements FormWidgetFactory {
         }
 
         if (readonly) {
-            return getReadOnlyViewsFromJson(context, jsonObject, bundle, resourceResolver);
+            return getReadOnlyViewsFromJson(context, jsonObject, bundle, resolver, resourceResolver);
         }
 
         String jsonKey = jsonObject.getString("key");
@@ -99,6 +99,9 @@ public class LocationPickerFactory implements FormWidgetFactory {
             null);
         parentView.setTag(R.id.key, jsonKey);
         parentView.setTag(R.id.type, jsonInputType);
+
+        loadMapConfig(context, jsonObject, resolver, parentView);
+
         boolean accuracyEnabled = jsonObject.has("accuracy") && jsonObject.getBoolean("accuracy");
         parentView.setTag(R.id.accuracy, accuracyEnabled);
         if (jsonObject.has("icon")) {
@@ -214,8 +217,24 @@ public class LocationPickerFactory implements FormWidgetFactory {
         return views;
     }
 
+    private void loadMapConfig(Context context, JSONObject jsonObject, JsonExpressionResolver resolver, View parentView) throws JSONException {
+        if (jsonObject.has("map_config")) {
+            String expression = jsonObject.optString("map_config");
+            JSONObject mapConfig;
+            if (resolver.isValidExpression(expression)) {
+                JSONObject currentValues = getCurrentValues(context);
+                mapConfig = resolver.resolveAsObject(expression, currentValues);
+            } else {
+                mapConfig = jsonObject.getJSONObject("map_config");
+            }
+            parentView.setTag(R.id.map_min_zoom, mapConfig.optDouble("min_zoom", MapsUtils.MIN_ZOOM_LEVEL));
+            parentView.setTag(R.id.map_max_zoom, mapConfig.optDouble("max_zoom", MapsUtils.MAX_ZOOM_LEVEL));
+            parentView.setTag(R.id.map_default_zoom, mapConfig.optDouble("default_zoom"));
+        }
+    }
+
     private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject,
-                                                JsonFormBundle bundle, ResourceResolver resourceResolver) throws JSONException {
+                                                JsonFormBundle bundle, JsonExpressionResolver resolver, ResourceResolver resourceResolver) throws JSONException {
         List<View> views = new ArrayList<>(1);
         View parentView = LayoutInflater.from(context).inflate(R.layout.item_location_text, null);
 
@@ -223,6 +242,7 @@ public class LocationPickerFactory implements FormWidgetFactory {
         String jsonType = jsonObject.getString("type");
         parentView.setTag(R.id.key, jsonKey);
         parentView.setTag(R.id.type, jsonType);
+        loadMapConfig(context, jsonObject, resolver, parentView);
 
         View mapContainer = parentView.findViewById(R.id.map_container);
         mapContainer.setId(View.generateViewId());

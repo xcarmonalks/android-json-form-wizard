@@ -17,4 +17,7 @@
     <!-- true, false : used with widget type location -->
     <item name="accuracy" type="id" />
     <item name="custom_icon" type="id" />
+    <item name="map_min_zoom" type="id" />
+    <item name="map_max_zoom" type="id" />
+    <item name="map_default_zoom" type="id" />
 </resources>

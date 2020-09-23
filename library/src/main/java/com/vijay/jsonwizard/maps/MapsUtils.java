@@ -3,7 +3,6 @@ package com.vijay.jsonwizard.maps;
 import android.util.Log;
 
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -50,12 +49,15 @@ public class MapsUtils {
         return String.format("%s, %s, %s", latitude, longitude, accuracy);
     }
 
-    public static void loadStaticMap(Fragment fragment, int containerId, String key, String value, String customIcon) {
+    public static void loadStaticMap(Fragment fragment, int containerId, String key, String value, String customIcon,
+                                     Float customZoomLevel) {
         FragmentManager fragmentManager = fragment.getActivity().getSupportFragmentManager();
-        loadStaticMap(fragmentManager, containerId, key, value, customIcon);
+        float zoomLevel = customZoomLevel != null ? customZoomLevel : MAX_ZOOM_LEVEL;
+        loadStaticMap(fragmentManager, containerId, key, value, customIcon, zoomLevel);
     }
 
-    private static void loadStaticMap(FragmentManager fragmentManager, int containerId, String key, String value, final String customIcon) {
+    private static void loadStaticMap(FragmentManager fragmentManager, int containerId, String key, String value,
+                                      final String customIcon, final float zoomLevel) {
         try {
             final LatLng position = MapsUtils.parse(value);
 
@@ -81,8 +83,8 @@ public class MapsUtils {
                         markerOptions.icon(BitmapDescriptorFactory.fromPath(customIcon));
                     }
                     googleMap.addMarker(markerOptions);
-                    CameraPosition pos = CameraPosition.builder().target(position).zoom(
-                        MapsUtils.MAX_ZOOM_LEVEL).build();
+                    CameraPosition pos = CameraPosition.builder().target(position)
+                            .zoom(zoomLevel).build();
                     googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(pos));
                 }
             });
