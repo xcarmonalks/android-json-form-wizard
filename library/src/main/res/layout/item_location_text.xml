@@ -86,7 +86,7 @@
             android:focusable="true"
             android:layout_marginStart="12dp"
             android:background="?selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_map_black_18dp"
+            android:src="@drawable/ic_pick_location_18dp"
             android:tint="@color/primary_text" />
 
     </LinearLayout>

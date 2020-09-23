@@ -1,18 +1,17 @@
 package com.vijay.jsonwizard.widgets;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.text.InputType;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.fragment.app.FragmentActivity;
 
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rey.material.util.ViewUtil;
@@ -148,6 +147,13 @@ public class LocationPickerFactory implements FormWidgetFactory {
         String key = jsonKey;
         imageView.setTag(R.id.key, jsonKey);
         imageView.setTag(R.id.type, jsonInputType);
+
+        String customIconInput = jsonObject.optString("icon_input");
+        if (!TextUtils.isEmpty(customIconInput)) {
+            String customIconPath = resourceResolver.resolvePath(context, customIconInput);
+            Bitmap bitmap = BitmapFactory.decodeFile(customIconPath);
+            imageView.setImageBitmap(bitmap);
+        }
         final View.OnClickListener onClickListenerWithValue = getOnClickListenerWithValue(
             parentView, etLatitude, etLongitude, etAccuracy, listener, accuracyEnabled);
         imageView.setOnClickListener(onClickListenerWithValue);

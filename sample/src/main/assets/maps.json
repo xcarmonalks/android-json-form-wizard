@@ -27,6 +27,7 @@
                 "type": "location",
                 "hint": "Location",
                 "icon": "marker.png",
+                "icon_input": "marker.png",
                 "accuracy": true,
                 "v_required": {
                     "value": "true",
