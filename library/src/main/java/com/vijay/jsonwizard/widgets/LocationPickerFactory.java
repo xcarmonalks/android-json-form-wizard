@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -279,6 +280,8 @@ public class LocationPickerFactory implements FormWidgetFactory {
             fillDefaultValue(parentView, etLatitude, etLongitude, etAccuracy, value);
         } else {
             mapContainer.setVisibility(View.GONE);
+            FrameLayout containerParent = (FrameLayout) mapContainer.getParent();
+            containerParent.setVisibility(View.GONE);
         }
 
         final ImageView imageView = parentView.findViewById(R.id.icon);
