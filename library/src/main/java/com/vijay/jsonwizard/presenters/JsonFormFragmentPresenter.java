@@ -308,21 +308,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                     } else {
                         getView().writeValue(mStepName, key, editText.getText().toString());
                     }
-                } else if (editText.getTag(R.id.type).equals(JsonFormConstants.LOCATION_PICKER)) {
-                    ValidationStatus validationStatus = LocationPickerFactory.validate(editText);
-                    if (!validationStatus.isValid()) {
-                        return validationStatus;
-                    }
-                    if (JsonFormConstants.EDIT_GROUP.equals(type)) {
-                        String parentKey = (String) mainView.getTag(R.id.key);
-                        String childKey = (String) childAt.getTag(R.id.key);
-                        getView().writeValue(mStepName, parentKey, JsonFormConstants.FIELDS_FIELD_NAME, childKey,
-                            editText.getText().toString());
-                    } else {
-                        getView().writeValue(mStepName, key, editText.getText().toString());
-                    }
                 }
-
 
             } else if (childAt instanceof ImageView) {
                 ValidationStatus validationStatus = ImagePickerFactory.validate((ImageView) childAt);
@@ -362,12 +348,55 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                     return validationStatus;
                 }
             } else if (childAt instanceof LinearLayout) {
-                ValidationStatus validationStatus = writeValuesAndValidate((LinearLayout) childAt);
+                if (JsonFormConstants.LOCATION_PICKER.equals(childAt.getTag(R.id.type))) {
+                    ValidationStatus validationStatus = writeValuesAndValidateLocationPicker((LinearLayout) childAt, key);
+                    if (!validationStatus.isValid()) {
+                        return validationStatus;
+                    }
+                } else {
+                    ValidationStatus validationStatus = writeValuesAndValidate((LinearLayout) childAt);
+                    if (!validationStatus.isValid()) {
+                        return validationStatus;
+                    }
+                }
+            }
+        }
+        return new ValidationStatus(true, null);
+    }
+
+    private ValidationStatus writeValuesAndValidateLocationPicker(LinearLayout widget, String key) {
+        MaterialEditText etLatitude = null;
+        MaterialEditText etLongitude = null;
+        MaterialEditText etAccuracy = null;
+        LinearLayout valueContainer = widget.findViewById(R.id.value_container);
+        for (int i = 0; i < valueContainer.getChildCount(); i++) {
+            View childView = valueContainer.getChildAt(i);
+            if (childView instanceof MaterialEditText) {
+                String childKey = (String) childView.getTag(R.id.key);
+                MaterialEditText met = (MaterialEditText) childView;
+                if (childKey.endsWith(KEY_SUFFIX_LATITUDE)) {
+                    etLatitude = met;
+                } else if (childKey.endsWith(KEY_SUFFIX_LONGITUDE)) {
+                    etLongitude = met;
+                } else if (childKey.endsWith(KEY_SUFFIX_ACCURACY)) {
+                    etAccuracy = met;
+                }
+                ValidationStatus validationStatus = LocationPickerFactory.validate(met);
                 if (!validationStatus.isValid()) {
                     return validationStatus;
                 }
             }
         }
+
+        String value;
+        if (etAccuracy != null && !etAccuracy.getText().toString().isEmpty()) {
+            value = MapsUtils.toString(etLatitude.getText().toString(),
+                    etLongitude.getText().toString(), etAccuracy.getText().toString());
+        } else {
+            value = MapsUtils.toString(etLatitude.getText().toString(),
+                    etLongitude.getText().toString());
+        }
+        getView().writeValue(mStepName, key, value);
         return new ValidationStatus(true, null);
     }
 
