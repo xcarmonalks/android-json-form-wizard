@@ -118,7 +118,7 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
                 String value = (String) view.getTag(R.id.value);
                 if (!TextUtils.isEmpty(value)) {
                     String key = (String) view.getTag(R.id.key);
-                    updateRelevantMap(key, value);
+                    redrawMap(key, value);
                 }
             }
         }
@@ -230,6 +230,21 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
 
     @Override
     public void updateRelevantMap(String key, String value) {
+        int childCount = mMainView.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            View view = mMainView.getChildAt(i);
+            if (JsonFormConstants.LOCATION_PICKER.equals(view.getTag(R.id.type))) {
+                String widgetKey = (String) view.getTag(R.id.key);
+                if (widgetKey != null && widgetKey.equals(key)) {
+                    view.setTag(R.id.value, value);
+                    break;
+                }
+            }
+        }
+        // Map will be redrawn by onResume lifecycle method
+    }
+
+    private void redrawMap(String key, String value) {
         View view = getView();
         View inputView = findViewWithTagKeyValue(view, key);
         String customIcon = (String) inputView.getTag(R.id.custom_icon);
