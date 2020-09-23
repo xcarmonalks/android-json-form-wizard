@@ -12,18 +12,24 @@
         android:layout_marginBottom="8dp" />
 
     <FrameLayout
-        android:id="@+id/map_container"
         android:layout_width="match_parent"
-        android:background="@drawable/location_placeholder"
-        android:layout_height="255dp">
+        android:layout_height="wrap_content"
+        android:background="@drawable/textview_border"
+        android:padding="1dp">
+        <FrameLayout
+            android:id="@+id/map_container"
+            android:layout_width="match_parent"
+            android:background="?selectableItemBackground"
+            android:layout_height="255dp">
 
-        <ImageView
-            android:id="@+id/map_placeholder"
-            android:layout_width="72dp"
-            android:layout_height="72dp"
-            android:layout_gravity="center"
-            android:src="@drawable/ic_map_black_18dp"
-            android:tint="@color/secondary_text" />
+            <ImageView
+                android:id="@+id/map_placeholder"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_map_black_18dp"
+                android:tint="@color/secondary_text" />
+        </FrameLayout>
     </FrameLayout>
 
     <LinearLayout
