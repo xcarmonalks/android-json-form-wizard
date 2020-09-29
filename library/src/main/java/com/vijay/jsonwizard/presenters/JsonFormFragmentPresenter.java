@@ -506,8 +506,8 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                 intent.putExtra(EXTRA_USE_ACCURACY, useAccuracy);
                 intent.putExtra(EXTRA_CONFIG_MIN_ZOOM, (Double) v.getTag(R.id.map_min_zoom));
                 intent.putExtra(EXTRA_CONFIG_MAX_ZOOM, (Double) v.getTag(R.id.map_max_zoom));
-                Double defaultZoom = (Double) v.getTag(R.id.map_max_zoom);
-                if (defaultZoom != Double.NaN) {
+                Double defaultZoom = (Double) v.getTag(R.id.map_default_zoom);
+                if (defaultZoom != null && defaultZoom.doubleValue() != Double.NaN) {
                     intent.putExtra(EXTRA_CONFIG_DEFAULT_ZOOM, defaultZoom);
                 }
                 mCurrentKey = key;
