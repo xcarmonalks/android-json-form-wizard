@@ -677,15 +677,22 @@ Step 2. Add the dependency in the form
 ```
 
 ##### Barcode Editext usage:
-Barcode uses the Thin Google ML Kit API.
-You may add metadata to the app Manifest to download the barcode module as soon as the app is installed.
+Barcode uses the MLKit API from Firebase. In order to use it, the following steeps are needed.
+Step 1. Apply google services plugin
+```gradle
+apply plugin: 'com.google.gms.google-services'
+```
+Step 2. Add camera permission
+```xml
+<uses-permission android:name="android.permission.CAMERA"/>
+```
+Step 3. Add the Firebase MLKit vision API key to the app
+Step 4 (Optional). Add metadata to the app Manifest to download the barcode module as soon as the app is installed.
 ```xml
 <meta-data
-    android:name="com.google.mlkit.vision.DEPENDENCIES"
+    android:name="com.google.firebase.ml.vision.DEPENDENCIES"
     android:value="barcode"/>
 ```
-If you don't enable install-time model downloads, the model is downloaded the first time you run the scanner.
-Requests you make before the download has completed produce no results. 
 
 # TODOs
 

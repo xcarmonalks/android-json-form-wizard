@@ -3,9 +3,9 @@
     "step1": {
         "fields": [
             {
-                "key": "barcode",
-                "type": "barcode_text",
-                "hint": "Barcode"
+                "key": "image",
+                "type": "choose_image",
+                "uploadButtonText": "Upload"
             },
             {
                 "key": "name",
