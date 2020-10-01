@@ -19,7 +19,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
-import com.google.mlkit.vision.barcode.Barcode;
+import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode;
 import com.vijay.jsonwizard.barcode.common.GraphicOverlay;
 import com.vijay.jsonwizard.barcode.common.GraphicOverlay.Graphic;
 
@@ -32,11 +32,11 @@ public class BarcodeGraphic extends Graphic {
 
     private final Paint rectPaint;
     private final Paint barcodePaint;
-    private final Barcode barcode;
+    private final FirebaseVisionBarcode barcode;
     private RectF rect;
     private Rect textRect;
 
-    BarcodeGraphic(GraphicOverlay overlay, Barcode barcode) {
+    BarcodeGraphic(GraphicOverlay overlay, FirebaseVisionBarcode barcode) {
         super(overlay);
 
         this.barcode = barcode;
@@ -98,7 +98,7 @@ public class BarcodeGraphic extends Graphic {
         this.barcodePaint.setColor(Color.RED);
     }
 
-    public Barcode getBarcode() {
+    public FirebaseVisionBarcode getBarcode() {
         return this.barcode;
     }
 
