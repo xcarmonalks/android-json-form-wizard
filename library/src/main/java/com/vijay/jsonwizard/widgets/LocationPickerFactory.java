@@ -123,14 +123,17 @@ public class LocationPickerFactory implements FormWidgetFactory {
         inputContainer.setTag(R.id.key, jsonKey);
         inputContainer.setTag(R.id.type, jsonInputType);
 
+        boolean editable = jsonObject.optBoolean("editable");
         MaterialEditText etLatitude = parentView.findViewById(R.id.location_latitude);
         etLatitude.setId(ViewUtil.generateViewId());
+        etLatitude.setEnabled(editable);
         etLatitude.setInputType(INPUT_TYPE_DECIMAL_NUMBER);
         etLatitude.setTag(R.id.key, jsonKey + KEY_SUFFIX_LATITUDE);
         etLatitude.setTag(R.id.type, jsonInputType);
 
         MaterialEditText etLongitude = parentView.findViewById(R.id.location_longitude);
         etLongitude.setId(ViewUtil.generateViewId());
+        etLongitude.setEnabled(editable);
         etLongitude.setInputType(INPUT_TYPE_DECIMAL_NUMBER);
         etLongitude.setTag(R.id.key, jsonKey + KEY_SUFFIX_LONGITUDE);
         etLongitude.setTag(R.id.type, jsonInputType);
@@ -142,6 +145,7 @@ public class LocationPickerFactory implements FormWidgetFactory {
         etAccuracy.setTag(R.id.type, jsonInputType);
 
         if (accuracyEnabled) {
+            etAccuracy.setEnabled(editable);
             etAccuracy.setVisibility(View.VISIBLE);
         } else {
             etAccuracy.setVisibility(View.GONE);

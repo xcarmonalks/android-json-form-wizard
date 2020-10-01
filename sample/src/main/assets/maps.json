@@ -17,7 +17,8 @@
                     "min_zoom": 1,
                     "max_zoom": 50,
                     "default_zoom": 1
-                }
+                },
+                "editable": true
             }
         ],
         "title": "Pre-Map",
