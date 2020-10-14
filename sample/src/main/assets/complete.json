@@ -22,6 +22,17 @@
                 "value": "name_val"
             },
             {
+                "key": "h1",
+                "type": "resource_view",
+                "label": "Help",
+                "config": {
+                    "color": "#0645AD",
+                    "size": 24,
+                    "align": "end"
+                },
+                "resource": "sample.html"
+            },
+            {
                 "key": "editGroup",
                 "type": "edit_group",
                 "optNumber": "3",

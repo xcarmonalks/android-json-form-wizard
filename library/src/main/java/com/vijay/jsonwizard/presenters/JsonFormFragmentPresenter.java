@@ -7,6 +7,8 @@ import static com.vijay.jsonwizard.maps.MapsActivity.EXTRA_CUSTOM_MARKER_ICON;
 import static com.vijay.jsonwizard.maps.MapsActivity.EXTRA_INITIAL_LOCATION;
 import static com.vijay.jsonwizard.maps.MapsActivity.EXTRA_RESULT_LOCATION;
 import static com.vijay.jsonwizard.maps.MapsActivity.EXTRA_USE_ACCURACY;
+import static com.vijay.jsonwizard.resourceviewer.WebViewActivity.EXTRA_RESOURCE;
+import static com.vijay.jsonwizard.resourceviewer.WebViewActivity.EXTRA_TITLE;
 import static com.vijay.jsonwizard.widgets.LocationPickerFactory.KEY_SUFFIX_ACCURACY;
 import static com.vijay.jsonwizard.widgets.LocationPickerFactory.KEY_SUFFIX_LATITUDE;
 import static com.vijay.jsonwizard.widgets.LocationPickerFactory.KEY_SUFFIX_LONGITUDE;
@@ -21,6 +23,7 @@ import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewParent;
+import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
@@ -46,6 +49,7 @@ import com.vijay.jsonwizard.interactors.JsonFormInteractor;
 import com.vijay.jsonwizard.maps.MapsActivity;
 import com.vijay.jsonwizard.maps.MapsUtils;
 import com.vijay.jsonwizard.mvp.MvpBasePresenter;
+import com.vijay.jsonwizard.resourceviewer.WebViewActivity;
 import com.vijay.jsonwizard.utils.CarouselAdapter;
 import com.vijay.jsonwizard.utils.DateUtils;
 import com.vijay.jsonwizard.utils.ImagePicker;
@@ -80,6 +84,8 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
     private static final int RESULT_LOAD_IMG = 1;
     private static final int RESULT_LOAD_BARCODE = 2;
     private static final int RESULT_LOAD_LOCATION = 3;
+    private static final int RESULT_RESOURCE_VIEW = 4;
+
     private static final String PARAM_BARCODE = "barcode";
     private static final String PARAM_ERROR = "error";
     private String mStepName;
@@ -125,7 +131,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         while (step.has("next")) {
             try {
                 String nextStep = JsonFormUtils.resolveNextStep(step, resolver,
-                    new JSONObject(getView().getCurrentJsonState()));
+                        new JSONObject(getView().getCurrentJsonState()));
                 if (JsonFormConstants.END_STEP_NAME.equals(nextStep)) {
                     // Break while loop, "next" step is fake
                     mStepDetails = step;
@@ -133,7 +139,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                 } else {
                     step = getView().getStep(nextStep);
                     views.addAll(
-                        getStepFormElements(stepName, step, bundle, resolver, resourceResolver));
+                            getStepFormElements(stepName, step, bundle, resolver, resourceResolver));
                 }
             } catch (JSONException e) {
                 Log.e(TAG, e.getMessage(), e);
@@ -143,9 +149,9 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
     }
 
     private List<View> getStepFormElements(String stepName, JSONObject stepDetails, JsonFormBundle bundle,
-        JsonExpressionResolver resolver, ResourceResolver resourceResolver) {
+                                           JsonExpressionResolver resolver, ResourceResolver resourceResolver) {
         List<View> views = mJsonFormInteractor.fetchFormElements(stepName, getView().getContext(), stepDetails,
-            getView().getCommonListener(), bundle, resolver, resourceResolver, mVisualizationMode);
+                getView().getCommonListener(), bundle, resolver, resourceResolver, mVisualizationMode);
         return views;
     }
 
@@ -156,7 +162,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                 getView().setUpBackButton();
             }
             JsonFormBundle bundle = getView().getBundle(
-                getView().getContext().getResources().getConfiguration().locale);
+                    getView().getContext().getResources().getConfiguration().locale);
             getView().setActionBarTitle(bundle.resolveKey(mStepDetails.optString("title")));
             if (mStepDetails.has("next")) {
                 getView().updateVisibilityOfNextAndSave(true, false);
@@ -233,9 +239,9 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
             ValidationStatus validationStatus = writeValuesAndValidate(mainView);
             if (validationStatus.isValid()) {
                 String nextStep = JsonFormUtils.resolveNextStep(mStepDetails, getView().getExpressionResolver(), new JSONObject(getView().getCurrentJsonState()));
-                if(JsonFormConstants.END_STEP_NAME.equals(nextStep)) {
+                if (JsonFormConstants.END_STEP_NAME.equals(nextStep)) {
                     onSaveClick(mainView);
-                }else {
+                } else {
                     JsonFormFragment next = JsonFormFragment.getFormFragment(nextStep);
                     getView().hideKeyBoard();
                     getView().transactThis(next);
@@ -266,7 +272,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                         String parentKey = (String) mainView.getTag(R.id.key);
                         String childKey = (String) childAt.getTag(R.id.key);
                         getView().writeValue(mStepName, parentKey, JsonFormConstants.FIELDS_FIELD_NAME, childKey,
-                            editText.getText().toString());
+                                editText.getText().toString());
                     } else {
                         getView().writeValue(mStepName, key, editText.getText().toString());
                     }
@@ -276,12 +282,12 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                         return validationStatus;
                     }
                     Date date = DateUtils.parseDate(editText.getText().toString(),
-                        (String) editText.getTag(R.id.v_pattern));
+                            (String) editText.getTag(R.id.v_pattern));
                     if (JsonFormConstants.EDIT_GROUP.equals(type)) {
                         String parentKey = (String) childAt.getTag(R.id.key);
                         String childKey = (String) childAt.getTag(R.id.childKey);
                         getView().writeValue(mStepName, parentKey, JsonFormConstants.FIELDS_FIELD_NAME, childKey,
-                            DateUtils.toJSONDateFormat(date));
+                                DateUtils.toJSONDateFormat(date));
                     } else {
                         getView().writeValue(mStepName, key, DateUtils.toJSONDateFormat(date));
                     }
@@ -294,7 +300,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                         String parentKey = (String) mainView.getTag(R.id.key);
                         String childKey = (String) childAt.getTag(R.id.key);
                         getView().writeValue(mStepName, parentKey, JsonFormConstants.FIELDS_FIELD_NAME, childKey,
-                            editText.getText().toString());
+                                editText.getText().toString());
                     } else {
                         getView().writeValue(mStepName, key, editText.getText().toString());
                     }
@@ -307,7 +313,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                         String parentKey = (String) mainView.getTag(R.id.key);
                         String childKey = (String) childAt.getTag(R.id.key);
                         getView().writeValue(mStepName, parentKey, JsonFormConstants.FIELDS_FIELD_NAME, childKey,
-                            editText.getText().toString());
+                                editText.getText().toString());
                     } else {
                         getView().writeValue(mStepName, key, editText.getText().toString());
                     }
@@ -328,7 +334,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                 String parentKey = (String) childAt.getTag(R.id.key);
                 String childKey = (String) childAt.getTag(R.id.childKey);
                 getView().writeValue(mStepName, parentKey, JsonFormConstants.OPTIONS_FIELD_NAME, childKey,
-                    String.valueOf(((CheckBox) childAt).isChecked()));
+                        String.valueOf(((CheckBox) childAt).isChecked()));
             } else if (childAt instanceof RadioButton) {
                 String parentKey = (String) childAt.getTag(R.id.key);
                 String childKey = (String) childAt.getTag(R.id.childKey);
@@ -513,6 +519,21 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                 mCurrentKey = key;
                 getView().startActivityForResult(intent, RESULT_LOAD_LOCATION);
             }
+
+            if (JsonFormConstants.RESOURCE_VIEWER.equals(type)) {
+                getView().hideKeyBoard();
+                String resource = (String) v.getTag(R.id.value);
+                if (resource.endsWith(".html") || resource.endsWith(".htm")
+                        || resource.startsWith("http://") || resource.startsWith("https://")) {
+                    Intent intent = new Intent(v.getContext(), WebViewActivity.class);
+                    String title = (String) v.getTag(R.id.label);
+                    intent.putExtra(EXTRA_TITLE, title);
+                    intent.putExtra(EXTRA_RESOURCE, resource);
+                    getView().startActivityForResult(intent, RESULT_RESOURCE_VIEW);
+                } else {
+                    Log.w(TAG, "Resource currently not supported: " + resource);
+                }
+            }
         }
     }
 
@@ -521,7 +542,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
             String parentKey = (String) compoundButton.getTag(R.id.key);
             String childKey = (String) compoundButton.getTag(R.id.childKey);
             getView().writeValue(mStepName, parentKey, JsonFormConstants.OPTIONS_FIELD_NAME, childKey,
-                String.valueOf(((CheckBox) compoundButton).isChecked()));
+                    String.valueOf(((CheckBox) compoundButton).isChecked()));
         } else if (compoundButton instanceof RadioButton) {
             if (isChecked) {
                 String parentKey = (String) compoundButton.getTag(R.id.key);
@@ -538,7 +559,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
             Object value = parent.getItemAtPosition(position + 1);
             if (value instanceof SpinnerFactory.ValueLabelPair) {
                 getView().writeValue(mStepName, parentKey,
-                    ((SpinnerFactory.ValueLabelPair) value).getValue());
+                        ((SpinnerFactory.ValueLabelPair) value).getValue());
             } else {
                 getView().writeValue(mStepName, parentKey, (String) value);
             }
@@ -601,7 +622,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
 
     private boolean hasPermissions(Context context, String... permissions) {
         if (context != null && permissions != null) {
-            for (String permission: permissions) {
+            for (String permission : permissions) {
                 if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
                     return false;
                 }

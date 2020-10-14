@@ -356,6 +356,33 @@ value - will be the value present in the Barcode EditText after completion of wi
 ##### Barcode EditText Required Validation
 same as EditText
 
+#### Resource Viewer (HTML)
+```json
+    {
+        "key": "help",
+        "type": "resource_view",
+        "label": "Additional info",
+        "resource": "help.html",
+        "config": {
+            "color": "#0645AD",
+            "size": 24,
+            "align": "end"
+        }
+    }
+```
+
+key - any unique value, not really used since no value is read.
+
+type - must be resource_view for this widget.
+
+label - label to show in the form.
+
+resource - filename or URL of the resource to open.
+    It will attempt to be resolved via ResourceResolver
+
+config - widget configuration.
+    Supports color (android hex string), size (in sp) and align ('start', 'center' or 'end').
+
 #### I18n
 ##### Bundle definition
 ```json
