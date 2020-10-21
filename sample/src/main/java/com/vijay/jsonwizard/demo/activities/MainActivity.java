@@ -2,6 +2,7 @@ package com.vijay.jsonwizard.demo.activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -9,10 +10,12 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 
 import com.vijay.jsonwizard.activities.JsonFormActivity;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.demo.R;
+import com.vijay.jsonwizard.demo.state.StateProvider;
 import com.vijay.jsonwizard.demo.utils.CommonUtils;
 import com.vijay.jsonwizard.utils.JsonFormUtils;
 import com.vijay.jsonwizard.utils.PropertiesUtils;
@@ -20,6 +23,8 @@ import com.vijay.jsonwizard.utils.PropertiesUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+
+import java.io.File;
 
 /**
  * Created by vijay on 5/16/15.
@@ -90,6 +95,16 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("json", json);
                 intent.putExtra(JsonFormConstants.VISUALIZATION_MODE_EXTRA, JsonFormConstants.VISUALIZATION_MODE_READ_ONLY);
                 // intent.putExtra("pausedStep", "step2");
+                startActivityForResult(intent, REQUEST_CODE_GET_JSON);
+            }
+        });
+        findViewById(R.id.button_launch_big_form).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, JsonFormActivity.class);
+                String json = CommonUtils.loadJSONFromAsset(getApplicationContext(), COMPLETE_JSON_PATH);
+                Uri uri = StateProvider.saveState(json);
+                intent.putExtra("jsonUri", uri);
                 startActivityForResult(intent, REQUEST_CODE_GET_JSON);
             }
         });

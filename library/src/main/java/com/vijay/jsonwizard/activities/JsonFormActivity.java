@@ -3,6 +3,7 @@ package com.vijay.jsonwizard.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -95,7 +96,18 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
         if (savedInstanceState == null) {
             String contentResolver = getIntent().getStringExtra("resolver");
             String resourceResolver = getIntent().getStringExtra("resourceResolver");
-            init(getIntent().getStringExtra("json"), getIntent()
+            String formJson = getIntent().getStringExtra("json");
+            if (formJson == null && getIntent().getParcelableExtra("jsonUri") != null) {
+                Uri jsonUri = getIntent().getParcelableExtra("jsonUri");
+                try (Cursor c = getContentResolver().query(jsonUri, null, null, null, null)) {
+                    if (c != null && c.moveToFirst()) {
+                        formJson = c.getString(0);
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Could not resolve JsonForm URI: " + jsonUri, e);
+                }
+            }
+            init(formJson, getIntent()
                     .getIntExtra(JsonFormConstants.VISUALIZATION_MODE_EXTRA, JsonFormConstants.VISUALIZATION_MODE_EDIT),
                 contentResolver, resourceResolver);
             if (mJSONObject != null) {

@@ -3,4 +3,5 @@
     <string name="click_to_launch">Click to launch JsonActivity</string>
     <string name="click_to_launch_ro">Click to launch ReadOnly</string>
     <string name="click_to_launch_maps_sample">Click to launch Map widget sample</string>
+    <string name="launch_big_form">Click to launch Big sample</string>
 </resources>

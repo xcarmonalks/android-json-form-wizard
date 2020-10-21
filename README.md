@@ -563,6 +563,32 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 }
 ```
 
+### Starting form activity with a big json
+
+Android Intent extras have a size limit; if the json is bigger than said limit,
+you should send the data with a content URI.
+
+```java
+    Intent intent = new Intent(context, JsonFormActivity.class);
+    Uri jsonFileUri = StateProvider.saveState(json);
+    intent.putExtra("jsonUri", jsonFileUri);
+    startActivityForResult(intent, REQUEST_CODE_GET_JSON);
+```
+
+For a supported custom provider example, refer to the demo application's `StateProvider` class.
+
+Don't forget to declare your provider in the `AndroidManifest.xml` file.
+```xml
+    <application>
+        <!-- [...] -->
+        <provider
+            android:authorities="com.vijay.jsonwizard.demo"
+            android:name=".state.StateProvider"
+            android:enabled="true"
+            android:exported="false" />
+    </application>
+```
+
 ## Output Json (of demo input json)
 
 ```json
