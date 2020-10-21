@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, JsonFormActivity.class);
                 String json = CommonUtils.loadJSONFromAsset(getApplicationContext(), COMPLETE_JSON_PATH);
-                Uri uri = StateProvider.saveState(json);
+                Uri uri = StateProvider.saveState(MainActivity.this, json);
                 intent.putExtra("jsonUri", uri);
                 startActivityForResult(intent, REQUEST_CODE_GET_JSON);
             }

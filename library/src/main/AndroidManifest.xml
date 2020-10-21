@@ -16,7 +16,7 @@
         </provider>
 
         <provider
-            android:authorities="com.jsonwizard.formstate"
+            android:authorities="${applicationId}.jsonwizard.formstate"
             android:name="com.vijay.jsonwizard.state.StateProvider"
             android:enabled="true"
             android:exported="false" />

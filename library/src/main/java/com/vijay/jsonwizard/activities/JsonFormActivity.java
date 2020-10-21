@@ -315,7 +315,7 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
             if (json.length() < 200000) {
                 intent.putExtra("json", json);
             } else {
-                Uri uri = StateProvider.saveState(json);
+                Uri uri = StateProvider.saveState(this, json);
                 intent.putExtra("uri", uri);
             }
             intent.putExtra("pausedStep", PropertiesUtils.getInstance(getBaseContext()).getPausedStep());

@@ -2,6 +2,7 @@ package com.vijay.jsonwizard.state;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.database.MatrixCursor;
@@ -19,9 +20,9 @@ public class StateProvider extends ContentProvider {
 
     private static String sState = null;
 
-    public static Uri saveState(String state) {
+    public static Uri saveState(Context context, String state) {
         sState = state;
-        return buildUri();
+        return buildUri(context);
     }
 
     private static boolean uriMatchesChecklistState(@NonNull Uri uri) {

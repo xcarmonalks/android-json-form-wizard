@@ -1,5 +1,6 @@
 package com.vijay.jsonwizard.state;
 
+import android.content.Context;
 import android.net.Uri;
 
 public class StateContract {
@@ -13,8 +14,8 @@ public class StateContract {
     private StateContract() {
     }
 
-    public static Uri buildUri() {
-        String authority = "com.jsonwizard.formstate";
+    public static Uri buildUri(Context context) {
+        String authority = String.format("%s.jsonwizard.formstate", context.getPackageName());
         return Uri.parse("content://" + authority + "/" + FORM_STATE);
     }
 

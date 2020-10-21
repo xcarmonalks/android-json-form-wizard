@@ -570,7 +570,7 @@ you should send the data via provided `StateProvider`.
 
 ```java
     Intent intent = new Intent(context, JsonFormActivity.class);
-    Uri jsonFileUri = StateProvider.saveState(json);
+    Uri jsonFileUri = StateProvider.saveState(context, json);
     intent.putExtra("jsonUri", jsonFileUri);
     startActivityForResult(intent, REQUEST_CODE_GET_JSON);
 ```
