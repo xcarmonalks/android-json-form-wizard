@@ -10,12 +10,11 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
 
 import com.vijay.jsonwizard.activities.JsonFormActivity;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.demo.R;
-import com.vijay.jsonwizard.demo.state.StateProvider;
+import com.vijay.jsonwizard.state.StateProvider;
 import com.vijay.jsonwizard.demo.utils.CommonUtils;
 import com.vijay.jsonwizard.utils.JsonFormUtils;
 import com.vijay.jsonwizard.utils.PropertiesUtils;
@@ -23,8 +22,6 @@ import com.vijay.jsonwizard.utils.PropertiesUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-
-import java.io.File;
 
 /**
  * Created by vijay on 5/16/15.

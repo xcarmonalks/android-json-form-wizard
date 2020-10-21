@@ -39,12 +39,6 @@
                 <action android:name="jsonFormPaused"/>
             </intent-filter>
         </receiver>
-
-        <provider
-            android:authorities="com.vijay.jsonwizard.demo"
-            android:name=".state.StateProvider"
-            android:enabled="true"
-            android:exported="false" />
     </application>
 
 </manifest>

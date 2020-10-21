@@ -15,6 +15,12 @@
                 android:resource="@xml/provider_paths"/>
         </provider>
 
+        <provider
+            android:authorities="com.jsonwizard.formstate"
+            android:name="com.vijay.jsonwizard.state.StateProvider"
+            android:enabled="true"
+            android:exported="false" />
+
         <activity android:name=".barcode.LivePreviewActivity" android:exported="true"/>
 
         <activity android:name=".maps.MapsActivity" android:exported="true" />

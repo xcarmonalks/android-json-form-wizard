@@ -566,27 +566,13 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 ### Starting form activity with a big json
 
 Android Intent extras have a size limit; if the json is bigger than said limit,
-you should send the data with a content URI.
+you should send the data via provided `StateProvider`.
 
 ```java
     Intent intent = new Intent(context, JsonFormActivity.class);
     Uri jsonFileUri = StateProvider.saveState(json);
     intent.putExtra("jsonUri", jsonFileUri);
     startActivityForResult(intent, REQUEST_CODE_GET_JSON);
-```
-
-For a supported custom provider example, refer to the demo application's `StateProvider` class.
-
-Don't forget to declare your provider in the `AndroidManifest.xml` file.
-```xml
-    <application>
-        <!-- [...] -->
-        <provider
-            android:authorities="com.vijay.jsonwizard.demo"
-            android:name=".state.StateProvider"
-            android:enabled="true"
-            android:exported="false" />
-    </application>
 ```
 
 ## Output Json (of demo input json)
@@ -684,6 +670,46 @@ Don't forget to declare your provider in the `AndroidManifest.xml` file.
         "title":"Step 3 of 3"
     }
 }
+```
+
+### Obtaining partially completed form
+
+Even if the form has not been finished, the partially completed data can be obtained
+with a receiver listening for event `jsonFormPaused`.
+
+```java
+    public static final String FORM_PAUSED_ACTION = "jsonFormPaused";
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        if (FORM_PAUSED_ACTION.equals(intent.getAction())) {
+            String json = intent.getStringExtra("json"); // Current form state
+            String pausedStep = intent.getStringExtra("pausedStep"); // Name of the step where it was paused
+
+            // If the form state is too big, the data will be provided via content URI
+            if (json == null) {
+                ContentResolver contentResolver = context.getContentResolver();
+                String type = contentResolver.getType(uri);
+                String jsonCol;
+                if (type == null) {
+                    throw new IllegalArgumentException("Unhandled URI: Undefined content type");
+                }
+                if (StateContract.ITEM_TYPE.equals(type)) {
+                    jsonCol = StateContract.COL_JSON;
+                } else {
+                    throw new IllegalArgumentException("Unhandled URI: Unrecognized content type: " + type);
+                }
+                try (Cursor cursor = contentResolver.query(uri, null, null, null, null)) {
+                    if (cursor != null && cursor.moveToFirst()) {
+                        return cursor.getString(cursor.getColumnIndex(jsonCol));
+                    } else {
+                        throw new IllegalStateException("Invalid URI: No data");
+                    }
+                }
+            }
+            // Work with the data...
+        }
+    }
 ```
 
 # Including in your project

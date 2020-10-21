@@ -1,6 +1,5 @@
 package com.vijay.jsonwizard.activities;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
@@ -25,6 +24,7 @@ import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.fragments.JsonFormFragment;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.JsonApi;
+import com.vijay.jsonwizard.state.StateProvider;
 import com.vijay.jsonwizard.utils.JsonFormUtils;
 import com.vijay.jsonwizard.utils.PropertiesUtils;
 
@@ -33,6 +33,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Locale;
+
+import static com.vijay.jsonwizard.state.StateContract.COL_JSON;
 
 public class JsonFormActivity extends AppCompatActivity implements JsonApi {
 
@@ -101,7 +103,7 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
                 Uri jsonUri = getIntent().getParcelableExtra("jsonUri");
                 try (Cursor c = getContentResolver().query(jsonUri, null, null, null, null)) {
                     if (c != null && c.moveToFirst()) {
-                        formJson = c.getString(0);
+                        formJson = c.getString(c.getColumnIndex(COL_JSON));
                     }
                 } catch (Exception e) {
                     Log.e(TAG, "Could not resolve JsonForm URI: " + jsonUri, e);
@@ -308,7 +310,14 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
         super.onPause();
         if (mVisualizationMode != JsonFormConstants.VISUALIZATION_MODE_READ_ONLY) {
             Intent intent = new Intent("jsonFormPaused");
-            intent.putExtra("json", mJSONObject.toString());
+            String json = mJSONObject.toString();
+            // Avoid sending more than 200Kb as intent extra
+            if (json.length() < 200000) {
+                intent.putExtra("json", json);
+            } else {
+                Uri uri = StateProvider.saveState(json);
+                intent.putExtra("uri", uri);
+            }
             intent.putExtra("pausedStep", PropertiesUtils.getInstance(getBaseContext()).getPausedStep());
             PropertiesUtils.getInstance(getBaseContext()).setPausedStep(null);
             sendBroadcast(intent);
