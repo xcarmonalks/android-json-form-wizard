@@ -106,8 +106,8 @@ public class JsonFormUtils {
                 } else {
                     if (isCheckbox(field)) {
                         processCheckbox(field, dataMap);
-                    } else if (isImageChooser(field) && incluideBase64) {
-                        processImageChooser(field, dataMap);
+                    } else if (isImageChooser(field)) {
+                        processImageChooser(field, dataMap, incluideBase64);
                     } else if (field.has("key") && field.has("value")) {
                         dataMap.put(field.getString("key"), field.get("value"));
                     }
@@ -116,12 +116,17 @@ public class JsonFormUtils {
         }
     }
 
-    private static void processImageChooser(JSONObject field, Map<String, Object> dataMap) throws JSONException {
+    private static void processImageChooser(JSONObject field, Map<String, Object> dataMap, boolean includeBase64)
+            throws JSONException {
         String imagePath = field.optString("value");
         if (!TextUtils.isEmpty(imagePath)) {
-            String base64 = ImageFileUtils.processImageFromFile(imagePath);
             dataMap.put(field.getString("key"), field.get("value"));
-            dataMap.put(field.getString("key") + "#base64", base64);
+            if (includeBase64) {
+                String base64 = ImageFileUtils.processImageFromFile(imagePath);
+                dataMap.put(field.getString("key") + "#base64", base64);
+            } else {
+                dataMap.put(field.getString("key") + "#is_image", true);
+            }
         }
     }
 
