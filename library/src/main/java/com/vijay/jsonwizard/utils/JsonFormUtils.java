@@ -76,7 +76,7 @@ public class JsonFormUtils {
                 field = findInJSON(field, key);
             } else if (isCheckbox(field)) {
                 JSONArray options = field.getJSONArray("options");
-                return findInJSONOptions(options, key);
+                field = findInJSONOptions(options, key);
             }
             if (field != null && field.has("key") && field.getString("key").equals(key)) {
                 return field;
