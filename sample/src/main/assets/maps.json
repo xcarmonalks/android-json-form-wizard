@@ -32,8 +32,8 @@
                 "key": "map",
                 "type": "location",
                 "hint": "Location",
-                "icon": "marker.png",
-                "icon_input": "marker.png",
+                "icon": "images/marker.png",
+                "icon_input": "images/marker.png",
                 "accuracy": true,
                 "map_config": {
                     "min_zoom": 1,

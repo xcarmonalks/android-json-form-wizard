@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private static JSONObject extractDataFromForm(String form) {
         try {
             return JsonFormUtils.extractDataFromForm(
-                (JSONObject) new JSONTokener(form).nextValue());
+                (JSONObject) new JSONTokener(form).nextValue(), false);
         } catch (JSONException e) {
             Log.e(TAG, "Error parsing JSON document", e);
         }
@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, JsonFormActivity.class);
                 String json = CommonUtils.loadJSONFromAsset(getApplicationContext(), MAPS_SAMPLE);
                 intent.putExtra("json", json);
-                intent.putExtra(JsonFormConstants.VISUALIZATION_MODE_EXTRA, JsonFormConstants.VISUALIZATION_MODE_READ_ONLY);
+                // intent.putExtra(JsonFormConstants.VISUALIZATION_MODE_EXTRA, JsonFormConstants.VISUALIZATION_MODE_READ_ONLY);
                 // intent.putExtra("pausedStep", "step2");
                 startActivityForResult(intent, REQUEST_CODE_GET_JSON);
             }

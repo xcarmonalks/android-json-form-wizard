@@ -12,12 +12,16 @@ public class AssetsResourceResolver implements ResourceResolver {
 
     private static final String TAG = "AssetsResourceResolver";
 
-    private static String moveAssetToCache(Context context, String assetName, String assetFolderName) {
+    private static String moveAssetToCache(Context context, String assetName) {
 
         File f = new File(context.getCacheDir() + File.separator + assetName);
         if (!f.exists()) {
-            try (InputStream is = context.getAssets().open(assetFolderName + File.separator + assetName);
-                 FileOutputStream fos = new FileOutputStream(f);) {
+            if (f.getParentFile() != null) {
+                // Create parent dirs
+                f.getParentFile().mkdirs();
+            }
+            try (InputStream is = context.getAssets().open(assetName);
+                 FileOutputStream fos = new FileOutputStream(f)) {
 
                 byte[] buffer = new byte[1024];
                 int length;
@@ -28,7 +32,7 @@ public class AssetsResourceResolver implements ResourceResolver {
                 fos.flush();
 
             } catch (Exception e) {
-                Log.e(TAG, "moveAssetToCache: Error moving asset " + assetFolderName + " to cache", e);
+                Log.e(TAG, "moveAssetToCache: Error moving asset " + assetName + " to cache", e);
                 return null;
             }
         }
@@ -39,7 +43,7 @@ public class AssetsResourceResolver implements ResourceResolver {
     public String resolvePath(Context context, String id) {
         String imagePath = id;
         if (!TextUtils.isEmpty(imagePath)) {
-            imagePath = moveAssetToCache(context, imagePath, "imagenes");
+            imagePath = moveAssetToCache(context, imagePath);
         }
         return imagePath;
     }
