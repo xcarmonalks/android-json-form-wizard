@@ -55,6 +55,7 @@ import com.vijay.jsonwizard.utils.DateUtils;
 import com.vijay.jsonwizard.utils.ImagePicker;
 import com.vijay.jsonwizard.utils.ImageUtils;
 import com.vijay.jsonwizard.utils.JsonFormUtils;
+import com.vijay.jsonwizard.utils.ResourceViewer;
 import com.vijay.jsonwizard.utils.ValidationStatus;
 import com.vijay.jsonwizard.views.JsonFormFragmentView;
 import com.vijay.jsonwizard.viewstates.JsonFormFragmentViewState;
@@ -521,6 +522,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
             }
 
             if (JsonFormConstants.RESOURCE_VIEWER.equals(type)) {
+                mCurrentKey = key;
                 getView().hideKeyBoard();
                 String resource = (String) v.getTag(R.id.value);
                 if (resource.endsWith(".html") || resource.endsWith(".htm")
@@ -530,8 +532,10 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                     intent.putExtra(EXTRA_TITLE, title);
                     intent.putExtra(EXTRA_RESOURCE, resource);
                     getView().startActivityForResult(intent, RESULT_RESOURCE_VIEW);
-                } else {
-                    Log.w(TAG, "Resource currently not supported: " + resource);
+                } else if (new File(resource).exists()) {
+                    // Attempt to launch open file intent
+                    Intent intent = ResourceViewer.getOpenFileIntent(getView().getContext(), resource);
+                    getView().startActivityForResult(intent, RESULT_RESOURCE_VIEW);
                 }
             }
         }

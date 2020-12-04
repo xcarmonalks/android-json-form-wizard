@@ -356,17 +356,26 @@ value - will be the value present in the Barcode EditText after completion of wi
 ##### Barcode EditText Required Validation
 same as EditText
 
-#### Resource Viewer (HTML)
+#### Resource Viewer
+
+This widget will open HTML files in a WebView in a new Activity,
+or attempt to launch an intent with the provided resource file.
+
 ```json
     {
         "key": "help",
         "type": "resource_view",
         "label": "Additional info",
-        "resource": "help.html",
+        "resource": "docs/sample.pdf",
+        "icon": "images/pdf.png",
         "config": {
             "color": "#0645AD",
             "size": 24,
-            "align": "end"
+            "align": "end",
+            "icon_width": 54,
+            "icon_height": 54,
+            "icon_position": "end",
+            "icon_color": "#0645AD"
         }
     }
 ```
@@ -377,11 +386,19 @@ type - must be resource_view for this widget.
 
 label - label to show in the form.
 
+icon (optional) - icon resource to show.
+
 resource - filename or URL of the resource to open.
     It will attempt to be resolved via ResourceResolver
 
-config - widget configuration.
-    Supports color (android hex string), size (in sp) and align ('start', 'center' or 'end').
+config (optional) - widget configuration.
+
+* Supports `color` (android hex string), `size` (in sp) and `align` ('start', 'center' or 'end').
+* Also supports the following icon config: `icon_width` and `icon_height` (in dp),
+`icon_position` ('start', 'end', 'bottom' or 'top'), defaulting to top,
+and `icon_color` (android hex string).
+
+* **Note: `icon_color` only works if the icon has a proper alpha channel.**
 
 #### I18n
 ##### Bundle definition

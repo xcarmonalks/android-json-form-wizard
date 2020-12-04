@@ -24,13 +24,18 @@
             {
                 "key": "h1",
                 "type": "resource_view",
-                "label": "Help",
+                "label": "Guidelines",
+                "icon": "images/pdf.png",
                 "config": {
                     "color": "#0645AD",
                     "size": 24,
+                    "icon_width": 54,
+                    "icon_height": 54,
+                    "icon_position": "end",
+                    "icon_color": "#0645AD",
                     "align": "end"
                 },
-                "resource": "sample.html"
+                "resource": "docs/sample.pdf"
             },
             {
                 "key": "editGroup",
