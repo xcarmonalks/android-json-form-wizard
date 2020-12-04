@@ -54,6 +54,11 @@ public class ResourceViewerFactory implements FormWidgetFactory {
 
         // Load json data
         String resource = jsonObject.getString("resource");
+        if (resolver.isValidExpression(resource)) {
+            JSONObject currentValues = getCurrentValues(context);
+            resource = resolver.resolveAsString(resource, currentValues);
+        }
+
         String resourcePath = resourceResolver.resolvePath(context, resource);
         if (resourcePath != null && new File(resourcePath).exists()) {
             wrapper.setTag(R.id.value, resourcePath);
@@ -63,6 +68,12 @@ public class ResourceViewerFactory implements FormWidgetFactory {
         String labelText = bundle.resolveKey(jsonObject.getString("label"));
         String iconPath = bundle.resolveKey(jsonObject.getString("icon"));
 
+        if (resolver.isValidExpression(labelText)) {
+            JSONObject currentValues = getCurrentValues(context);
+            labelText = resolver.resolveAsString(labelText, currentValues);
+        } else {
+            labelText = bundle.resolveKey(labelText);
+        }
 
         wrapper.setTag(R.id.label, labelText);
         wrapper.setOnClickListener(listener);
