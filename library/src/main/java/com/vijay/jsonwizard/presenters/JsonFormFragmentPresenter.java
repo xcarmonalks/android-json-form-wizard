@@ -474,9 +474,9 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
 
     public void onClick(View v) {
 
+        String key = (String) v.getTag(R.id.key);
+        String type = (String) v.getTag(R.id.type);
         if (checkFormPermissions()) {
-            String key = (String) v.getTag(R.id.key);
-            String type = (String) v.getTag(R.id.type);
             if (JsonFormConstants.CHOOSE_IMAGE.equals(type)) {
                 mCurrentKey = key;
                 if (v.getTag(R.id.btn_clear) != null) {
@@ -496,47 +496,49 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                 mCurrentKey = key;
                 getView().startActivityForResult(barcodeIntent, RESULT_LOAD_BARCODE);
             }
+        } else {
+            Log.w(TAG, "CAMERA and STORAGE permissions required to use IMAGE or BARCODE widgets");
+        }
 
-            if (JsonFormConstants.LOCATION_PICKER.equals(type)) {
-                Log.d(TAG, "onClick: location");
-                getView().hideKeyBoard();
-                Intent intent = new Intent(v.getContext(), MapsActivity.class);
-                String value = (String) v.getTag(R.id.value);
-                boolean useAccuracy = (boolean) v.getTag(R.id.accuracy);
-                if (value != null && MapsUtils.isValidPositionString(value)) {
-                    intent.putExtra(EXTRA_INITIAL_LOCATION, value);
-                }
-                String customIcon = (String) v.getTag(R.id.custom_icon);
-                if (customIcon != null) {
-                    intent.putExtra(EXTRA_CUSTOM_MARKER_ICON, customIcon);
-                }
-                intent.putExtra(EXTRA_USE_ACCURACY, useAccuracy);
-                intent.putExtra(EXTRA_CONFIG_MIN_ZOOM, (Double) v.getTag(R.id.map_min_zoom));
-                intent.putExtra(EXTRA_CONFIG_MAX_ZOOM, (Double) v.getTag(R.id.map_max_zoom));
-                Double defaultZoom = (Double) v.getTag(R.id.map_default_zoom);
-                if (defaultZoom != null && !defaultZoom.isNaN()) {
-                    intent.putExtra(EXTRA_CONFIG_DEFAULT_ZOOM, defaultZoom);
-                }
-                mCurrentKey = key;
-                getView().startActivityForResult(intent, RESULT_LOAD_LOCATION);
+        if (JsonFormConstants.LOCATION_PICKER.equals(type)) {
+            Log.d(TAG, "onClick: location");
+            getView().hideKeyBoard();
+            Intent intent = new Intent(v.getContext(), MapsActivity.class);
+            String value = (String) v.getTag(R.id.value);
+            boolean useAccuracy = (boolean) v.getTag(R.id.accuracy);
+            if (value != null && MapsUtils.isValidPositionString(value)) {
+                intent.putExtra(EXTRA_INITIAL_LOCATION, value);
             }
+            String customIcon = (String) v.getTag(R.id.custom_icon);
+            if (customIcon != null) {
+                intent.putExtra(EXTRA_CUSTOM_MARKER_ICON, customIcon);
+            }
+            intent.putExtra(EXTRA_USE_ACCURACY, useAccuracy);
+            intent.putExtra(EXTRA_CONFIG_MIN_ZOOM, (Double) v.getTag(R.id.map_min_zoom));
+            intent.putExtra(EXTRA_CONFIG_MAX_ZOOM, (Double) v.getTag(R.id.map_max_zoom));
+            Double defaultZoom = (Double) v.getTag(R.id.map_default_zoom);
+            if (defaultZoom != null && !defaultZoom.isNaN()) {
+                intent.putExtra(EXTRA_CONFIG_DEFAULT_ZOOM, defaultZoom);
+            }
+            mCurrentKey = key;
+            getView().startActivityForResult(intent, RESULT_LOAD_LOCATION);
+        }
 
-            if (JsonFormConstants.RESOURCE_VIEWER.equals(type)) {
-                mCurrentKey = key;
-                getView().hideKeyBoard();
-                String resource = (String) v.getTag(R.id.value);
-                if (resource.endsWith(".html") || resource.endsWith(".htm")
-                        || resource.startsWith("http://") || resource.startsWith("https://")) {
-                    Intent intent = new Intent(v.getContext(), WebViewActivity.class);
-                    String title = (String) v.getTag(R.id.label);
-                    intent.putExtra(EXTRA_TITLE, title);
-                    intent.putExtra(EXTRA_RESOURCE, resource);
-                    getView().startActivityForResult(intent, RESULT_RESOURCE_VIEW);
-                } else if (new File(resource).exists()) {
-                    // Attempt to launch open file intent
-                    Intent intent = ResourceViewer.getOpenFileIntent(getView().getContext(), resource);
-                    getView().startActivityForResult(intent, RESULT_RESOURCE_VIEW);
-                }
+        if (JsonFormConstants.RESOURCE_VIEWER.equals(type)) {
+            mCurrentKey = key;
+            getView().hideKeyBoard();
+            String resource = (String) v.getTag(R.id.value);
+            if (resource.endsWith(".html") || resource.endsWith(".htm")
+                    || resource.startsWith("http://") || resource.startsWith("https://")) {
+                Intent intent = new Intent(v.getContext(), WebViewActivity.class);
+                String title = (String) v.getTag(R.id.label);
+                intent.putExtra(EXTRA_TITLE, title);
+                intent.putExtra(EXTRA_RESOURCE, resource);
+                getView().startActivityForResult(intent, RESULT_RESOURCE_VIEW);
+            } else if (new File(resource).exists()) {
+                // Attempt to launch open file intent
+                Intent intent = ResourceViewer.getOpenFileIntent(getView().getContext(), resource);
+                getView().startActivityForResult(intent, RESULT_RESOURCE_VIEW);
             }
         }
     }

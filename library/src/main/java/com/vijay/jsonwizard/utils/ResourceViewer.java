@@ -18,7 +18,6 @@ public class ResourceViewer {
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_VIEW);
         Uri uri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName(), new File(filepath));
-        Log.i("TEST", filepath);
         if (uri.toString().contains(".doc") || uri.toString().contains(".docx")) {
             // Word document
             intent.setDataAndType(uri, "application/msword");
