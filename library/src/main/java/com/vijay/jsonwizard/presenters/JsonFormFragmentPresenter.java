@@ -20,10 +20,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewParent;
-import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
@@ -74,6 +74,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import fr.ganfra.materialspinner.MaterialSpinner;
 
@@ -89,6 +90,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
 
     private static final String PARAM_BARCODE = "barcode";
     private static final String PARAM_ERROR = "error";
+    private static final Pattern URI_PATTERN = Pattern.compile("^\\w+:[^\\s]+$");
     private String mStepName;
     private JSONObject mStepDetails;
     private String mCurrentKey;
@@ -528,8 +530,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
             mCurrentKey = key;
             getView().hideKeyBoard();
             String resource = (String) v.getTag(R.id.value);
-            if (resource.endsWith(".html") || resource.endsWith(".htm")
-                    || resource.startsWith("http://") || resource.startsWith("https://")) {
+            if (resource.endsWith(".html") || resource.endsWith(".htm")) {
                 Intent intent = new Intent(v.getContext(), WebViewActivity.class);
                 String title = (String) v.getTag(R.id.label);
                 intent.putExtra(EXTRA_TITLE, title);
@@ -539,6 +540,12 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                 // Attempt to launch open file intent
                 Intent intent = ResourceViewer.getOpenFileIntent(getView().getContext(), resource);
                 getView().startActivityForResult(intent, RESULT_RESOURCE_VIEW);
+            } else if (URI_PATTERN.matcher(resource).matches()) {
+                Uri uri = Uri.parse(resource);
+                Intent intent = ResourceViewer.getOpenUriIntent(uri);
+                getView().startActivityForResult(intent, RESULT_RESOURCE_VIEW);
+            } else {
+                Log.w(TAG, "Unsupported resource: " + resource);
             }
         }
     }
