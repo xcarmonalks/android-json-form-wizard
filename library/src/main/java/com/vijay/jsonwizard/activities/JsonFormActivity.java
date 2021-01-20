@@ -34,6 +34,7 @@ import org.json.JSONObject;
 
 import java.util.Locale;
 
+import static com.vijay.jsonwizard.constants.JsonFormConstants.MAX_PARCEL_SIZE;
 import static com.vijay.jsonwizard.state.StateContract.COL_JSON;
 
 public class JsonFormActivity extends AppCompatActivity implements JsonApi {
@@ -312,11 +313,11 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
             Intent intent = new Intent("jsonFormPaused");
             String json = mJSONObject.toString();
             // Avoid sending more than 200Kb as intent extra
-            if (json.length() < 200000) {
-                intent.putExtra("json", json);
-            } else {
+            if (json != null && json.length() >= MAX_PARCEL_SIZE) {
                 Uri uri = StateProvider.saveState(this, json);
                 intent.putExtra("uri", uri);
+            } else {
+                intent.putExtra("json", json);
             }
             intent.putExtra("pausedStep", PropertiesUtils.getInstance(getBaseContext()).getPausedStep());
             PropertiesUtils.getInstance(getBaseContext()).setPausedStep(null);

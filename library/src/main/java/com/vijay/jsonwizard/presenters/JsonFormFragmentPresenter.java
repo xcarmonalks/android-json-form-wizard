@@ -1,5 +1,6 @@
 package com.vijay.jsonwizard.presenters;
 
+import static com.vijay.jsonwizard.constants.JsonFormConstants.MAX_PARCEL_SIZE;
 import static com.vijay.jsonwizard.maps.MapsActivity.EXTRA_CONFIG_DEFAULT_ZOOM;
 import static com.vijay.jsonwizard.maps.MapsActivity.EXTRA_CONFIG_MAX_ZOOM;
 import static com.vijay.jsonwizard.maps.MapsActivity.EXTRA_CONFIG_MIN_ZOOM;
@@ -50,6 +51,7 @@ import com.vijay.jsonwizard.maps.MapsActivity;
 import com.vijay.jsonwizard.maps.MapsUtils;
 import com.vijay.jsonwizard.mvp.MvpBasePresenter;
 import com.vijay.jsonwizard.resourceviewer.WebViewActivity;
+import com.vijay.jsonwizard.state.StateProvider;
 import com.vijay.jsonwizard.utils.CarouselAdapter;
 import com.vijay.jsonwizard.utils.DateUtils;
 import com.vijay.jsonwizard.utils.ImagePicker;
@@ -416,7 +418,14 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         ValidationStatus validationStatus = writeValuesAndValidate(mainView);
         if (validationStatus.isValid()) {
             Intent returnIntent = new Intent();
-            returnIntent.putExtra("json", getView().getCurrentJsonState());
+            String json = getView().getCurrentJsonState();
+            // Avoid sending more than 200Kb as intent extra
+            if (json != null && json.length() >= MAX_PARCEL_SIZE) {
+                Uri uri = StateProvider.saveState(getView().getContext(), json);
+                returnIntent.putExtra("uri", uri);
+            } else {
+                returnIntent.putExtra("json", json);
+            }
             getView().finishWithResult(returnIntent);
         } else {
             Toast.makeText(getView().getContext(), validationStatus.getErrorMessage(), Toast.LENGTH_LONG).show();

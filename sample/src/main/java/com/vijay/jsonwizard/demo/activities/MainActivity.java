@@ -2,6 +2,7 @@ package com.vijay.jsonwizard.demo.activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,6 +23,8 @@ import com.vijay.jsonwizard.utils.PropertiesUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+
+import static com.vijay.jsonwizard.state.StateContract.COL_JSON;
 
 /**
  * Created by vijay on 5/16/15.
@@ -132,6 +135,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE_GET_JSON && resultCode == RESULT_OK) {
             String json = data.getStringExtra("json");
+            if (json == null) {
+                Uri jsonUri = data.getParcelableExtra("uri");
+                try (Cursor c = getContentResolver().query(jsonUri, null, null, null, null)) {
+                    if (c != null && c.moveToFirst()) {
+                        json = c.getString(c.getColumnIndex(COL_JSON));
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Could not resolve JsonForm URI: " + jsonUri, e);
+                }
+            }
             Log.d(TAG, json);
             JSONObject result = extractDataFromForm(json);
             Log.d(TAG, result.toString());

@@ -41,5 +41,6 @@ public class JsonFormConstants {
     public static final int VISUALIZATION_MODE_SIGNATURE_VISUALIZATION = 4;
 
     public static final int RESULT_JSON_PARSE_ERROR = -2;
+    public static final int MAX_PARCEL_SIZE = 200000;
 
 }

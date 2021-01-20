@@ -592,6 +592,28 @@ you should send the data via provided `StateProvider`.
     startActivityForResult(intent, REQUEST_CODE_GET_JSON);
 ```
 
+The same goes when receiving the result for a big json
+
+```java
+@Override
+protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    if (requestCode == REQUEST_CODE_GET_JSON && resultCode == RESULT_OK) {
+        String json = data.getStringExtra("json");
+        if (json == null) {
+            Uri jsonUri = data.getParcelableExtra("uri");
+            try (Cursor c = getContentResolver().query(jsonUri, null, null, null, null)) {
+                if (c != null && c.moveToFirst()) {
+                    json = c.getString(c.getColumnIndex("JSON"));
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Could not resolve JsonForm URI: " + jsonUri, e);
+            }
+        }
+    }
+    super.onActivityResult(requestCode, resultCode, data);
+}
+```
+
 ## Output Json (of demo input json)
 
 ```json
