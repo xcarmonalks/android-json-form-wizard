@@ -65,8 +65,8 @@ public class ResourceViewerFactory implements FormWidgetFactory {
         } else {
             wrapper.setTag(R.id.value, resource);
         }
-        String labelText = bundle.resolveKey(jsonObject.getString("label"));
-        String iconPath = bundle.resolveKey(jsonObject.getString("icon"));
+        String labelText = bundle.resolveKey(jsonObject.optString("label"));
+        String iconPath = bundle.resolveKey(jsonObject.optString("icon"));
 
         if (resolver.isValidExpression(labelText)) {
             JSONObject currentValues = getCurrentValues(context);
