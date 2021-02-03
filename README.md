@@ -412,11 +412,11 @@ e.g.
 
 ```
 {
-        "key": "help",
-        "type": "resource_view",
-        "label": "Additional info",
-        "resource": "intent://com.google.android.apps.maps/android.intent.action.VIEW",
-    }
+    "key": "help",
+    "type": "resource_view",
+    "label": "Additional info",
+    "resource": "intent://com.google.android.apps.maps/android.intent.action.VIEW",
+}
 ```
 
 #### I18n
