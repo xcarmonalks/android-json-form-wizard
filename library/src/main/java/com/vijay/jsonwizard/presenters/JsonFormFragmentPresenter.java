@@ -93,6 +93,8 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
     private static final String PARAM_BARCODE = "barcode";
     private static final String PARAM_ERROR = "error";
     private static final Pattern URI_PATTERN = Pattern.compile("^\\w+:[^\\s]+$");
+    private static final Pattern INTENT_PATTERN = Pattern.compile("^intent:\\/\\/[^\\s]+\\/[^\\s|\\?]+(\\?([^\\s|=]+=[^\\s|&]+(&[^\\s|=]+=[^\\s|&]+)*)?)?$");
+
     private String mStepName;
     private JSONObject mStepDetails;
     private String mCurrentKey;
@@ -549,6 +551,14 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                 // Attempt to launch open file intent
                 Intent intent = ResourceViewer.getOpenFileIntent(getView().getContext(), resource);
                 getView().startActivityForResult(intent, RESULT_RESOURCE_VIEW);
+            } else if (INTENT_PATTERN.matcher(resource).matches()) {
+                Uri uri = Uri.parse(resource);
+                Intent intent = ResourceViewer.getCustomUriIntent(v.getContext(), uri);
+                if (intent != null) {
+                    getView().startActivityForResult(intent, RESULT_RESOURCE_VIEW);
+                } else {
+                    Log.w(TAG, "Cannot launch intent: " + resource);
+                }
             } else if (URI_PATTERN.matcher(resource).matches()) {
                 Uri uri = Uri.parse(resource);
                 Intent intent = ResourceViewer.getOpenUriIntent(uri);

@@ -400,6 +400,25 @@ and `icon_color` (android hex string).
 
 * **Note: `icon_color` only works if the icon has a proper alpha channel.**
 
+##### Custom intent support
+
+It may also support launching a custom intent, given a custom intent serialized as follows:
+
+`intent://<package>/<action>?<extra_name>=<extra_val>`
+
+Note, however, that extra values are limited to String values.
+
+e.g.
+
+```
+{
+        "key": "help",
+        "type": "resource_view",
+        "label": "Additional info",
+        "resource": "intent://com.google.android.apps.maps/android.intent.action.VIEW",
+    }
+```
+
 #### I18n
 ##### Bundle definition
 ```json
