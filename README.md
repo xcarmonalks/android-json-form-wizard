@@ -751,6 +751,36 @@ with a receiver listening for event `jsonFormPaused`.
     }
 ```
 
+# JsonPath support
+
+## _Section incomplete_
+
+Some widgets support the usage of JsonPath expressions to show or condition values according to "current" form values, e.g.
+
+Conditionally compute whether to show next step:
+```json
+"next": {
+    "step2": "$.current-values[?(@.age=='12-19')]"
+}
+```
+
+Initialize a field value according to another value selected in a previous step:
+```json
+{
+    "key": "name2",
+    "type": "label",
+    "text": "$.current-values.name"
+}
+```
+
+Currently, JsonPath expressions are computed for the following widgets/properties:
+- Label (`text`): The expression should resolve to a string.
+- EditText (`readonly`, `v_required.value`): Checks for expression 'truthiness'.
+- ExtendedLabel (`text`, `params`): The expression should resolve to a string.
+- Spinner (`values`, `labels`, `value`): The expression should resolve to a string in case of
+property `value`, or an array of strings in case of `values` and `labels`.
+
+
 # Including in your project
 
 gradle:

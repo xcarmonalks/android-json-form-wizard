@@ -96,7 +96,14 @@ public class SpinnerFactory implements FormWidgetFactory {
         int indexToSelect = -1;
         final String value = jsonObject.optString("value");
         if (!TextUtils.isEmpty(value)) {
-            valueToSelect = value;
+            if (resolver.isValidExpression(value)) {
+                valueToSelect = resolver.resolveAsString(value, getCurrentValues(context));
+                if (valueToSelect == null) {
+                    valueToSelect = "";
+                }
+            } else {
+                valueToSelect = value;
+            }
         }
 
         JSONArray valuesJson = resolveOptJSONArray("values", context, jsonObject, resolver);
