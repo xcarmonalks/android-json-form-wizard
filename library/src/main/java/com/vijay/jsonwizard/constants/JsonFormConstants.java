@@ -43,4 +43,5 @@ public class JsonFormConstants {
     public static final int RESULT_JSON_PARSE_ERROR = -2;
     public static final int MAX_PARCEL_SIZE = 200000;
 
+    public static final String EXTRA_TRACK_HISTORY = "trackHistory";
 }

@@ -20,6 +20,7 @@ import com.vijay.jsonwizard.demo.utils.CommonUtils;
 import com.vijay.jsonwizard.utils.JsonFormUtils;
 import com.vijay.jsonwizard.utils.PropertiesUtils;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -66,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 intent.putExtra("json", json);
+                intent.putExtra(JsonFormConstants.EXTRA_TRACK_HISTORY, true);
                 intent.putExtra("resolver",
                     "com.vijay.jsonwizard.demo.expressions.AssetsContentResolver");
                 //intent.putExtra(JsonFormConstants.ORIENTATION_EXTRA, JsonFormConstants
@@ -146,6 +148,15 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             Log.d(TAG, json);
+            try {
+                JSONObject jsonObject = new JSONObject(json);
+                JSONArray history = jsonObject.optJSONArray("_history");
+                if (history != null) {
+                    Log.i(TAG, String.format("History: %s", history.toString()));
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             JSONObject result = extractDataFromForm(json);
             Log.d(TAG, result.toString());
             /*if(data.getBooleanExtra("pause", false)) {

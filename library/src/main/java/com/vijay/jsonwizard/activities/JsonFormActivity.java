@@ -41,6 +41,8 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
 
     private static final String TAG = "JsonFormActivity";
 
+    private static final String PROP_HISTORY = "_history";
+
     private Toolbar mToolbar;
 
     private JSONObject mJSONObject;
@@ -51,6 +53,7 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
     private ExternalContentResolver mContentResolver;
     private String externalContentResolverClass;
     private String resourceResolverClass;
+    private boolean mTrackHistory;
 
     public void init(String json, Integer visualizationMode, String externalContentResolverClass,
         String resourceResolverClass) {
@@ -97,6 +100,7 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
 
     protected void createFragments(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
+            mTrackHistory = getIntent().getBooleanExtra(JsonFormConstants.EXTRA_TRACK_HISTORY, false);
             String contentResolver = getIntent().getStringExtra("resolver");
             String resourceResolver = getIntent().getStringExtra("resourceResolver");
             String formJson = getIntent().getStringExtra("json");
@@ -133,6 +137,7 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
                 }
             }
         } else {
+            mTrackHistory = savedInstanceState.getBoolean("trackHistory");
             init(savedInstanceState.getString("jsonState"),
                 savedInstanceState.getInt(JsonFormConstants.VISUALIZATION_MODE_EXTRA),
                 savedInstanceState.getString("resolver"), savedInstanceState.getString("resourceResolver"));
@@ -219,6 +224,7 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
             outState.putInt(JsonFormConstants.VISUALIZATION_MODE_EXTRA, mVisualizationMode);
             outState.putString("resolver", externalContentResolverClass);
             outState.putString("resourceResolver", resourceResolverClass);
+            outState.putBoolean("trackHistory", mTrackHistory);
         }
     }
 
@@ -263,6 +269,42 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
     @Override
     public ExternalContentResolver getExternalContentResolver() {
         return mContentResolver;
+    }
+
+    @Override
+    public void historyPush(String stepName) throws JSONException {
+        if (!mTrackHistory) {
+            return;
+        }
+        synchronized (mJSONObject) {
+            JSONArray history = mJSONObject.optJSONArray(PROP_HISTORY);
+            if (history == null) {
+                history = new JSONArray();
+                mJSONObject.put(PROP_HISTORY, history);
+            }
+            JSONObject slice = new JSONObject();
+            slice.put("name", stepName);
+            JSONObject stepState = mJSONObject.optJSONObject(stepName);
+            if (stepState != null && stepState.has("fields")) {
+                slice.put("state", stepState.optJSONArray("fields"));
+            } else {
+                slice.put("state", stepState);
+            }
+            history.put(slice);
+        }
+    }
+
+    @Override
+    public void historyPop() {
+        if (!mTrackHistory) {
+            return;
+        }
+        synchronized (mJSONObject) {
+            JSONArray history = mJSONObject.optJSONArray(PROP_HISTORY);
+            if (history != null) {
+                history.remove(history.length() - 1);
+            }
+        }
     }
 
     private void configureInputMethod() {
