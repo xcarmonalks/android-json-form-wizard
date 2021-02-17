@@ -41,6 +41,8 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
 
     private static final String TAG = "JsonFormActivity";
 
+    private static final String PROP_HISTORY = "_history";
+
     private Toolbar mToolbar;
 
     private JSONObject mJSONObject;
@@ -263,6 +265,36 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
     @Override
     public ExternalContentResolver getExternalContentResolver() {
         return mContentResolver;
+    }
+
+    @Override
+    public void historyPush(String stepName) throws JSONException {
+        synchronized (mJSONObject) {
+            JSONArray history = mJSONObject.optJSONArray(PROP_HISTORY);
+            if (history == null) {
+                history = new JSONArray();
+                mJSONObject.put(PROP_HISTORY, history);
+            }
+            JSONObject slice = new JSONObject();
+            slice.put("name", stepName);
+            JSONObject stepState = mJSONObject.optJSONObject(stepName);
+            if (stepState != null && stepState.has("fields")) {
+                slice.put("state", JsonFormUtils.extractDataFromForm(stepState));
+            } else {
+                slice.put("state", stepState);
+            }
+            history.put(slice);
+        }
+    }
+
+    @Override
+    public void historyPop() {
+        synchronized (mJSONObject) {
+            JSONArray history = mJSONObject.optJSONArray(PROP_HISTORY);
+            if (history != null) {
+                history.remove(history.length() - 1);
+            }
+        }
     }
 
     private void configureInputMethod() {

@@ -455,6 +455,24 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
     }
 
     @Override
+    public void historyPush(String stepName) {
+        try {
+            mJsonApi.historyPush(stepName);
+        } catch (Exception e) {
+            Log.e(TAG, "Error popping history", e);
+        }
+    }
+
+    @Override
+    public void historyPop() {
+        try {
+            mJsonApi.historyPop();
+        } catch (Exception e) {
+            Log.e(TAG, "Error popping history", e);
+        }
+    }
+
+    @Override
     public void onCurrentItemChanged(@Nullable CarouselAdapter.ViewHolder viewHolder, int adapterPosition) {
         presenter.onCurrentItemChanged(viewHolder, adapterPosition);
     }

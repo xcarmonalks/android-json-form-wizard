@@ -17,6 +17,7 @@ import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.mvp.MvpView;
 import com.vijay.jsonwizard.mvp.ViewState;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -81,4 +82,8 @@ public interface JsonFormFragmentView<VS extends ViewState> extends MvpView {
     JsonExpressionResolver getExpressionResolver();
 
     ResourceResolver getResourceResolver();
+
+    void historyPush(String stepName);
+
+    void historyPop();
 }

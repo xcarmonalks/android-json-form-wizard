@@ -191,6 +191,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
     }
 
     public void onBackClick() {
+        getView().historyPop();
         getView().hideKeyBoard();
         getView().backClick();
     }
@@ -243,6 +244,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         try {
             ValidationStatus validationStatus = writeValuesAndValidate(mainView);
             if (validationStatus.isValid()) {
+                getView().historyPush(mStepName);
                 String nextStep = JsonFormUtils.resolveNextStep(mStepDetails, getView().getExpressionResolver(), new JSONObject(getView().getCurrentJsonState()));
                 if (JsonFormConstants.END_STEP_NAME.equals(nextStep)) {
                     onSaveClick(mainView);
