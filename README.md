@@ -614,6 +614,131 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 }
 ```
 
+### History management
+
+In some complex forms, it may be interesting to keep track of how the form was filled in each step.
+
+In this case, when launching the form, set the extra value `trackHistory`
+(you may use the constant in JsonFormConstants) to true.
+
+```java
+    Intent intent = new Intent(context, JsonFormActivity.class);
+    String json = "Your complete JSON";
+    intent.putExtra("json", json);
+    //Optional -- Configure screen orientation, inputMethod and visualizationMode
+    intent.putExtra(JsonFormConstants.EXTRA_TRACK_HISTORY, true);
+    startActivityForResult(intent, REQUEST_CODE_GET_JSON);
+```
+
+Launching the form with history tracking enabled will make the output json
+have an additional `_history` property with an array of every step and its state on exit.
+
+Sample output json with `trackHistory` enabled:
+
+```json
+{
+    "count":"3",
+    "step1":{
+        // -- snip
+    },
+    "step2":{
+        // -- snip
+    },
+    "step3":{
+        // -- snip
+    },
+    "_history": [
+        {
+            "name": "step1",
+            "state": [
+                 {
+                     "key":"name",
+                     "type":"edit_text",
+                     "hint":"Enter Your Name",
+                     "value":"Vijay"
+                 },
+                 {
+                     "key":"email",
+                     "type":"edit_text",
+                     "hint":"Enter Your Email",
+                     "value":"dummy@gmail.com"
+                 },
+                 {
+                     "key":"labelBackgroundImage",
+                     "type":"label",
+                     "text":"Choose Background Image"
+                 },
+                 {
+                     "key":"chooseImage",
+                     "type":"choose_image",
+                     "uploadButtonText":"Choose",
+                     "value":"\/storage\/emulated\/0\/Pictures\/Wally\/10017.png"
+                 }
+            ]
+        },
+        {
+            "name": "step2",
+            "state": [
+                 {
+                     "key":"name",
+                     "type":"edit_text",
+                     "hint":"Enter Country",
+                     "value":"India"
+                 },
+                 {
+                     "key":"checkData",
+                     "type":"check_box",
+                     "label":"Select multiple preferences",
+                     "options":[
+                         {
+                             "key":"awesomeness",
+                             "text":"Are you willing for some awesomeness?",
+                             "value":"true"
+                         },
+                         {
+                             "key":"newsletter",
+                             "text":"Do you really want to opt out from my newsletter?",
+                             "value":"false"
+                         }
+                     ]
+                 },
+                 {
+                     "key":"radioData",
+                     "type":"radio",
+                     "label":"Select one item from below",
+                     "options":[
+                         {
+                             "key":"areYouPro",
+                             "text":"Are you pro?"
+                         },
+                         {
+                             "key":"areYouAmature",
+                             "text":"Are you amature?"
+                         },
+                         {
+                             "key":"areYouNovice",
+                             "text":"Are you novice?"
+                         }
+                     ],
+                     "value":"areYouPro"
+                 }
+            ]
+        },
+        {
+            "name": "step3",
+            "state": [
+                 {
+                     "key":"anything",
+                     "type":"edit_text",
+                     "hint":"Enter Anything You Want",
+                     "value":"anything"
+                 }
+            ]
+        }
+    ],
+}
+```
+
 ## Output Json (of demo input json)
 
 ```json

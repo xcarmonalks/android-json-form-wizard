@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 intent.putExtra("json", json);
+                intent.putExtra(JsonFormConstants.EXTRA_TRACK_HISTORY, true);
                 intent.putExtra("resolver",
                     "com.vijay.jsonwizard.demo.expressions.AssetsContentResolver");
                 //intent.putExtra(JsonFormConstants.ORIENTATION_EXTRA, JsonFormConstants

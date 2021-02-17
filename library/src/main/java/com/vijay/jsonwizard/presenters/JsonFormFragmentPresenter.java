@@ -419,6 +419,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
     public void onSaveClick(LinearLayout mainView) {
         ValidationStatus validationStatus = writeValuesAndValidate(mainView);
         if (validationStatus.isValid()) {
+            getView().historyPush(mStepName);
             Intent returnIntent = new Intent();
             String json = getView().getCurrentJsonState();
             // Avoid sending more than 200Kb as intent extra
