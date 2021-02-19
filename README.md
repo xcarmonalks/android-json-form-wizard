@@ -819,20 +819,24 @@ Currently, JsonPath expressions are computed for the following widgets/propertie
   - `params`: Each of the param supports an expression which should resolve to a string.
 - EditText
   - `readonly`, `v_required.value`: Checks for expression 'truthiness'.
+  - `value`: The expression should resolve to a single string.
 - Spinner
   - `values`, `labels`: Should resolve to an array of strings.
-  - `value`: The expression should resolve to a string.
 - RadioButton
   - `options`: Should resolve to an array of strings.
+  - `value`: The expression should resolve to a string.
 - BarcodeText
   - `readonly`, `v_required.value`: Checks for expression 'truthiness'.
+  - `value`: The expression should resolve to a single string.
 - Location
   - `readonly`, `v_required.value`: Checks for expression 'truthiness'.
   - `map_config`: Should resolve to a valid map config object.
+  - `value`: The expression should resolve to a valid location string.
 - Carousel
   - `values`, `images`: Should resolve to a string array.
 - CheckBox
   - `show`: Checks for 'truthiness'.
+  - `value`: Checks for 'truthiness' to set the default checked state.
 - TimePicker
   - `v_required.value`: Checks for expression 'truthiness'.
 - ResourceViewer
