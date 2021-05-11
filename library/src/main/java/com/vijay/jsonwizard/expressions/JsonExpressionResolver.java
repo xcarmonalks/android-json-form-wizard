@@ -146,11 +146,16 @@ public class JsonExpressionResolver {
         if (instance != null) {
             localContext.put("$", "current-values", instance);
         }
-        JSONArray array = localContext.read(localExpression);
+        try {
+            JSONArray array = localContext.read(localExpression);
 
-        localContext.delete("current-values");
+            localContext.delete("current-values");
 
-        return array;
+            return array;
+        } catch (Exception e) {
+            Log.w("JsonExpression", "Could not resolve expression: " + localExpression, e);
+            return null;
+        }
     }
 
     public boolean existsExpression(String expression, JSONObject instance) throws JSONException {
