@@ -895,6 +895,99 @@ with a receiver listening for event `jsonFormPaused`.
     }
 ```
 
+# _WIP_ JsonPath support
+
+Some widgets support the usage of JsonPath expressions to show or condition values according to "current" form values, e.g.
+
+Conditionally compute whether to show next step:
+```json
+"next": {
+    "step2": "$.current-values[?(@.age=='12-19')]"
+}
+```
+
+Initialize a field value according to another value selected in a previous step:
+```json
+{
+    "key": "name2",
+    "type": "label",
+    "text": "$.current-values.name"
+}
+```
+
+Or load values from an external json, e.g.
+
+`assets/data-library.json`
+```json
+{
+    "books": [
+        {
+            "title": "Introduction to Programming",
+            "isbn": "95-9361-770-1"
+        },
+        {
+            "title": "Android for Dummies",
+            "isbn": "99-9050-667-1"
+        },
+        {
+            "title": "Machine Learning 101",
+            "isbn": "95-0168-964-6"
+        }
+    ]
+}
+```
+
+`form.json`
+```json
+{
+    "count": 1,
+    "step-1": {
+        "fields": [
+            {
+                "key": "book",
+                "type": "spinner",
+                "hint": "Choose a book",
+                "values": "@.data-library/books[*].isbn",
+                "labels": "@.data-library/books[*].title",
+            }
+        ]
+    }
+}
+```
+
+Currently, JsonPath expressions are computed for the following widgets/properties:
+- Label
+  - `text`: The expression should resolve to a string.
+- ExtendedLabel
+  - `text`: The expression should resolve to a string.
+  - `params`: Each of the param supports an expression which should resolve to a string.
+- EditText
+  - `readonly`, `v_required.value`: Checks for expression 'truthiness'.
+  - `value`: The expression should resolve to a single string.
+- Spinner
+  - `values`, `labels`: Should resolve to an array of strings.
+- RadioButton
+  - `options`: Should resolve to an array of strings.
+  - `value`: The expression should resolve to a string.
+- BarcodeText
+  - `readonly`, `v_required.value`: Checks for expression 'truthiness'.
+  - `value`: The expression should resolve to a single string.
+- Location
+  - `readonly`, `v_required.value`: Checks for expression 'truthiness'.
+  - `map_config`: Should resolve to a valid map config object.
+  - `value`: The expression should resolve to a valid location string.
+- Carousel
+  - `values`, `images`: Should resolve to a string array.
+- CheckBox
+  - `show`: Checks for 'truthiness'.
+  - `value`: Checks for 'truthiness' to set the default checked state.
+- TimePicker
+  - `v_required.value`: Checks for expression 'truthiness'.
+- ResourceViewer
+  - `label`, `resource`: Should resolve to a single string value.
+  - `config`: Should resolve to a valid config object.
+
+
 # Including in your project
 
 gradle:

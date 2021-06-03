@@ -76,8 +76,15 @@ public class CheckBoxFactory implements FormWidgetFactory {
                 checkBox.setTextSize(16);
                 checkBox.setTypeface(Typeface.createFromAsset(context.getAssets(), FONT_REGULAR_PATH));
                 checkBox.setOnCheckedChangeListener(listener);
-                if (!TextUtils.isEmpty(item.optString("value"))) {
-                    checkBox.setChecked(item.optBoolean("value"));
+                final String value = item.optString("value");
+                if (!TextUtils.isEmpty(value)) {
+                    boolean checked;
+                    if (resolver.isValidExpression(value)) {
+                        checked = resolver.existsExpression(value, getCurrentValues(context));
+                    } else {
+                        checked = item.optBoolean("value");
+                    }
+                    checkBox.setChecked(checked);
                 }
                 if (i == options.length() - 1) {
                     checkBox.setLayoutParams(getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0,
@@ -100,12 +107,21 @@ public class CheckBoxFactory implements FormWidgetFactory {
         for (int i = 0; i < options.length(); i++) {
             JSONObject item = options.getJSONObject(i);
             if (isVisible(item, context, resolver)) {
-                if (!TextUtils.isEmpty(item.optString("value")) && item.optBoolean("value")) {
-                    views.add(
-                        getTextViewWith(context, 16, bundle.resolveKey(item.getString("text")), item.getString("key"),
-                            null, getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0,
-                                (int) context.getResources().getDimension(R.dimen.default_bottom_margin)),
-                            FONT_REGULAR_PATH));
+                final String value = item.optString("value");
+                if (!TextUtils.isEmpty(value)) {
+                    boolean checked;
+                    if (resolver.isValidExpression(value)) {
+                        checked = resolver.existsExpression(value, getCurrentValues(context));
+                    } else {
+                        checked = item.optBoolean("value");
+                    }
+                    if (checked) {
+                        views.add(
+                                getTextViewWith(context, 16, bundle.resolveKey(item.getString("text")), item.getString("key"),
+                                        null, getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0,
+                                                (int) context.getResources().getDimension(R.dimen.default_bottom_margin)),
+                                        FONT_REGULAR_PATH));
+                    }
                 }
             }
         }

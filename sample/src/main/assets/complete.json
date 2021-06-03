@@ -119,12 +119,7 @@
                     "Stark",
                     "Targeriyan",
                     "Lannister"
-                ],
-                "v_required": {
-                    "value": "true",
-                    "err": "Please choose a value to proceed."
-                },
-                "value": "Lannister"
+                ]
             },
             {
                 "key": "age",
@@ -154,6 +149,21 @@
     },
     "step2": {
         "fields": [
+            {
+                "key": "house-2",
+                "type": "spinner",
+                "hint": "Confirm Thy House",
+                "values": [
+                    "Stark",
+                    "Targeriyan",
+                    "Lannister"
+                ],
+                "v_required": {
+                    "value": "true",
+                    "err": "Please choose a value to proceed."
+                },
+                "value": "$.current-values.house"
+            },
             {
                 "key": "name2",
                 "type": "edit_text",
