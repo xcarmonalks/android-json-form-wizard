@@ -445,7 +445,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
             if (bitmap != null) {
                 File image = new File(context.getExternalCacheDir(), System.currentTimeMillis() + ".jpg");
                 ImageUtils.saveToFile(bitmap, image);
-                getView().updateRelevantImageView(bitmap, image.getAbsolutePath(), mCurrentKey);
+                getView().updateRelevantImageView(bitmap, image.getAbsolutePath(), mCurrentKey,mStepName);
             }
         }
 
@@ -496,7 +496,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
             if (JsonFormConstants.CHOOSE_IMAGE.equals(type)) {
                 mCurrentKey = key;
                 if (v.getTag(R.id.btn_clear) != null) {
-                    getView().updateRelevantImageView(null, null, key);
+                    getView().updateRelevantImageView(null, null, key, mStepName);
                     v.setVisibility(View.GONE);
                 } else {
                     getView().hideKeyBoard();

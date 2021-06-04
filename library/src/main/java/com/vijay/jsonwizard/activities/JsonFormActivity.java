@@ -13,6 +13,7 @@ import android.view.WindowManager;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.gu.toolargetool.TooLargeTool;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.demo.resources.AssetsResourceResolver;
@@ -86,6 +87,7 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        TooLargeTool.startLogging(this.getApplication());
         configureInputMethod();
         configureOrientation();
         initialize();

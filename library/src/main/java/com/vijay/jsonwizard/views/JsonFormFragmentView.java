@@ -17,7 +17,6 @@ import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.mvp.MvpView;
 import com.vijay.jsonwizard.mvp.ViewState;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -53,7 +52,8 @@ public interface JsonFormFragmentView<VS extends ViewState> extends MvpView {
 
     void startActivityForResult(Intent intent, int requestCode);
 
-    void updateRelevantImageView(Bitmap bitmap, String imagePath, String currentKey);
+    void updateRelevantImageView(Bitmap bitmap, String imagePath, String currentKey,
+        String stepName);
 
     void updateRelevantEditText(String currentKey, String value);
 
