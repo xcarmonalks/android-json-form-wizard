@@ -222,7 +222,8 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if (mJSONObject != null) {
-            outState.putString("jsonState", mJSONObject.toString());
+            //outState.putString("jsonState", mJSONObject.toString());
+            JsonFormUtils.writeTempFormToDisk(this,mJSONObject.toString());
             outState.putInt(JsonFormConstants.VISUALIZATION_MODE_EXTRA, mVisualizationMode);
             outState.putString("resolver", externalContentResolverClass);
             outState.putString("resourceResolver", resourceResolverClass);
