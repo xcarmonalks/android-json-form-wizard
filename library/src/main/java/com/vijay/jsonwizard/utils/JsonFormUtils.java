@@ -68,6 +68,17 @@ public class JsonFormUtils {
         return null;
     }
 
+    public static JSONObject findFieldInJSON(JSONObject root, String key) throws JSONException {
+        JSONArray fields = root.getJSONArray("fields");
+        for (int i = 0; i < fields.length(); i++) {
+            JSONObject field = (JSONObject) fields.get(i);
+            if (field != null && field.has("key") && field.getString("key").equals(key)) {
+                return field;
+            }
+        }
+        return null;
+    }
+
     private static JSONObject findInJSON(JSONObject root, String key) throws JSONException {
         JSONArray fields = root.getJSONArray("fields");
         for (int i = 0; i < fields.length(); i++) {

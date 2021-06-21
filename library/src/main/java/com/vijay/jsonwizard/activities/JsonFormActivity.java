@@ -53,7 +53,7 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
     private String resourceResolverClass;
 
     public void init(String json, Integer visualizationMode, String externalContentResolverClass,
-        String resourceResolverClass) {
+                     String resourceResolverClass) {
         this.externalContentResolverClass = externalContentResolverClass;
         this.resourceResolverClass = resourceResolverClass;
         if (!TextUtils.isEmpty(externalContentResolverClass)) {
@@ -111,8 +111,8 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
                 }
             }
             init(formJson, getIntent()
-                    .getIntExtra(JsonFormConstants.VISUALIZATION_MODE_EXTRA, JsonFormConstants.VISUALIZATION_MODE_EDIT),
-                contentResolver, resourceResolver);
+                            .getIntExtra(JsonFormConstants.VISUALIZATION_MODE_EXTRA, JsonFormConstants.VISUALIZATION_MODE_EDIT),
+                    contentResolver, resourceResolver);
             if (mJSONObject != null) {
                 String step = JsonFormConstants.FIRST_STEP_NAME;
                 String pausedStep = getIntent().getStringExtra("pausedStep");
@@ -120,8 +120,8 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
                 getSupportFragmentManager().beginTransaction().add(R.id.container,
                         JsonFormFragment.getFormFragment(step)).commit();
                 try {
-                    if(pausedStep != null && !"".equals(pausedStep)){
-                        while(!pausedStep.equals(step)) {
+                    if (pausedStep != null && !"".equals(pausedStep)) {
+                        while (!pausedStep.equals(step)) {
                             step = JsonFormUtils.resolveNextStep(mJSONObject.getJSONObject(step), getExpressionResolver(), mJSONObject);
                             JsonFormFragment nStep = JsonFormFragment.getFormFragment(step);
                             getSupportFragmentManager().beginTransaction().replace(R.id.container, nStep)
@@ -134,8 +134,8 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
             }
         } else {
             init(savedInstanceState.getString("jsonState"),
-                savedInstanceState.getInt(JsonFormConstants.VISUALIZATION_MODE_EXTRA),
-                savedInstanceState.getString("resolver"), savedInstanceState.getString("resourceResolver"));
+                    savedInstanceState.getInt(JsonFormConstants.VISUALIZATION_MODE_EXTRA),
+                    savedInstanceState.getString("resolver"), savedInstanceState.getString("resourceResolver"));
         }
     }
 
@@ -147,7 +147,11 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
     public synchronized JSONObject getStep(String name) {
         synchronized (mJSONObject) {
             try {
-                return mJSONObject.getJSONObject(name);
+                JSONObject step = mJSONObject.getJSONObject(name);
+                if (!step.has("template")) {
+                    return step;
+                }
+                return applyTemplateForStep(name, step);
             } catch (JSONException e) {
                 Log.e(TAG, e.getMessage(), e);
             }
@@ -155,44 +159,203 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
         return null;
     }
 
-    @Override
-    public void writeValue(String stepName, String key, String value) throws JSONException {
-        synchronized (mJSONObject) {
-            JSONObject jsonObject = mJSONObject.getJSONObject(stepName);
-            JSONArray fields = jsonObject.getJSONArray("fields");
-            for (int i = 0; i < fields.length(); i++) {
-                JSONObject item = fields.getJSONObject(i);
-                String keyAtIndex = item.optString("key");
-                if (key.equals(keyAtIndex)) {
-                    item.put("value", value);
-                    return;
+    //TODO: Support for edit_group
+    private JSONObject applyTemplateForStep(String name, JSONObject step) throws JSONException {
+
+        JSONObject template = findTemplateForStep(step);
+        //Perform a deep copy of the original template and merge with step
+        JSONObject newStep = new JSONObject(template.toString());
+        if (step.has("next")) {
+            newStep.put("next", step.get("next"));
+        }
+        if (step.has("title")) {
+            newStep.put("title", step.get("title"));
+        }
+
+        // Rewrite template keys prefixed with step name and set previous stored values
+        JSONArray fields = newStep.getJSONArray("fields");
+        for (int i = 0; i < fields.length(); i++) {
+            JSONObject item = fields.getJSONObject(i);
+            String key = item.optString("key");
+            String type = item.getString("type");
+            if (key != null) {
+                String newKey = name + "_" + key;
+                item.put("key", newKey);
+                if (type.equals("check_box")) {
+                    setOptionsValue(name, step, newKey, item);
+                } else {
+                    if (step.has("fields")) {
+                        String stepValue = findValue(step, newKey);
+                        if (stepValue != null && !"".equals(stepValue)) {
+                            item.put("value", stepValue);
+                        }
+                    }
+                }
+            }
+        }
+        return newStep;
+    }
+
+    private void setOptionsValue(String name, JSONObject step, String parentKey, JSONObject target)
+            throws JSONException {
+        JSONArray sourceOptions = new JSONArray();
+        if (step.has("fields")) {
+            JSONObject field = JsonFormUtils.findFieldInJSON(step, parentKey);
+            sourceOptions = field.optJSONArray("options");
+            if (sourceOptions == null) {
+                sourceOptions = new JSONArray();
+            }
+        }
+
+        JSONArray targetOptions = target.optJSONArray("options");
+        if (targetOptions == null) {
+            return;
+        }
+
+        for (int i = 0; i < targetOptions.length(); i++) {
+            JSONObject targetOption = targetOptions.getJSONObject(i);
+            String targetOptionKey = targetOption.getString("key");
+            String newTargetOptionKey = name + "_" + targetOptionKey;
+            targetOption.put("key", newTargetOptionKey);
+            for (int j = 0; j < sourceOptions.length(); j++) {
+                JSONObject sourceOption = sourceOptions.getJSONObject(j);
+                String sourceKey = sourceOption.getString("key");
+                String sourceValue = sourceOption.optString("value");
+                if (newTargetOptionKey.equals(sourceKey) && sourceValue != null) {
+                    targetOption.put("value", sourceValue);
                 }
             }
         }
     }
 
+    private String findValue(JSONObject jsonObject, String key) {
+        try {
+            JSONObject field = JsonFormUtils.findFieldInJSON(jsonObject, key);
+            return field.optString("value");
+        } catch (JSONException e) {
+            Log.e(TAG, "No value found", e);
+        }
+        return null;
+    }
+
+    private JSONObject findTemplateForStep(JSONObject step) throws JSONException {
+        String templateName = step.getString("template");
+        JSONObject templates = mJSONObject.getJSONObject("templates");
+        return templates.getJSONObject(templateName);
+    }
+
     @Override
-    public void writeValue(String stepName, String parentKey, String childObjectKey, String childKey, String value)
-        throws JSONException {
+    public void writeValue(String stepName, String key, String value) throws JSONException {
         synchronized (mJSONObject) {
             JSONObject jsonObject = mJSONObject.getJSONObject(stepName);
-            JSONArray fields = jsonObject.getJSONArray("fields");
+
+            JSONArray fields = jsonObject.optJSONArray("fields");
+            if (fields == null) {
+                JSONArray emptyArray = new JSONArray();
+                jsonObject.put("fields", emptyArray);
+                fields = jsonObject.getJSONArray("fields");
+            }
+            boolean found = false;
+            for (int i = 0; i < fields.length(); i++) {
+                JSONObject item = fields.getJSONObject(i);
+                String keyAtIndex = item.optString("key");
+                if (key.equals(keyAtIndex)) {
+                    item.put("value", value);
+                    found = true;
+                    return;
+                }
+            }
+            //TODO: rewrite previous search logic for a more elegant way. If found the code
+            // never reaches the following line
+            if (!found) {
+                JSONObject template = findTemplateForStep(jsonObject);
+                String type = "edit-text";
+                if (template != null) {
+                    //Remove stepName prefix form fieldKey
+                    String templateFieldKey = key.substring(stepName.length() + 1);
+                    JSONObject field = JsonFormUtils.findFieldInJSON(template, templateFieldKey);
+                    type = field.getString("type");
+                }
+                JSONObject newValue = new JSONObject();
+                newValue.put("key", key);
+                newValue.put("value", value);
+                newValue.put("type", type);
+                fields.put(newValue);
+            }
+        }
+    }
+
+    @Override
+    public void writeValue(String stepName, String parentKey, String childObjectKey,
+                           String childKey, String value)
+            throws JSONException {
+
+        if (value == null || "".equals(value)) {
+            return;
+        }
+
+        synchronized (mJSONObject) {
+            JSONObject jsonObject = mJSONObject.getJSONObject(stepName);
+
+            JSONArray fields = jsonObject.optJSONArray("fields");
+            if (fields == null) {
+                JSONArray emptyArray = new JSONArray();
+                jsonObject.put("fields", emptyArray);
+                fields = jsonObject.getJSONArray("fields");
+            }
+
+            boolean found = false;
             for (int i = 0; i < fields.length(); i++) {
                 JSONObject item = fields.getJSONObject(i);
                 String keyAtIndex = item.getString("key");
                 if (parentKey.equals(keyAtIndex)) {
+                    found = true;
                     JSONArray jsonArray = item.getJSONArray(childObjectKey);
+                    boolean innerItemFound = false;
                     for (int j = 0; j < jsonArray.length(); j++) {
                         JSONObject innerItem = jsonArray.getJSONObject(j);
                         String anotherKeyAtIndex = innerItem.getString("key");
                         if (childKey.equals(anotherKeyAtIndex)) {
-                            if (value != null && !"".equals(value)) {
-                                innerItem.put("value", value);
-                            }
+                            innerItem.put("value", value);
+                            innerItemFound = true;
                             return;
                         }
                     }
+                    if (!innerItemFound) {
+                        JSONObject innerValue = new JSONObject();
+                        innerValue.put("key", childKey);
+                        innerValue.put("value", value);
+                        jsonArray.put(innerValue);
+                    }
                 }
+            }
+
+            //TODO: rewrite previous search logic for a more elegant way. If found the code
+            // never reaches the following line
+            if (!found) {
+                JSONObject template = findTemplateForStep(jsonObject);
+                String type = "edit-text";
+                if (template != null) {
+                    //Remove stepName prefix form fieldKey
+                    String templateFieldKey = parentKey.substring(stepName.length() + 1);
+                    JSONObject field = JsonFormUtils.findFieldInJSON(template, templateFieldKey);
+                    type = field.getString("type");
+                }
+
+                JSONObject newValue = new JSONObject();
+                newValue.put("key", parentKey);
+                newValue.put("type", type);
+
+                JSONArray childObjects = new JSONArray();
+                newValue.put(childObjectKey, childObjects);
+
+                JSONObject innerValue = new JSONObject();
+                innerValue.put("key", childKey);
+                innerValue.put("value", value);
+
+                childObjects.put(innerValue);
+
+                fields.put(newValue);
             }
         }
     }
