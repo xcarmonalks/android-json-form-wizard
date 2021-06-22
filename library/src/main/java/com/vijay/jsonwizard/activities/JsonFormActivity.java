@@ -206,7 +206,10 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
             while (it.hasNext()) {
                 String key = it.next();
 
-                String value = expressionResolver.resolveAsString(params.getString(key), currentValues);
+                String value = params.getString(key);
+                if (expressionResolver.isValidExpression(value)) {
+                    value = expressionResolver.resolveAsString(params.getString(key), currentValues);
+                }
                 newParamsContainer.put(key, value);
             }
             newStep.put("template_params", newParamsContainer);
