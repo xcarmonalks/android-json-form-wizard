@@ -24,6 +24,7 @@ import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
 import com.vijay.jsonwizard.interfaces.JsonApi;
+import com.vijay.jsonwizard.utils.ExpressionResolverContextUtils;
 import com.vijay.jsonwizard.utils.JsonFormUtils;
 
 import org.json.JSONException;
@@ -66,7 +67,7 @@ public class LabelFactory implements FormWidgetFactory {
         if (valuesExpression == null) {
             textValue = bundle.resolveKey(jsonObject.getString(TEXT_FIELD));
         } else {
-            JSONObject currentValues = getCurrentValues(context);
+            JSONObject currentValues = getCurrentValues(context, stepName);
             textValue = resolver.resolveAsString(valuesExpression, currentValues);
         }
 
@@ -98,7 +99,7 @@ public class LabelFactory implements FormWidgetFactory {
         if (valuesExpression == null) {
             textValue = bundle.resolveKey(jsonObject.getString(TEXT_FIELD));
         } else {
-            JSONObject currentValues = getCurrentValues(context);
+            JSONObject currentValues = getCurrentValues(context, stepName);
             textValue = resolver.resolveAsString(valuesExpression, currentValues);
         }
 
@@ -110,14 +111,8 @@ public class LabelFactory implements FormWidgetFactory {
     }
 
     @Nullable
-    private JSONObject getCurrentValues(Context context) throws JSONException {
-        JSONObject currentValues = null;
-        if (context instanceof JsonApi) {
-            String currentJsonState = ((JsonApi) context).currentJsonState();
-            JSONObject currentJsonObject = new JSONObject(currentJsonState);
-            currentValues = JsonFormUtils.extractDataFromForm(currentJsonObject, false);
-        }
-        return currentValues;
+    private JSONObject getCurrentValues(Context context, String stepName) throws JSONException {
+        return ExpressionResolverContextUtils.getCurrentValues(context, stepName);
     }
 
     private String getValuesAsJsonExpression(JSONObject jsonObject, JsonExpressionResolver resolver) {

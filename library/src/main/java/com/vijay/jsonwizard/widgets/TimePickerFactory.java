@@ -20,6 +20,7 @@ import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
 import com.vijay.jsonwizard.interfaces.JsonApi;
 import com.vijay.jsonwizard.utils.DateUtils;
+import com.vijay.jsonwizard.utils.ExpressionResolverContextUtils;
 import com.vijay.jsonwizard.utils.JsonFormUtils;
 import com.vijay.jsonwizard.utils.ValidationStatus;
 import com.vijay.jsonwizard.validators.edittext.RequiredValidator;
@@ -58,12 +59,12 @@ public class TimePickerFactory implements FormWidgetFactory {
                 views = getReadOnlyViewsFromJson(context, jsonObject, bundle);
                 break;
             default:
-                views = getEditableViewsFromJson(context, jsonObject, bundle, resolver);
+                views = getEditableViewsFromJson(stepName, context, jsonObject, bundle, resolver);
         }
         return views;
     }
 
-    private List<View> getEditableViewsFromJson(Context context, JSONObject jsonObject, JsonFormBundle bundle, JsonExpressionResolver resolver)
+    private List<View> getEditableViewsFromJson(String stepName, Context context, JSONObject jsonObject, JsonFormBundle bundle, JsonExpressionResolver resolver)
         throws JSONException {
         List<View> views = new ArrayList<>(1);
         final MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(
@@ -97,7 +98,7 @@ public class TimePickerFactory implements FormWidgetFactory {
             if (!TextUtils.isEmpty(requiredValue)) {
                 boolean required = false;
                 if (resolver.isValidExpression(requiredValue)) {
-                    JSONObject currentValues = getCurrentValues(context);
+                    JSONObject currentValues = getCurrentValues(context, stepName);
                     required = resolver.existsExpression(requiredValue, currentValues);
                 } else {
                     required = Boolean.TRUE.toString().equalsIgnoreCase(requiredValue);
@@ -217,14 +218,8 @@ public class TimePickerFactory implements FormWidgetFactory {
     }
 
     @Nullable
-    private JSONObject getCurrentValues(Context context) throws JSONException {
-        JSONObject currentValues = null;
-        if (context instanceof JsonApi) {
-            String currentJsonState = ((JsonApi) context).currentJsonState();
-            JSONObject currentJsonObject = new JSONObject(currentJsonState);
-            currentValues = JsonFormUtils.extractDataFromForm(currentJsonObject, false);
-        }
-        return currentValues;
+    private JSONObject getCurrentValues(Context context, String stepName) throws JSONException {
+        return ExpressionResolverContextUtils.getCurrentValues(context, stepName);
     }
 }
 

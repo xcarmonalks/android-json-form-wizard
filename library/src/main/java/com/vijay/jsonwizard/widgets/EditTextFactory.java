@@ -21,6 +21,7 @@ import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
 import com.vijay.jsonwizard.interfaces.JsonApi;
+import com.vijay.jsonwizard.utils.ExpressionResolverContextUtils;
 import com.vijay.jsonwizard.utils.JsonFormUtils;
 import com.vijay.jsonwizard.utils.ValidationStatus;
 import com.vijay.jsonwizard.validators.edittext.MaxLengthValidator;
@@ -68,7 +69,7 @@ public class EditTextFactory implements FormWidgetFactory {
         boolean readonly = false;
 
         if (resolver.isValidExpression(readonlyValue)) {
-            JSONObject currentValues = getCurrentValues(context, stepName);
+            JSONObject currentValues = ExpressionResolverContextUtils.getCurrentValues(context, stepName);
             readonly = resolver.existsExpression(readonlyValue, currentValues);
         } else {
             readonly = Boolean.TRUE.toString().equalsIgnoreCase(readonlyValue);
@@ -92,7 +93,7 @@ public class EditTextFactory implements FormWidgetFactory {
 
         String value = jsonObject.optString("value");
         if (resolver.isValidExpression(value)) {
-            JSONObject currentValues = getCurrentValues(context, stepName);
+            JSONObject currentValues = ExpressionResolverContextUtils.getCurrentValues(context, stepName);
             value = resolver.resolveAsString(value, currentValues);
         }
         if (!TextUtils.isEmpty(value)) {
@@ -111,7 +112,7 @@ public class EditTextFactory implements FormWidgetFactory {
             if (!TextUtils.isEmpty(requiredValue)) {
                 boolean required = false;
                 if (resolver.isValidExpression(requiredValue)) {
-                    JSONObject currentValues = getCurrentValues(context, stepName);
+                    JSONObject currentValues = ExpressionResolverContextUtils.getCurrentValues(context, stepName);
                     required = resolver.existsExpression(requiredValue, currentValues);
                 } else {
                     required = Boolean.TRUE.toString().equalsIgnoreCase(requiredValue);
@@ -221,25 +222,4 @@ public class EditTextFactory implements FormWidgetFactory {
         return views;
     }
 
-    @Nullable
-    private JSONObject getCurrentValues(Context context, String stepName) throws JSONException {
-        JSONObject currentValues = null;
-        if (context instanceof JsonApi) {
-            String currentJsonState = ((JsonApi) context).currentJsonState();
-            JSONObject currentJsonObject = new JSONObject(currentJsonState);
-            currentValues = JsonFormUtils.extractDataFromForm(currentJsonObject, false);
-
-            JSONObject step = currentJsonObject.getJSONObject(stepName);
-            if (step.has("template_params")) {
-                /*
-                  TODO: Optimize step retrieval. Following method rebuilds step from template.
-                  Can be optimized by giving access to the step definition built during fragment initialization
-                */
-                step = ((JsonApi) context).getStep(stepName);
-                JSONObject templateParams = step.getJSONObject("template_params");
-                currentValues.put("template_params", templateParams);
-            }
-        }
-        return currentValues;
-    }
 }

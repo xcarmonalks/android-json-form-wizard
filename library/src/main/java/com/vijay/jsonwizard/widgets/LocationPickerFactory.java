@@ -28,6 +28,7 @@ import com.vijay.jsonwizard.maps.LocationPart;
 import com.vijay.jsonwizard.maps.LocationTextWatcher;
 import com.vijay.jsonwizard.maps.LocationValueReporter;
 import com.vijay.jsonwizard.maps.MapsUtils;
+import com.vijay.jsonwizard.utils.ExpressionResolverContextUtils;
 import com.vijay.jsonwizard.utils.JsonFormUtils;
 import com.vijay.jsonwizard.utils.ValidationStatus;
 import com.vijay.jsonwizard.validators.edittext.EqualsValidator;
@@ -65,7 +66,7 @@ public class LocationPickerFactory implements FormWidgetFactory {
         List<View> views;
         switch (visualizationMode) {
             case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY:
-                views = getReadOnlyViewsFromJson(context, jsonObject, bundle, resolver, resourceResolver);
+                views = getReadOnlyViewsFromJson(stepName, context, jsonObject, bundle, resolver, resourceResolver);
                 break;
             default:
                 views = getEditableViewsFromJson(stepName, context, jsonObject, listener, bundle,
@@ -82,14 +83,14 @@ public class LocationPickerFactory implements FormWidgetFactory {
         boolean readonly = false;
 
         if (resolver.isValidExpression(readonlyValue)) {
-            JSONObject currentValues = getCurrentValues(context);
+            JSONObject currentValues = getCurrentValues(context, stepName);
             readonly = resolver.existsExpression(readonlyValue, currentValues);
         } else {
             readonly = Boolean.TRUE.toString().equalsIgnoreCase(readonlyValue);
         }
 
         if (readonly) {
-            return getReadOnlyViewsFromJson(context, jsonObject, bundle, resolver, resourceResolver);
+            return getReadOnlyViewsFromJson(stepName, context, jsonObject, bundle, resolver, resourceResolver);
         }
 
         String jsonKey = jsonObject.getString("key");
@@ -101,7 +102,7 @@ public class LocationPickerFactory implements FormWidgetFactory {
         parentView.setTag(R.id.key, jsonKey);
         parentView.setTag(R.id.type, jsonInputType);
 
-        loadMapConfig(context, jsonObject, resolver, parentView);
+        loadMapConfig(stepName, context, jsonObject, resolver, parentView);
 
         boolean accuracyEnabled = jsonObject.has("accuracy") && jsonObject.getBoolean("accuracy");
         parentView.setTag(R.id.accuracy, accuracyEnabled);
@@ -182,7 +183,7 @@ public class LocationPickerFactory implements FormWidgetFactory {
             if (!TextUtils.isEmpty(requiredValue)) {
                 boolean required = false;
                 if (resolver.isValidExpression(requiredValue)) {
-                    JSONObject currentValues = getCurrentValues(context);
+                    JSONObject currentValues = getCurrentValues(context, stepName);
                     required = resolver.existsExpression(requiredValue, currentValues);
                 } else {
                     required = Boolean.TRUE.toString().equalsIgnoreCase(requiredValue);
@@ -222,12 +223,12 @@ public class LocationPickerFactory implements FormWidgetFactory {
         return views;
     }
 
-    private void loadMapConfig(Context context, JSONObject jsonObject, JsonExpressionResolver resolver, View parentView) throws JSONException {
+    private void loadMapConfig(String stepName, Context context, JSONObject jsonObject, JsonExpressionResolver resolver, View parentView) throws JSONException {
         if (jsonObject.has("map_config")) {
             String expression = jsonObject.optString("map_config");
             JSONObject mapConfig;
             if (resolver.isValidExpression(expression)) {
-                JSONObject currentValues = getCurrentValues(context);
+                JSONObject currentValues = getCurrentValues(context, stepName);
                 mapConfig = resolver.resolveAsObject(expression, currentValues);
             } else {
                 mapConfig = jsonObject.getJSONObject("map_config");
@@ -238,7 +239,7 @@ public class LocationPickerFactory implements FormWidgetFactory {
         }
     }
 
-    private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject,
+    private List<View> getReadOnlyViewsFromJson(String stepName, Context context, JSONObject jsonObject,
                                                 JsonFormBundle bundle, JsonExpressionResolver resolver, ResourceResolver resourceResolver) throws JSONException {
         List<View> views = new ArrayList<>(1);
         View parentView = LayoutInflater.from(context).inflate(R.layout.item_location_text, null);
@@ -247,7 +248,7 @@ public class LocationPickerFactory implements FormWidgetFactory {
         String jsonType = jsonObject.getString("type");
         parentView.setTag(R.id.key, jsonKey);
         parentView.setTag(R.id.type, jsonType);
-        loadMapConfig(context, jsonObject, resolver, parentView);
+        loadMapConfig(stepName, context, jsonObject, resolver, parentView);
 
         View mapContainer = parentView.findViewById(R.id.map_container);
         mapContainer.setId(View.generateViewId());
@@ -335,14 +336,8 @@ public class LocationPickerFactory implements FormWidgetFactory {
     }
 
     @Nullable
-    private JSONObject getCurrentValues(Context context) throws JSONException {
-        JSONObject currentValues = null;
-        if (context instanceof JsonApi) {
-            String currentJsonState = ((JsonApi) context).currentJsonState();
-            JSONObject currentJsonObject = new JSONObject(currentJsonState);
-            currentValues = JsonFormUtils.extractDataFromForm(currentJsonObject, false);
-        }
-        return currentValues;
+    private JSONObject getCurrentValues(Context context, String stepName) throws JSONException {
+        return ExpressionResolverContextUtils.getCurrentValues(context, stepName);
     }
 
 

@@ -19,6 +19,7 @@ import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
 import com.vijay.jsonwizard.interfaces.JsonApi;
+import com.vijay.jsonwizard.utils.ExpressionResolverContextUtils;
 import com.vijay.jsonwizard.utils.JsonFormUtils;
 import com.vijay.jsonwizard.utils.ValidationStatus;
 
@@ -59,15 +60,15 @@ public class SpinnerFactory implements FormWidgetFactory {
         List<View> views = null;
         switch (visualizationMode) {
             case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY:
-                views = getReadOnlyViewsFromJson(context, jsonObject, bundle, resolver);
+                views = getReadOnlyViewsFromJson(stepName, context, jsonObject, bundle, resolver);
                 break;
             default:
-                views = getEditableViewsFromJson(context, jsonObject, listener, bundle, resolver);
+                views = getEditableViewsFromJson(stepName, context, jsonObject, listener, bundle, resolver);
         }
         return views;
     }
 
-    private List<View> getEditableViewsFromJson(Context context, JSONObject jsonObject, CommonListener listener,
+    private List<View> getEditableViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener,
         JsonFormBundle bundle, JsonExpressionResolver resolver) throws JSONException {
         List<View> views = new ArrayList<>(1);
         MaterialSpinner spinner = (MaterialSpinner) LayoutInflater.from(context).inflate(R.layout.item_spinner, null);
@@ -99,9 +100,9 @@ public class SpinnerFactory implements FormWidgetFactory {
             valueToSelect = value;
         }
 
-        JSONArray valuesJson = resolveOptJSONArray("values", context, jsonObject, resolver);
+        JSONArray valuesJson = resolveOptJSONArray("values", context, stepName, jsonObject, resolver);
 
-        JSONArray labelsJson = resolveOptJSONArray("labels", context, jsonObject, resolver);
+        JSONArray labelsJson = resolveOptJSONArray("labels", context, stepName, jsonObject, resolver);
 
         ValueLabelPair[] values = getValues(valuesJson, labelsJson, bundle);
         String otherOption = bundle.resolveKey(jsonObject.optString("other"));
@@ -123,14 +124,8 @@ public class SpinnerFactory implements FormWidgetFactory {
     }
 
     @Nullable
-    private JSONObject getCurrentValues(Context context) throws JSONException {
-        JSONObject currentValues = null;
-        if (context instanceof JsonApi) {
-            String currentJsonState = ((JsonApi) context).currentJsonState();
-            JSONObject currentJsonObject = new JSONObject(currentJsonState);
-            currentValues = JsonFormUtils.extractDataFromForm(currentJsonObject, false);
-        }
-        return currentValues;
+    private JSONObject getCurrentValues(Context context, String stepName) throws JSONException {
+        return ExpressionResolverContextUtils.getCurrentValues(context, stepName);
     }
 
     private ValueLabelPair[] getValues(JSONArray valuesJson, JSONArray labelsJson, JsonFormBundle bundle) {
@@ -172,7 +167,7 @@ public class SpinnerFactory implements FormWidgetFactory {
         return null;
     }
 
-    private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject, JsonFormBundle bundle, JsonExpressionResolver resolver)
+    private List<View> getReadOnlyViewsFromJson(String stepName, Context context, JSONObject jsonObject, JsonFormBundle bundle, JsonExpressionResolver resolver)
         throws JSONException {
         List<View> views = new ArrayList<>(1);
         MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(R.layout.item_edit_text,
@@ -186,9 +181,9 @@ public class SpinnerFactory implements FormWidgetFactory {
 
         String value = jsonObject.optString("value");
 
-        JSONArray labelsJson = resolveOptJSONArray("labels", context, jsonObject, resolver);
+        JSONArray labelsJson = resolveOptJSONArray("labels", context, stepName, jsonObject, resolver);
         if (labelsJson != null) {
-            JSONArray valuesJson = resolveOptJSONArray("values", context, jsonObject, resolver);
+            JSONArray valuesJson = resolveOptJSONArray("values", context, stepName, jsonObject, resolver);
 
             ValueLabelPair[] values = getValues(valuesJson, labelsJson, bundle);
 
@@ -202,13 +197,13 @@ public class SpinnerFactory implements FormWidgetFactory {
         return views;
     }
 
-    private JSONArray resolveOptJSONArray(String key, Context context, JSONObject jsonObject,
+    private JSONArray resolveOptJSONArray(String key, Context context, String stepName, JSONObject jsonObject,
         JsonExpressionResolver resolver) throws JSONException {
 
         String jsonExpression = jsonObject.optString(key);
         JSONArray array;
         if (resolver.isValidExpression(jsonExpression)) {
-            JSONObject currentValues = getCurrentValues(context);
+            JSONObject currentValues = getCurrentValues(context, stepName);
             array = resolver.resolveAsArray(jsonExpression, currentValues);
         } else {
             array = jsonObject.optJSONArray(key);

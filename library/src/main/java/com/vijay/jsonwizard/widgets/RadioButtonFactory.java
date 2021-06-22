@@ -28,6 +28,7 @@ import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
 import com.vijay.jsonwizard.interfaces.JsonApi;
+import com.vijay.jsonwizard.utils.ExpressionResolverContextUtils;
 import com.vijay.jsonwizard.utils.JsonFormUtils;
 
 import org.json.JSONArray;
@@ -54,12 +55,12 @@ public class RadioButtonFactory implements FormWidgetFactory {
                 views = getReadOnlyViewsFromJson(context, jsonObject, bundle);
                 break;
             default:
-                views = getEditableViewsFromJson(context, jsonObject, listener, bundle, resolver);
+                views = getEditableViewsFromJson(stepName, context, jsonObject, listener, bundle, resolver);
         }
         return views;
     }
 
-    private List<View> getEditableViewsFromJson(Context context, JSONObject jsonObject, CommonListener listener,
+    private List<View> getEditableViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener,
         JsonFormBundle bundle, JsonExpressionResolver resolver) throws JSONException {
         List<View> views = new ArrayList<>(1);
         views.add(
@@ -74,7 +75,7 @@ public class RadioButtonFactory implements FormWidgetFactory {
         JSONArray options = null;
         String valuesExpression = getValuesAsJsonExpression(jsonObject, resolver);
         if (valuesExpression != null) {
-            JSONObject currentValues = getCurrentValues(context);
+            JSONObject currentValues = getCurrentValues(context, stepName);
             options = resolver.resolveAsArray(valuesExpression, currentValues);
         } else {
             options = jsonObject.getJSONArray(JsonFormConstants.OPTIONS_FIELD_NAME);
@@ -119,14 +120,8 @@ public class RadioButtonFactory implements FormWidgetFactory {
     }
 
     @Nullable
-    private JSONObject getCurrentValues(Context context) throws JSONException {
-        JSONObject currentValues = null;
-        if (context instanceof JsonApi) {
-            String currentJsonState = ((JsonApi) context).currentJsonState();
-            JSONObject currentJsonObject = new JSONObject(currentJsonState);
-            currentValues = JsonFormUtils.extractDataFromForm(currentJsonObject, false);
-        }
-        return currentValues;
+    private JSONObject getCurrentValues(Context context, String stepName) throws JSONException {
+        return ExpressionResolverContextUtils.getCurrentValues(context, stepName);
     }
 
 

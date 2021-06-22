@@ -22,6 +22,7 @@ import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
 import com.vijay.jsonwizard.interfaces.JsonApi;
+import com.vijay.jsonwizard.utils.ExpressionResolverContextUtils;
 import com.vijay.jsonwizard.utils.JsonFormUtils;
 import com.vijay.jsonwizard.utils.ValidationStatus;
 import com.vijay.jsonwizard.validators.edittext.MaxLengthValidator;
@@ -66,7 +67,7 @@ public class BarcodeTextFactory implements FormWidgetFactory {
         boolean readonly = false;
 
         if (resolver.isValidExpression(readonlyValue)) {
-            JSONObject currentValues = getCurrentValues(context);
+            JSONObject currentValues = getCurrentValues(context, stepName);
             readonly = resolver.existsExpression(readonlyValue, currentValues);
         } else {
             readonly = Boolean.TRUE.toString().equalsIgnoreCase(readonlyValue);
@@ -110,7 +111,7 @@ public class BarcodeTextFactory implements FormWidgetFactory {
             if (!TextUtils.isEmpty(requiredValue)) {
                 boolean required = false;
                 if (resolver.isValidExpression(requiredValue)) {
-                    JSONObject currentValues = getCurrentValues(context);
+                    JSONObject currentValues = getCurrentValues(context,stepName);
                     required = resolver.existsExpression(requiredValue, currentValues);
                 } else {
                     required = Boolean.TRUE.toString().equalsIgnoreCase(requiredValue);
@@ -227,13 +228,7 @@ public class BarcodeTextFactory implements FormWidgetFactory {
     }
 
     @Nullable
-    private JSONObject getCurrentValues(Context context) throws JSONException {
-        JSONObject currentValues = null;
-        if (context instanceof JsonApi) {
-            String currentJsonState = ((JsonApi) context).currentJsonState();
-            JSONObject currentJsonObject = new JSONObject(currentJsonState);
-            currentValues = JsonFormUtils.extractDataFromForm(currentJsonObject, false);
-        }
-        return currentValues;
+    private JSONObject getCurrentValues(Context context, String stepName) throws JSONException {
+       return ExpressionResolverContextUtils.getCurrentValues(context, stepName);
     }
 }
