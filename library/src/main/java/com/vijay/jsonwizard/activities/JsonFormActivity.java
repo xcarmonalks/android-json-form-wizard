@@ -1,5 +1,6 @@
 package com.vijay.jsonwizard.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.Surface;
 import android.view.WindowManager;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -32,6 +34,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Iterator;
 import java.util.Locale;
 
 import static com.vijay.jsonwizard.constants.JsonFormConstants.MAX_PARCEL_SIZE;
@@ -193,7 +196,27 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
                 }
             }
         }
+
+        if (step.has("template_params")) {
+            JSONObject newParamsContainer = new JSONObject();
+            JsonExpressionResolver expressionResolver = getExpressionResolver();
+            JSONObject params = step.getJSONObject("template_params");
+            Iterator<String> it = params.keys();
+            JSONObject currentValues = getCurrentValues();
+            while (it.hasNext()) {
+                String key = it.next();
+
+                String value = expressionResolver.resolveAsString(params.getString(key), currentValues);
+                newParamsContainer.put(key, value);
+            }
+            newStep.put("template_params", newParamsContainer);
+        }
+
         return newStep;
+    }
+
+    private JSONObject getCurrentValues() throws JSONException {
+        return JsonFormUtils.extractDataFromForm(mJSONObject, false);
     }
 
     private void setOptionsValue(String name, JSONObject step, String parentKey, JSONObject target)

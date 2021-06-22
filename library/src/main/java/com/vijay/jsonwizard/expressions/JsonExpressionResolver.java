@@ -20,6 +20,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 public class JsonExpressionResolver {
+    private static final String TAG = "Resolver";
 
     static {
         Configuration.setDefaults(new Configuration.Defaults() {
@@ -87,36 +88,51 @@ public class JsonExpressionResolver {
     }
 
     public String resolveAsString(String expression, JSONObject instance) throws JSONException {
-        JSONArray array = resolveExpression(expression, instance);
-        if (array == null || array.length() == 0) {
-            return null;
+        try {
+            JSONArray array = resolveExpression(expression, instance);
+
+            if (array == null || array.length() == 0) {
+                return null;
+            }
+            if (array.isNull(0)) {
+                return null;
+            }
+            return array.getString(0);
+        } catch (PathNotFoundException e) {
+            Log.e(TAG, "Path not found: " + expression, e);
         }
-        if (array.isNull(0)) {
-            return null;
-        }
-        return array.getString(0);
+        return null;
     }
 
     public JSONArray resolveAsArray(String expression, JSONObject instance) {
-        JSONArray array = resolveExpression(expression, instance);
-        if (array == null || array.length() == 0) {
-            return null;
+        try {
+            JSONArray array = resolveExpression(expression, instance);
+            if (array == null || array.length() == 0) {
+                return null;
+            }
+            Object item = array.opt(0);
+            if (item instanceof JSONArray) {
+                return (JSONArray) item;
+            }
+            return array;
+        } catch (PathNotFoundException e) {
+            Log.e(TAG, "Path not found: " + expression, e);
         }
-        Object item = array.opt(0);
-        if (item instanceof JSONArray) {
-            return (JSONArray) item;
-        }
-        return array;
+        return null;
     }
 
     public JSONObject resolveAsObject(String expression, JSONObject instance) {
-        JSONArray array = resolveExpression(expression, instance);
-        if (array == null || array.length() == 0) {
-            return null;
-        }
-        Object item = array.opt(0);
-        if (item instanceof JSONObject) {
-            return (JSONObject) item;
+        try {
+            JSONArray array = resolveExpression(expression, instance);
+            if (array == null || array.length() == 0) {
+                return null;
+            }
+            Object item = array.opt(0);
+            if (item instanceof JSONObject) {
+                return (JSONObject) item;
+            }
+        } catch (PathNotFoundException e) {
+            Log.e(TAG, "Path not found: " + expression, e);
         }
         return null;
     }
@@ -131,14 +147,14 @@ public class JsonExpressionResolver {
             localContext = contentCache.get(externalReference);
             if (localContext == null) {
                 Log.w("ExpressionResolver",
-                    "resolveAsArray: external content " + externalReference + " can not be loaded");
+                        "resolveAsArray: external content " + externalReference + " can not be loaded");
                 return null;
             }
 
             localExpression = extractJsonExpression(expression);
             if (localExpression == null) {
                 Log.w("ExpressionResolver",
-                    "resolveAsArray: external content expression can not be extracted " + expression);
+                        "resolveAsArray: external content expression can not be extracted " + expression);
                 return null;
             }
         }
@@ -163,14 +179,14 @@ public class JsonExpressionResolver {
             localContext = contentCache.get(externalReference);
             if (localContext == null) {
                 Log.w("ExpressionResolver",
-                    "resolveAsArray: external content " + externalReference + " can not be loaded");
+                        "resolveAsArray: external content " + externalReference + " can not be loaded");
                 return false;
             }
 
             localExpression = extractJsonExpression(expression);
             if (localExpression == null) {
                 Log.w("ExpressionResolver",
-                    "resolveAsArray: external content expression can not be extracted " + expression);
+                        "resolveAsArray: external content expression can not be extracted " + expression);
                 return false;
             }
         }

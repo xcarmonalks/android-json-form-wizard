@@ -10,7 +10,10 @@
     "next": "step3"
   },
   "step3": {
-    "template": "template0"
+    "template": "template0",
+    "template_params": {
+      "address": "$.current-values.step1_address"
+    }
   },
   "templates": {
     "template0": {
@@ -26,6 +29,7 @@
           "key": "address",
           "type": "edit_text",
           "hint": "${address.hint}",
+          "value": "$.current-values.template_params.address",
           "readonly": "false",
           "lines": 4
         },
