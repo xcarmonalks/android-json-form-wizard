@@ -5,6 +5,7 @@ import android.util.Log;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.JsonPathException;
 import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.spi.json.JsonOrgJsonProvider;
@@ -162,11 +163,15 @@ public class JsonExpressionResolver {
         if (instance != null) {
             localContext.put("$", "current-values", instance);
         }
-        JSONArray array = localContext.read(localExpression);
+        try {
+            JSONArray array = localContext.read(localExpression);
+            localContext.delete("current-values");
+            return array;
+        } catch (JsonPathException e) {
+            Log.e(TAG, "Error evaluation expression " + localExpression, e);
+        }
 
-        localContext.delete("current-values");
-
-        return array;
+        return null;
     }
 
     public boolean existsExpression(String expression, JSONObject instance) throws JSONException {

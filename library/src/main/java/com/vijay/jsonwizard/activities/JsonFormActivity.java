@@ -27,6 +27,7 @@ import com.vijay.jsonwizard.fragments.JsonFormFragment;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.JsonApi;
 import com.vijay.jsonwizard.state.StateProvider;
+import com.vijay.jsonwizard.utils.ExpressionResolverContextUtils;
 import com.vijay.jsonwizard.utils.JsonFormUtils;
 import com.vijay.jsonwizard.utils.PropertiesUtils;
 
@@ -165,7 +166,7 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
     //TODO: Support for edit_group
     private JSONObject applyTemplateForStep(String name, JSONObject step) throws JSONException {
 
-        JSONObject template = findTemplateForStep(step);
+        JSONObject template = findTemplateForStep(name, step);
         //Perform a deep copy of the original template and merge with step
         JSONObject newStep = new JSONObject(template.toString());
         if (step.has("next")) {
@@ -264,10 +265,33 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
         return null;
     }
 
-    private JSONObject findTemplateForStep(JSONObject step) throws JSONException {
-        String templateName = step.getString("template");
-        JSONObject templates = mJSONObject.getJSONObject("templates");
-        return templates.getJSONObject(templateName);
+    private JSONObject findTemplateForStep(String stepName, JSONObject step) throws JSONException {
+        JSONObject template = null;
+
+        String templateNameOrExpression = step.getString("template");
+        JsonExpressionResolver resolver = getExpressionResolver();
+        if (resolver != null && resolver.isValidExpression(templateNameOrExpression)) {
+            JSONObject currentValues = ExpressionResolverContextUtils.getCurrentValues(this, stepName);
+            template = resolver.resolveAsObject(templateNameOrExpression, currentValues);
+            if (template == null) {
+                // try as literal
+                String templateName = resolver.resolveAsString(templateNameOrExpression, currentValues);
+                template = findLocalTemplateForStep(templateName);
+            }
+        } else {
+            template = findLocalTemplateForStep(templateNameOrExpression);
+        }
+        return template;
+    }
+
+    private JSONObject findLocalTemplateForStep(String stepName) throws JSONException {
+        if (mJSONObject.has("templates")) {
+            JSONObject templates = mJSONObject.getJSONObject("templates");
+            return templates.getJSONObject(stepName);
+        } else {
+            Log.e(TAG, "Template " + stepName + " could not be found in the form definition");
+            return null;
+        }
     }
 
     @Override
@@ -294,7 +318,7 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
             //TODO: rewrite previous search logic for a more elegant way. If found the code
             // never reaches the following line
             if (!found) {
-                JSONObject template = findTemplateForStep(jsonObject);
+                JSONObject template = findTemplateForStep(stepName, jsonObject);
                 String type = "edit-text";
                 if (template != null) {
                     //Remove stepName prefix form fieldKey
@@ -359,7 +383,7 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
             //TODO: rewrite previous search logic for a more elegant way. If found the code
             // never reaches the following line
             if (!found) {
-                JSONObject template = findTemplateForStep(jsonObject);
+                JSONObject template = findTemplateForStep(stepName, jsonObject);
                 String type = "edit-text";
                 if (template != null) {
                     //Remove stepName prefix form fieldKey

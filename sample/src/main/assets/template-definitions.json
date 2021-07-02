@@ -1,0 +1,45 @@
+{
+  "ext-template1": {
+    "fields": [
+      {
+        "key": "checkData",
+        "type": "check_box",
+        "label": "Select multiple preferences",
+        "options": [
+          {
+            "key": "awesomeness",
+            "text": "Are you willing for some awesomeness?",
+            "value": "false"
+          },
+          {
+            "key": "newsletter",
+            "text": "Do you really want to opt out from my newsletter?",
+            "value": "false"
+          }
+        ]
+      },
+      {
+        "key": "radioData",
+        "type": "radio",
+        "label": "${step1.radioData}",
+        "orientation": "vertical",
+        "options": [
+          {
+            "key": "areYouPro",
+            "text": "Are you pro?"
+          },
+          {
+            "key": "areYouAmature",
+            "text": "Are you amature?"
+          },
+          {
+            "key": "areYouNovice",
+            "text": "Are you novice?"
+          }
+        ],
+        "value": "areYouPro"
+      }
+    ],
+    "title": "${form.title}"
+  }
+}
