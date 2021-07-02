@@ -167,11 +167,10 @@ public class JsonExpressionResolver {
             JSONArray array = localContext.read(localExpression);
             localContext.delete("current-values");
             return array;
-        } catch (JsonPathException e) {
-            Log.e(TAG, "Error evaluation expression " + localExpression, e);
+        } catch (Exception e) {
+            Log.w("JsonExpression", "Could not resolve expression: " + localExpression, e);
+            return null;
         }
-
-        return null;
     }
 
     public boolean existsExpression(String expression, JSONObject instance) throws JSONException {

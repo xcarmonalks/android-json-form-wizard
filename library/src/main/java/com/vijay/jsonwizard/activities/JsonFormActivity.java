@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.gu.toolargetool.TooLargeTool;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.demo.resources.AssetsResourceResolver;
@@ -45,6 +46,8 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
 
     private static final String TAG = "JsonFormActivity";
 
+    private static final String PROP_HISTORY = "_history";
+
     private Toolbar mToolbar;
 
     private JSONObject mJSONObject;
@@ -55,6 +58,7 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
     private ExternalContentResolver mContentResolver;
     private String externalContentResolverClass;
     private String resourceResolverClass;
+    private boolean mTrackHistory;
 
     public void init(String json, Integer visualizationMode, String externalContentResolverClass,
                      String resourceResolverClass) {
@@ -87,6 +91,7 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        TooLargeTool.startLogging(this.getApplication());
         configureInputMethod();
         configureOrientation();
         initialize();
@@ -101,6 +106,7 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
 
     protected void createFragments(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
+            mTrackHistory = getIntent().getBooleanExtra(JsonFormConstants.EXTRA_TRACK_HISTORY, false);
             String contentResolver = getIntent().getStringExtra("resolver");
             String resourceResolver = getIntent().getStringExtra("resourceResolver");
             String formJson = getIntent().getStringExtra("json");
@@ -137,6 +143,7 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
                 }
             }
         } else {
+            mTrackHistory = savedInstanceState.getBoolean("trackHistory");
             init(savedInstanceState.getString("jsonState"),
                     savedInstanceState.getInt(JsonFormConstants.VISUALIZATION_MODE_EXTRA),
                     savedInstanceState.getString("resolver"), savedInstanceState.getString("resourceResolver"));
@@ -366,7 +373,9 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
                         JSONObject innerItem = jsonArray.getJSONObject(j);
                         String anotherKeyAtIndex = innerItem.getString("key");
                         if (childKey.equals(anotherKeyAtIndex)) {
-                            innerItem.put("value", value);
+                            if (!TextUtils.isEmpty(value)) {
+                                innerItem.put("value", value);
+                            }
                             innerItemFound = true;
                             return;
                         }
@@ -428,10 +437,12 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if (mJSONObject != null) {
-            outState.putString("jsonState", mJSONObject.toString());
+            //outState.putString("jsonState", mJSONObject.toString());
+            JsonFormUtils.writeTempFormToDisk(this, mJSONObject.toString());
             outState.putInt(JsonFormConstants.VISUALIZATION_MODE_EXTRA, mVisualizationMode);
             outState.putString("resolver", externalContentResolverClass);
             outState.putString("resourceResolver", resourceResolverClass);
+            outState.putBoolean("trackHistory", mTrackHistory);
         }
     }
 
@@ -476,6 +487,42 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
     @Override
     public ExternalContentResolver getExternalContentResolver() {
         return mContentResolver;
+    }
+
+    @Override
+    public void historyPush(String stepName) throws JSONException {
+        if (!mTrackHistory) {
+            return;
+        }
+        synchronized (mJSONObject) {
+            JSONArray history = mJSONObject.optJSONArray(PROP_HISTORY);
+            if (history == null) {
+                history = new JSONArray();
+                mJSONObject.put(PROP_HISTORY, history);
+            }
+            JSONObject slice = new JSONObject();
+            slice.put("name", stepName);
+            JSONObject stepState = mJSONObject.optJSONObject(stepName);
+            if (stepState != null && stepState.has("fields")) {
+                slice.put("state", stepState.optJSONArray("fields"));
+            } else {
+                slice.put("state", stepState);
+            }
+            history.put(slice);
+        }
+    }
+
+    @Override
+    public void historyPop() {
+        if (!mTrackHistory) {
+            return;
+        }
+        synchronized (mJSONObject) {
+            JSONArray history = mJSONObject.optJSONArray(PROP_HISTORY);
+            if (history != null) {
+                history.remove(history.length() - 1);
+            }
+        }
     }
 
     private void configureInputMethod() {

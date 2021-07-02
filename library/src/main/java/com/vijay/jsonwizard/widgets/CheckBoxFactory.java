@@ -45,8 +45,8 @@ public class CheckBoxFactory implements FormWidgetFactory {
 
     @Override
     public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener,
-        JsonFormBundle bundle, JsonExpressionResolver resolver, ResourceResolver resourceResolver,
-        int visualizationMode) throws JSONException {
+                                       JsonFormBundle bundle, JsonExpressionResolver resolver, ResourceResolver resourceResolver,
+                                       int visualizationMode) throws JSONException {
         List<View> views = null;
         switch (visualizationMode) {
             case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY:
@@ -59,11 +59,11 @@ public class CheckBoxFactory implements FormWidgetFactory {
     }
 
     private List<View> getEditableViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener,
-        JsonFormBundle bundle, JsonExpressionResolver resolver) throws JSONException {
+                                                JsonFormBundle bundle, JsonExpressionResolver resolver) throws JSONException {
         List<View> views = new ArrayList<>(1);
         views.add(
-            getTextViewWith(context, 16, bundle.resolveKey(jsonObject.getString("label")), jsonObject.getString("key"),
-                jsonObject.getString("type"), getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0, 0), FONT_BOLD_PATH));
+                getTextViewWith(context, 16, bundle.resolveKey(jsonObject.getString("label")), jsonObject.getString("key"),
+                        jsonObject.getString("type"), getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0, 0), FONT_BOLD_PATH));
         JSONArray options = jsonObject.getJSONArray(JsonFormConstants.OPTIONS_FIELD_NAME);
         for (int i = 0; i < options.length(); i++) {
             JSONObject item = options.getJSONObject(i);
@@ -77,12 +77,19 @@ public class CheckBoxFactory implements FormWidgetFactory {
                 checkBox.setTextSize(16);
                 checkBox.setTypeface(Typeface.createFromAsset(context.getAssets(), FONT_REGULAR_PATH));
                 checkBox.setOnCheckedChangeListener(listener);
-                if (!TextUtils.isEmpty(item.optString("value"))) {
-                    checkBox.setChecked(item.optBoolean("value"));
+                final String value = item.optString("value");
+                if (!TextUtils.isEmpty(value)) {
+                    boolean checked;
+                    if (resolver.isValidExpression(value)) {
+                        checked = resolver.existsExpression(value, getCurrentValues(context, stepName));
+                    } else {
+                        checked = item.optBoolean("value");
+                    }
+                    checkBox.setChecked(checked);
                 }
                 if (i == options.length() - 1) {
                     checkBox.setLayoutParams(getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0,
-                        (int) context.getResources().getDimension(R.dimen.extra_bottom_margin)));
+                            (int) context.getResources().getDimension(R.dimen.extra_bottom_margin)));
                 }
                 views.add(checkBox);
             }
@@ -91,22 +98,31 @@ public class CheckBoxFactory implements FormWidgetFactory {
     }
 
     private List<View> getReadOnlyViewsFromJson(String stepName, Context context, JSONObject jsonObject, JsonFormBundle bundle,
-        JsonExpressionResolver resolver) throws JSONException {
+                                                JsonExpressionResolver resolver) throws JSONException {
         List<View> views = new ArrayList<>(1);
         views.add(
-            getTextViewWith(context, 16, bundle.resolveKey(jsonObject.getString("label")), jsonObject.getString("key"),
-                jsonObject.getString("type"), getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0,
-                    (int) context.getResources().getDimension(R.dimen.extra_bottom_margin)), FONT_BOLD_PATH));
+                getTextViewWith(context, 16, bundle.resolveKey(jsonObject.getString("label")), jsonObject.getString("key"),
+                        jsonObject.getString("type"), getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0,
+                                (int) context.getResources().getDimension(R.dimen.extra_bottom_margin)), FONT_BOLD_PATH));
         JSONArray options = jsonObject.getJSONArray(JsonFormConstants.OPTIONS_FIELD_NAME);
         for (int i = 0; i < options.length(); i++) {
             JSONObject item = options.getJSONObject(i);
             if (isVisible(stepName, item, context, resolver)) {
-                if (!TextUtils.isEmpty(item.optString("value")) && item.optBoolean("value")) {
-                    views.add(
-                        getTextViewWith(context, 16, bundle.resolveKey(item.getString("text")), item.getString("key"),
-                            null, getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0,
-                                (int) context.getResources().getDimension(R.dimen.default_bottom_margin)),
-                            FONT_REGULAR_PATH));
+                final String value = item.optString("value");
+                if (!TextUtils.isEmpty(value)) {
+                    boolean checked;
+                    if (resolver.isValidExpression(value)) {
+                        checked = resolver.existsExpression(value, getCurrentValues(context, stepName));
+                    } else {
+                        checked = item.optBoolean("value");
+                    }
+                    if (checked) {
+                        views.add(
+                                getTextViewWith(context, 16, bundle.resolveKey(item.getString("text")), item.getString("key"),
+                                        null, getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0,
+                                                (int) context.getResources().getDimension(R.dimen.default_bottom_margin)),
+                                        FONT_REGULAR_PATH));
+                    }
                 }
             }
         }

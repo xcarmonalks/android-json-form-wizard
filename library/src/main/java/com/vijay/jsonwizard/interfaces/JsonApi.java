@@ -34,4 +34,9 @@ public interface JsonApi {
     ResourceResolver getResourceResolver();
 
     ExternalContentResolver getExternalContentResolver();
+
+    void historyPush(String stepName) throws JSONException;
+
+    void historyPop() throws JSONException;
+
 }

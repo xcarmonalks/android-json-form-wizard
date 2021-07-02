@@ -54,7 +54,7 @@ public class EditTextFactory implements FormWidgetFactory {
         List<View> views = null;
         switch (visualizationMode) {
             case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY:
-                views = getReadOnlyViewsFromJson(context, jsonObject, bundle);
+                views = getReadOnlyViewsFromJson(stepName, context, jsonObject, bundle, resolver);
                 break;
             default:
                 views = getEditableViewsFromJson(stepName, context, jsonObject, bundle, resolver);
@@ -76,7 +76,7 @@ public class EditTextFactory implements FormWidgetFactory {
         }
 
         if (readonly) {
-            return getReadOnlyViewsFromJson(context, jsonObject, bundle);
+            return getReadOnlyViewsFromJson(stepName, context, jsonObject, bundle, resolver);
         }
 
         int minLength;
@@ -97,7 +97,16 @@ public class EditTextFactory implements FormWidgetFactory {
             value = resolver.resolveAsString(value, currentValues);
         }
         if (!TextUtils.isEmpty(value)) {
-            editText.setText(value);
+            String resolvedValue;
+            if (resolver.isValidExpression(value)) {
+                resolvedValue = resolver.resolveAsString(value, getCurrentValues(context, stepName));
+                if (resolvedValue == null) {
+                    resolvedValue = "";
+                }
+            } else {
+                resolvedValue = value;
+            }
+            editText.setText(resolvedValue);
         }
 
         if (!TextUtils.isEmpty(jsonObject.optString("lines"))) {
@@ -200,7 +209,7 @@ public class EditTextFactory implements FormWidgetFactory {
         return views;
     }
 
-    private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject, JsonFormBundle bundle)
+    private List<View> getReadOnlyViewsFromJson(String stepName, Context context, JSONObject jsonObject, JsonFormBundle bundle, JsonExpressionResolver resolver)
             throws JSONException {
         List<View> views = new ArrayList<>(1);
         MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(R.layout.item_edit_text,
@@ -211,7 +220,19 @@ public class EditTextFactory implements FormWidgetFactory {
         editText.setFloatingLabelText(hint);
         editText.setTag(R.id.key, jsonObject.getString("key"));
         editText.setTag(R.id.type, jsonObject.getString("type"));
-        editText.setText(jsonObject.optString("value"));
+        final String value = jsonObject.optString("value");
+        if (!TextUtils.isEmpty(value)) {
+            String resolvedValue;
+            if (resolver.isValidExpression(value)) {
+                resolvedValue = resolver.resolveAsString(value, getCurrentValues(context, stepName));
+                if (resolvedValue == null) {
+                    resolvedValue = "";
+                }
+            } else {
+                resolvedValue = value;
+            }
+            editText.setText(resolvedValue);
+        }
 
         if (!TextUtils.isEmpty(jsonObject.optString("lines"))) {
             editText.setSingleLine(false);
@@ -220,6 +241,11 @@ public class EditTextFactory implements FormWidgetFactory {
         editText.setEnabled(false);
         views.add(editText);
         return views;
+    }
+
+    @Nullable
+    private JSONObject getCurrentValues(Context context, String stepName) throws JSONException {
+        return ExpressionResolverContextUtils.getCurrentValues(context, stepName);
     }
 
 }

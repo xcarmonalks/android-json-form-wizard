@@ -170,7 +170,16 @@ public class LocationPickerFactory implements FormWidgetFactory {
 
         final String value = jsonObject.optString("value");
         if (!TextUtils.isEmpty(value)) {
-            fillDefaultValue(parentView, etLatitude, etLongitude, etAccuracy, value);
+            String resolvedValue;
+            if (resolver.isValidExpression(value)) {
+                resolvedValue = resolver.resolveAsString(value, getCurrentValues(context, stepName));
+                if (resolvedValue == null) {
+                    resolvedValue = "";
+                }
+            } else {
+                resolvedValue = value;
+            }
+            fillDefaultValue(parentView, etLatitude, etLongitude, etAccuracy, resolvedValue);
             mapContainer.findViewById(R.id.map_placeholder).setVisibility(View.GONE);
         } else {
             mapContainer.findViewById(R.id.map_placeholder).setVisibility(View.VISIBLE);
@@ -282,7 +291,16 @@ public class LocationPickerFactory implements FormWidgetFactory {
         String value = jsonObject.optString("value");
 
         if (!TextUtils.isEmpty(value)) {
-            fillDefaultValue(parentView, etLatitude, etLongitude, etAccuracy, value);
+            String resolvedValue;
+            if (resolver.isValidExpression(value)) {
+                resolvedValue = resolver.resolveAsString(value, getCurrentValues(context, stepName));
+                if (resolvedValue == null) {
+                    resolvedValue = "";
+                }
+            } else {
+                resolvedValue = value;
+            }
+            fillDefaultValue(parentView, etLatitude, etLongitude, etAccuracy, resolvedValue);
         } else {
             mapContainer.setVisibility(View.GONE);
             FrameLayout containerParent = (FrameLayout) mapContainer.getParent();

@@ -24,11 +24,27 @@ public class JsonFormBundle {
     private static final String BUNDLE_DEFAULT_PROPERTY = "default";
 
     private final Map<String, String> mBundle;
+    private boolean twoLevelLocale;
+
 
     public JsonFormBundle(JSONObject form, Locale locale) throws JSONException {
         mBundle = new HashMap<>();
         if (form.has("bundle")) {
-            loadBundle(form.getJSONObject("bundle"), locale.getLanguage());
+            JSONObject bundle = form.getJSONObject("bundle");
+            twoLevelLocale = hasTwoLevelLocale(bundle);
+            loadBundle(form.getJSONObject("bundle"), getLocale(locale));
+        }
+    }
+
+    private boolean hasTwoLevelLocale(JSONObject bundle) {
+        return bundle.keys().next().contains("-");
+    }
+
+    private String getLocale(Locale locale) {
+        if(twoLevelLocale){
+            return locale.getLanguage()+"-"+locale.getCountry();
+        }else{
+            return locale.getLanguage();
         }
     }
 

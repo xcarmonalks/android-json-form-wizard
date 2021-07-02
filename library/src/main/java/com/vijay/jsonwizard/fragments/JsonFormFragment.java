@@ -176,7 +176,8 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
     }
 
     @Override
-    public void updateRelevantImageView(Bitmap bitmap, String imagePath, String currentKey) {
+    public void updateRelevantImageView(Bitmap bitmap, String imagePath, String currentKey,
+        String stepName) {
         int childCount = mMainView.getChildCount();
         for (int i = 0; i < childCount; i++) {
             View view = mMainView.getChildAt(i);
@@ -191,6 +192,7 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
                     imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
 
                     view.findViewById(R.id.btn_clear).setVisibility(VISIBLE);
+                    writeValue(stepName,key,imagePath);
                 }
             }
         }
@@ -452,6 +454,24 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
     @Override
     public ResourceResolver getResourceResolver() {
         return mJsonApi.getResourceResolver();
+    }
+
+    @Override
+    public void historyPush(String stepName) {
+        try {
+            mJsonApi.historyPush(stepName);
+        } catch (Exception e) {
+            Log.e(TAG, "Error popping history", e);
+        }
+    }
+
+    @Override
+    public void historyPop() {
+        try {
+            mJsonApi.historyPop();
+        } catch (Exception e) {
+            Log.e(TAG, "Error popping history", e);
+        }
     }
 
     @Override

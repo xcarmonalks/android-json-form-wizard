@@ -66,4 +66,17 @@ public class ResourceViewer {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         return intent;
     }
+
+    public static Intent getCustomUriIntent(Context context, Uri uri) {
+        Intent intent = context.getPackageManager().getLaunchIntentForPackage(uri.getHost());
+        if (intent != null) {
+            intent.setAction(uri.getLastPathSegment());
+            for (String extra : uri.getQueryParameterNames()) {
+                intent.putExtra(extra, uri.getQueryParameter(extra));
+            }
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        }
+        return intent;
+    }
+
 }

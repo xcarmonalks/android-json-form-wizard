@@ -61,7 +61,7 @@ public class ResourceViewerFactory implements FormWidgetFactory {
         }
 
         String resourcePath = resourceResolver.resolvePath(context, resource);
-        if (resourcePath != null && new File(resourcePath).exists()) {
+        if (resourcePath != null) {
             wrapper.setTag(R.id.value, resourcePath);
         } else {
             wrapper.setTag(R.id.value, resource);

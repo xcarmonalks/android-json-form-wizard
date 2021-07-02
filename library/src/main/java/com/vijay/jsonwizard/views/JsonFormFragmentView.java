@@ -52,7 +52,8 @@ public interface JsonFormFragmentView<VS extends ViewState> extends MvpView {
 
     void startActivityForResult(Intent intent, int requestCode);
 
-    void updateRelevantImageView(Bitmap bitmap, String imagePath, String currentKey);
+    void updateRelevantImageView(Bitmap bitmap, String imagePath, String currentKey,
+        String stepName);
 
     void updateRelevantEditText(String currentKey, String value);
 
@@ -81,4 +82,8 @@ public interface JsonFormFragmentView<VS extends ViewState> extends MvpView {
     JsonExpressionResolver getExpressionResolver();
 
     ResourceResolver getResourceResolver();
+
+    void historyPush(String stepName);
+
+    void historyPop();
 }
