@@ -33,6 +33,10 @@ public class WebViewActivity extends AppCompatActivity {
         }
 
         WebView webView = findViewById(R.id.webview);
+
+        webView.getSettings().setAllowFileAccess(true);
+        webView.getSettings().setAllowContentAccess(true);
+
         String url = getIntent().getStringExtra(EXTRA_RESOURCE);
         if (url.startsWith("http://") || url.startsWith("https://")) {
             webView.loadUrl(url);
