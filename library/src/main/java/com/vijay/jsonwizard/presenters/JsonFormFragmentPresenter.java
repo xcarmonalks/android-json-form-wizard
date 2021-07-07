@@ -93,6 +93,8 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
     private static final String PARAM_BARCODE = "barcode";
     private static final String PARAM_ERROR = "error";
     private static final Pattern URI_PATTERN = Pattern.compile("^\\w+:[^\\s]+$");
+    private static final Pattern INTENT_PATTERN = Pattern.compile("^intent:\\/\\/[^\\s]+\\/[^\\s|\\?]+(\\?([^\\s|=]+=[^\\s|&]+(&[^\\s|=]+=[^\\s|&]+)*)?)?$");
+
     private String mStepName;
     private JSONObject mStepDetails;
     private String mCurrentKey;
@@ -191,6 +193,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
     }
 
     public void onBackClick() {
+        getView().historyPop();
         getView().hideKeyBoard();
         getView().backClick();
     }
@@ -243,6 +246,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         try {
             ValidationStatus validationStatus = writeValuesAndValidate(mainView);
             if (validationStatus.isValid()) {
+                getView().historyPush(mStepName);
                 String nextStep = JsonFormUtils.resolveNextStep(mStepDetails, getView().getExpressionResolver(), new JSONObject(getView().getCurrentJsonState()));
                 if (JsonFormConstants.END_STEP_NAME.equals(nextStep)) {
                     onSaveClick(mainView);
@@ -417,6 +421,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
     public void onSaveClick(LinearLayout mainView) {
         ValidationStatus validationStatus = writeValuesAndValidate(mainView);
         if (validationStatus.isValid()) {
+            getView().historyPush(mStepName);
             Intent returnIntent = new Intent();
             String json = getView().getCurrentJsonState();
             // Avoid sending more than 200Kb as intent extra
@@ -440,7 +445,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
             if (bitmap != null) {
                 File image = new File(context.getExternalCacheDir(), System.currentTimeMillis() + ".jpg");
                 ImageUtils.saveToFile(bitmap, image);
-                getView().updateRelevantImageView(bitmap, image.getAbsolutePath(), mCurrentKey);
+                getView().updateRelevantImageView(bitmap, image.getAbsolutePath(), mCurrentKey,mStepName);
             }
         }
 
@@ -491,7 +496,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
             if (JsonFormConstants.CHOOSE_IMAGE.equals(type)) {
                 mCurrentKey = key;
                 if (v.getTag(R.id.btn_clear) != null) {
-                    getView().updateRelevantImageView(null, null, key);
+                    getView().updateRelevantImageView(null, null, key, mStepName);
                     v.setVisibility(View.GONE);
                 } else {
                     getView().hideKeyBoard();
@@ -549,6 +554,14 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                 // Attempt to launch open file intent
                 Intent intent = ResourceViewer.getOpenFileIntent(getView().getContext(), resource);
                 getView().startActivityForResult(intent, RESULT_RESOURCE_VIEW);
+            } else if (INTENT_PATTERN.matcher(resource).matches()) {
+                Uri uri = Uri.parse(resource);
+                Intent intent = ResourceViewer.getCustomUriIntent(v.getContext(), uri);
+                if (intent != null) {
+                    getView().startActivityForResult(intent, RESULT_RESOURCE_VIEW);
+                } else {
+                    Log.w(TAG, "Cannot launch intent: " + resource);
+                }
             } else if (URI_PATTERN.matcher(resource).matches()) {
                 Uri uri = Uri.parse(resource);
                 Intent intent = ResourceViewer.getOpenUriIntent(uri);

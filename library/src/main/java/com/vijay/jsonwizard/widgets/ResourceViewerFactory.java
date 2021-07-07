@@ -26,6 +26,7 @@ import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
 import com.vijay.jsonwizard.interfaces.JsonApi;
+import com.vijay.jsonwizard.utils.ExpressionResolverContextUtils;
 import com.vijay.jsonwizard.utils.JsonFormUtils;
 
 import org.json.JSONException;
@@ -55,12 +56,12 @@ public class ResourceViewerFactory implements FormWidgetFactory {
         // Load json data
         String resource = jsonObject.getString("resource");
         if (resolver.isValidExpression(resource)) {
-            JSONObject currentValues = getCurrentValues(context);
+            JSONObject currentValues = getCurrentValues(context, stepName);
             resource = resolver.resolveAsString(resource, currentValues);
         }
 
         String resourcePath = resourceResolver.resolvePath(context, resource);
-        if (resourcePath != null && new File(resourcePath).exists()) {
+        if (resourcePath != null) {
             wrapper.setTag(R.id.value, resourcePath);
         } else {
             wrapper.setTag(R.id.value, resource);
@@ -69,7 +70,7 @@ public class ResourceViewerFactory implements FormWidgetFactory {
         String iconPath = bundle.resolveKey(jsonObject.optString("icon"));
 
         if (resolver.isValidExpression(labelText)) {
-            JSONObject currentValues = getCurrentValues(context);
+            JSONObject currentValues = getCurrentValues(context, stepName);
             labelText = resolver.resolveAsString(labelText, currentValues);
         } else {
             labelText = bundle.resolveKey(labelText);
@@ -90,7 +91,7 @@ public class ResourceViewerFactory implements FormWidgetFactory {
                 String expression = jsonObject.optString("config");
                 JSONObject config;
                 if (resolver.isValidExpression(expression)) {
-                    JSONObject currentValues = getCurrentValues(context);
+                    JSONObject currentValues = getCurrentValues(context, stepName);
                     config = resolver.resolveAsObject(expression, currentValues);
                 } else {
                     config = jsonObject.getJSONObject("config");
@@ -195,14 +196,8 @@ public class ResourceViewerFactory implements FormWidgetFactory {
     }
 
     @Nullable
-    private JSONObject getCurrentValues(Context context) throws JSONException {
-        JSONObject currentValues = null;
-        if (context instanceof JsonApi) {
-            String currentJsonState = ((JsonApi) context).currentJsonState();
-            JSONObject currentJsonObject = new JSONObject(currentJsonState);
-            currentValues = JsonFormUtils.extractDataFromForm(currentJsonObject, false);
-        }
-        return currentValues;
+    private JSONObject getCurrentValues(Context context, String stepName) throws JSONException {
+        return ExpressionResolverContextUtils.getCurrentValues(context, stepName);
     }
 
     private float dpsToPx(Context context, int value) {

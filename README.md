@@ -400,6 +400,25 @@ and `icon_color` (android hex string).
 
 * **Note: `icon_color` only works if the icon has a proper alpha channel.**
 
+##### Custom intent support
+
+It may also support launching a custom intent, given a custom intent serialized as follows:
+
+`intent://<package>/<action>?<extra_name>=<extra_val>`
+
+Note, however, that extra values are limited to String values.
+
+e.g.
+
+```
+{
+    "key": "help",
+    "type": "resource_view",
+    "label": "Additional info",
+    "resource": "intent://com.google.android.apps.maps/android.intent.action.VIEW",
+}
+```
+
 #### I18n
 ##### Bundle definition
 ```json
@@ -614,6 +633,131 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 }
 ```
 
+### History management
+
+In some complex forms, it may be interesting to keep track of how the form was filled in each step.
+
+In this case, when launching the form, set the extra value `trackHistory`
+(you may use the constant in JsonFormConstants) to true.
+
+```java
+    Intent intent = new Intent(context, JsonFormActivity.class);
+    String json = "Your complete JSON";
+    intent.putExtra("json", json);
+    //Optional -- Configure screen orientation, inputMethod and visualizationMode
+    intent.putExtra(JsonFormConstants.EXTRA_TRACK_HISTORY, true);
+    startActivityForResult(intent, REQUEST_CODE_GET_JSON);
+```
+
+Launching the form with history tracking enabled will make the output json
+have an additional `_history` property with an array of every step and its state on exit.
+
+Sample output json with `trackHistory` enabled:
+
+```json
+{
+    "count":"3",
+    "step1":{
+        // -- snip
+    },
+    "step2":{
+        // -- snip
+    },
+    "step3":{
+        // -- snip
+    },
+    "_history": [
+        {
+            "name": "step1",
+            "state": [
+                 {
+                     "key":"name",
+                     "type":"edit_text",
+                     "hint":"Enter Your Name",
+                     "value":"Vijay"
+                 },
+                 {
+                     "key":"email",
+                     "type":"edit_text",
+                     "hint":"Enter Your Email",
+                     "value":"dummy@gmail.com"
+                 },
+                 {
+                     "key":"labelBackgroundImage",
+                     "type":"label",
+                     "text":"Choose Background Image"
+                 },
+                 {
+                     "key":"chooseImage",
+                     "type":"choose_image",
+                     "uploadButtonText":"Choose",
+                     "value":"\/storage\/emulated\/0\/Pictures\/Wally\/10017.png"
+                 }
+            ]
+        },
+        {
+            "name": "step2",
+            "state": [
+                 {
+                     "key":"name",
+                     "type":"edit_text",
+                     "hint":"Enter Country",
+                     "value":"India"
+                 },
+                 {
+                     "key":"checkData",
+                     "type":"check_box",
+                     "label":"Select multiple preferences",
+                     "options":[
+                         {
+                             "key":"awesomeness",
+                             "text":"Are you willing for some awesomeness?",
+                             "value":"true"
+                         },
+                         {
+                             "key":"newsletter",
+                             "text":"Do you really want to opt out from my newsletter?",
+                             "value":"false"
+                         }
+                     ]
+                 },
+                 {
+                     "key":"radioData",
+                     "type":"radio",
+                     "label":"Select one item from below",
+                     "options":[
+                         {
+                             "key":"areYouPro",
+                             "text":"Are you pro?"
+                         },
+                         {
+                             "key":"areYouAmature",
+                             "text":"Are you amature?"
+                         },
+                         {
+                             "key":"areYouNovice",
+                             "text":"Are you novice?"
+                         }
+                     ],
+                     "value":"areYouPro"
+                 }
+            ]
+        },
+        {
+            "name": "step3",
+            "state": [
+                 {
+                     "key":"anything",
+                     "type":"edit_text",
+                     "hint":"Enter Anything You Want",
+                     "value":"anything"
+                 }
+            ]
+        }
+    ],
+}
+```
+
 ## Output Json (of demo input json)
 
 ```json
@@ -750,6 +894,99 @@ with a receiver listening for event `jsonFormPaused`.
         }
     }
 ```
+
+# _WIP_ JsonPath support
+
+Some widgets support the usage of JsonPath expressions to show or condition values according to "current" form values, e.g.
+
+Conditionally compute whether to show next step:
+```json
+"next": {
+    "step2": "$.current-values[?(@.age=='12-19')]"
+}
+```
+
+Initialize a field value according to another value selected in a previous step:
+```json
+{
+    "key": "name2",
+    "type": "label",
+    "text": "$.current-values.name"
+}
+```
+
+Or load values from an external json, e.g.
+
+`assets/data-library.json`
+```json
+{
+    "books": [
+        {
+            "title": "Introduction to Programming",
+            "isbn": "95-9361-770-1"
+        },
+        {
+            "title": "Android for Dummies",
+            "isbn": "99-9050-667-1"
+        },
+        {
+            "title": "Machine Learning 101",
+            "isbn": "95-0168-964-6"
+        }
+    ]
+}
+```
+
+`form.json`
+```json
+{
+    "count": 1,
+    "step-1": {
+        "fields": [
+            {
+                "key": "book",
+                "type": "spinner",
+                "hint": "Choose a book",
+                "values": "@.data-library/books[*].isbn",
+                "labels": "@.data-library/books[*].title",
+            }
+        ]
+    }
+}
+```
+
+Currently, JsonPath expressions are computed for the following widgets/properties:
+- Label
+  - `text`: The expression should resolve to a string.
+- ExtendedLabel
+  - `text`: The expression should resolve to a string.
+  - `params`: Each of the param supports an expression which should resolve to a string.
+- EditText
+  - `readonly`, `v_required.value`: Checks for expression 'truthiness'.
+  - `value`: The expression should resolve to a single string.
+- Spinner
+  - `values`, `labels`: Should resolve to an array of strings.
+- RadioButton
+  - `options`: Should resolve to an array of strings.
+  - `value`: The expression should resolve to a string.
+- BarcodeText
+  - `readonly`, `v_required.value`: Checks for expression 'truthiness'.
+  - `value`: The expression should resolve to a single string.
+- Location
+  - `readonly`, `v_required.value`: Checks for expression 'truthiness'.
+  - `map_config`: Should resolve to a valid map config object.
+  - `value`: The expression should resolve to a valid location string.
+- Carousel
+  - `values`, `images`: Should resolve to a string array.
+- CheckBox
+  - `show`: Checks for 'truthiness'.
+  - `value`: Checks for 'truthiness' to set the default checked state.
+- TimePicker
+  - `v_required.value`: Checks for expression 'truthiness'.
+- ResourceViewer
+  - `label`, `resource`: Should resolve to a single string value.
+  - `config`: Should resolve to a valid config object.
+
 
 # Including in your project
 

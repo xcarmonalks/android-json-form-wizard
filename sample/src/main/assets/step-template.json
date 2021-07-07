@@ -1,0 +1,106 @@
+{
+  "count": "2",
+  "step1": {
+    "template": "template0",
+    "template_params": {
+      "address": "a constant"
+    },
+    "title": "First step",
+    "next": "step2"
+  },
+  "step2": {
+    "template": "@.template-definitions/$.ext-template1",
+    "next": "step3"
+  },
+  "step3": {
+    "template": "template0",
+    "template_params": {
+      "address": "$.current-values.step1_address"
+    }
+  },
+  "templates": {
+    "template0": {
+      "fields": [
+        {
+          "key": "installation-code",
+          "type": "edit_text",
+          "hint": "${installation-code.hint}",
+          "edit_type": "number",
+          "readonly": "false"
+        },
+        {
+          "key": "address",
+          "type": "edit_text",
+          "hint": "${address.hint}",
+          "value": "$.current-values.template_params.address",
+          "readonly": "false",
+          "lines": 4
+        },
+        {
+          "key": "age",
+          "type": "spinner",
+          "hint": "Give Thy Age",
+          "values": [
+            "5-12",
+            "12-19",
+            ">20"
+          ],
+          "labels": [
+            "Child",
+            "Teen",
+            "Adult"
+          ],
+          "v_required": {
+            "value": "true",
+            "err": "Please choose a value to proceed."
+          },
+          "value": "12-19"
+        }
+      ],
+      "title": "${form.title}"
+    },
+    "template1": {
+      "fields": [
+        {
+          "key": "checkData",
+          "type": "check_box",
+          "label": "Select multiple preferences",
+          "options": [
+            {
+              "key": "awesomeness",
+              "text": "Are you willing for some awesomeness?",
+              "value": "false"
+            },
+            {
+              "key": "newsletter",
+              "text": "Do you really want to opt out from my newsletter?",
+              "value": "false"
+            }
+          ]
+        },
+        {
+          "key": "radioData",
+          "type": "radio",
+          "label": "${step1.radioData}",
+          "orientation": "vertical",
+          "options": [
+            {
+              "key": "areYouPro",
+              "text": "Are you pro?"
+            },
+            {
+              "key": "areYouAmature",
+              "text": "Are you amature?"
+            },
+            {
+              "key": "areYouNovice",
+              "text": "Are you novice?"
+            }
+          ],
+          "value": "areYouPro"
+        }
+      ],
+      "title": "${form.title}"
+    }
+  }
+}

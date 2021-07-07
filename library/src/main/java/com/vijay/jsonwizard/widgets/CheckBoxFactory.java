@@ -26,6 +26,7 @@ import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
 import com.vijay.jsonwizard.interfaces.JsonApi;
+import com.vijay.jsonwizard.utils.ExpressionResolverContextUtils;
 import com.vijay.jsonwizard.utils.JsonFormUtils;
 
 import org.json.JSONArray;
@@ -44,29 +45,29 @@ public class CheckBoxFactory implements FormWidgetFactory {
 
     @Override
     public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener,
-        JsonFormBundle bundle, JsonExpressionResolver resolver, ResourceResolver resourceResolver,
-        int visualizationMode) throws JSONException {
+                                       JsonFormBundle bundle, JsonExpressionResolver resolver, ResourceResolver resourceResolver,
+                                       int visualizationMode) throws JSONException {
         List<View> views = null;
         switch (visualizationMode) {
             case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY:
-                views = getReadOnlyViewsFromJson(context, jsonObject, bundle, resolver);
+                views = getReadOnlyViewsFromJson(stepName, context, jsonObject, bundle, resolver);
                 break;
             default:
-                views = getEditableViewsFromJson(context, jsonObject, listener, bundle, resolver);
+                views = getEditableViewsFromJson(stepName, context, jsonObject, listener, bundle, resolver);
         }
         return views;
     }
 
-    private List<View> getEditableViewsFromJson(Context context, JSONObject jsonObject, CommonListener listener,
-        JsonFormBundle bundle, JsonExpressionResolver resolver) throws JSONException {
+    private List<View> getEditableViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener,
+                                                JsonFormBundle bundle, JsonExpressionResolver resolver) throws JSONException {
         List<View> views = new ArrayList<>(1);
         views.add(
-            getTextViewWith(context, 16, bundle.resolveKey(jsonObject.getString("label")), jsonObject.getString("key"),
-                jsonObject.getString("type"), getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0, 0), FONT_BOLD_PATH));
+                getTextViewWith(context, 16, bundle.resolveKey(jsonObject.getString("label")), jsonObject.getString("key"),
+                        jsonObject.getString("type"), getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0, 0), FONT_BOLD_PATH));
         JSONArray options = jsonObject.getJSONArray(JsonFormConstants.OPTIONS_FIELD_NAME);
         for (int i = 0; i < options.length(); i++) {
             JSONObject item = options.getJSONObject(i);
-            if (isVisible(item, context, resolver)) {
+            if (isVisible(stepName, item, context, resolver)) {
                 CheckBox checkBox = (CheckBox) LayoutInflater.from(context).inflate(R.layout.item_checkbox, null);
                 checkBox.setText(bundle.resolveKey(item.getString("text")));
                 checkBox.setTag(R.id.key, jsonObject.getString("key"));
@@ -76,12 +77,19 @@ public class CheckBoxFactory implements FormWidgetFactory {
                 checkBox.setTextSize(16);
                 checkBox.setTypeface(Typeface.createFromAsset(context.getAssets(), FONT_REGULAR_PATH));
                 checkBox.setOnCheckedChangeListener(listener);
-                if (!TextUtils.isEmpty(item.optString("value"))) {
-                    checkBox.setChecked(item.optBoolean("value"));
+                final String value = item.optString("value");
+                if (!TextUtils.isEmpty(value)) {
+                    boolean checked;
+                    if (resolver.isValidExpression(value)) {
+                        checked = resolver.existsExpression(value, getCurrentValues(context, stepName));
+                    } else {
+                        checked = item.optBoolean("value");
+                    }
+                    checkBox.setChecked(checked);
                 }
                 if (i == options.length() - 1) {
                     checkBox.setLayoutParams(getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0,
-                        (int) context.getResources().getDimension(R.dimen.extra_bottom_margin)));
+                            (int) context.getResources().getDimension(R.dimen.extra_bottom_margin)));
                 }
                 views.add(checkBox);
             }
@@ -89,30 +97,39 @@ public class CheckBoxFactory implements FormWidgetFactory {
         return views;
     }
 
-    private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject, JsonFormBundle bundle,
-        JsonExpressionResolver resolver) throws JSONException {
+    private List<View> getReadOnlyViewsFromJson(String stepName, Context context, JSONObject jsonObject, JsonFormBundle bundle,
+                                                JsonExpressionResolver resolver) throws JSONException {
         List<View> views = new ArrayList<>(1);
         views.add(
-            getTextViewWith(context, 16, bundle.resolveKey(jsonObject.getString("label")), jsonObject.getString("key"),
-                jsonObject.getString("type"), getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0,
-                    (int) context.getResources().getDimension(R.dimen.extra_bottom_margin)), FONT_BOLD_PATH));
+                getTextViewWith(context, 16, bundle.resolveKey(jsonObject.getString("label")), jsonObject.getString("key"),
+                        jsonObject.getString("type"), getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0,
+                                (int) context.getResources().getDimension(R.dimen.extra_bottom_margin)), FONT_BOLD_PATH));
         JSONArray options = jsonObject.getJSONArray(JsonFormConstants.OPTIONS_FIELD_NAME);
         for (int i = 0; i < options.length(); i++) {
             JSONObject item = options.getJSONObject(i);
-            if (isVisible(item, context, resolver)) {
-                if (!TextUtils.isEmpty(item.optString("value")) && item.optBoolean("value")) {
-                    views.add(
-                        getTextViewWith(context, 16, bundle.resolveKey(item.getString("text")), item.getString("key"),
-                            null, getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0,
-                                (int) context.getResources().getDimension(R.dimen.default_bottom_margin)),
-                            FONT_REGULAR_PATH));
+            if (isVisible(stepName, item, context, resolver)) {
+                final String value = item.optString("value");
+                if (!TextUtils.isEmpty(value)) {
+                    boolean checked;
+                    if (resolver.isValidExpression(value)) {
+                        checked = resolver.existsExpression(value, getCurrentValues(context, stepName));
+                    } else {
+                        checked = item.optBoolean("value");
+                    }
+                    if (checked) {
+                        views.add(
+                                getTextViewWith(context, 16, bundle.resolveKey(item.getString("text")), item.getString("key"),
+                                        null, getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0,
+                                                (int) context.getResources().getDimension(R.dimen.default_bottom_margin)),
+                                        FONT_REGULAR_PATH));
+                    }
                 }
             }
         }
         return views;
     }
 
-    private boolean isVisible(JSONObject jsonObject, Context context, JsonExpressionResolver resolver) {
+    private boolean isVisible(String stepName, JSONObject jsonObject, Context context, JsonExpressionResolver resolver) {
 
         final String showExpression = jsonObject.optString("show");
         if (TextUtils.isEmpty(showExpression)) {
@@ -120,7 +137,7 @@ public class CheckBoxFactory implements FormWidgetFactory {
         }
         if (resolver.isValidExpression(showExpression)) {
             try {
-                JSONObject currentValues = getCurrentValues(context);
+                JSONObject currentValues = getCurrentValues(context, stepName);
                 return resolver.existsExpression(showExpression, currentValues);
             } catch (JSONException e) {
                 Log.e(TAG, "isVisible: Error evaluating expression " + showExpression, e);
@@ -132,13 +149,7 @@ public class CheckBoxFactory implements FormWidgetFactory {
     }
 
     @Nullable
-    private JSONObject getCurrentValues(Context context) throws JSONException {
-        JSONObject currentValues = null;
-        if (context instanceof JsonApi) {
-            String currentJsonState = ((JsonApi) context).currentJsonState();
-            JSONObject currentJsonObject = new JSONObject(currentJsonState);
-            currentValues = JsonFormUtils.extractDataFromForm(currentJsonObject, false);
-        }
-        return currentValues;
+    private JSONObject getCurrentValues(Context context, String stepName) throws JSONException {
+        return ExpressionResolverContextUtils.getCurrentValues(context, stepName);
     }
 }

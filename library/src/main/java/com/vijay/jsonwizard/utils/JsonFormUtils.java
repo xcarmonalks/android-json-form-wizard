@@ -1,5 +1,6 @@
 package com.vijay.jsonwizard.utils;
 
+import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -10,6 +11,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -63,6 +70,17 @@ public class JsonFormUtils {
                 if (field != null) {
                     return field;
                 }
+            }
+        }
+        return null;
+    }
+
+    public static JSONObject findFieldInJSON(JSONObject root, String key) throws JSONException {
+        JSONArray fields = root.getJSONArray("fields");
+        for (int i = 0; i < fields.length(); i++) {
+            JSONObject field = (JSONObject) fields.get(i);
+            if (field != null && field.has("key") && field.getString("key").equals(key)) {
+                return field;
             }
         }
         return null;
@@ -192,5 +210,40 @@ public class JsonFormUtils {
 
     public static JSONObject getCurrentValues(JSONObject currentJSON) throws JSONException {
         return JsonFormUtils.extractDataFromForm(currentJSON);
+    }
+
+    public static void writeTempFormToDisk(Context context,
+        String selectedForm){
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("tempform.txt", Context.MODE_PRIVATE));
+            outputStreamWriter.write(selectedForm);
+            outputStreamWriter.close();
+        } catch (IOException e) {
+            Log.e("IOExcep writeTempForm",""+e);
+        }
+    }
+
+    public static String readTempFormFromDisk(Context context) {
+        String form = "";
+        try {
+            InputStream inputStream = context.openFileInput("tempform.txt");
+            if ( inputStream != null ) {
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String receiveString = "";
+                StringBuilder stringBuilder = new StringBuilder();
+                while ( (receiveString = bufferedReader.readLine()) != null ) {
+                    stringBuilder.append("\n").append(receiveString);
+                }
+                inputStream.close();
+                form = stringBuilder.toString();
+            }
+        }
+        catch (FileNotFoundException e) {
+            Log.e("login activity", "File not found: " + e.toString());
+        } catch (IOException e) {
+            Log.e("login activity", "Can not read file: " + e.toString());
+        }
+        return form;
     }
 }

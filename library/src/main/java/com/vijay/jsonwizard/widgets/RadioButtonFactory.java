@@ -28,6 +28,7 @@ import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
 import com.vijay.jsonwizard.interfaces.JsonApi;
+import com.vijay.jsonwizard.utils.ExpressionResolverContextUtils;
 import com.vijay.jsonwizard.utils.JsonFormUtils;
 
 import org.json.JSONArray;
@@ -51,15 +52,15 @@ public class RadioButtonFactory implements FormWidgetFactory {
         List<View> views = null;
         switch (visualizationMode) {
             case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY:
-                views = getReadOnlyViewsFromJson(context, jsonObject, bundle);
+                views = getReadOnlyViewsFromJson(stepName, context, jsonObject, bundle, resolver);
                 break;
             default:
-                views = getEditableViewsFromJson(context, jsonObject, listener, bundle, resolver);
+                views = getEditableViewsFromJson(stepName, context, jsonObject, listener, bundle, resolver);
         }
         return views;
     }
 
-    private List<View> getEditableViewsFromJson(Context context, JSONObject jsonObject, CommonListener listener,
+    private List<View> getEditableViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener,
         JsonFormBundle bundle, JsonExpressionResolver resolver) throws JSONException {
         List<View> views = new ArrayList<>(1);
         views.add(
@@ -74,7 +75,7 @@ public class RadioButtonFactory implements FormWidgetFactory {
         JSONArray options = null;
         String valuesExpression = getValuesAsJsonExpression(jsonObject, resolver);
         if (valuesExpression != null) {
-            JSONObject currentValues = getCurrentValues(context);
+            JSONObject currentValues = getCurrentValues(context, stepName);
             options = resolver.resolveAsArray(valuesExpression, currentValues);
         } else {
             options = jsonObject.getJSONArray(JsonFormConstants.OPTIONS_FIELD_NAME);
@@ -84,6 +85,16 @@ public class RadioButtonFactory implements FormWidgetFactory {
         if (optionsLength > 0) {
             RadioGroup rg = new RadioGroup(context);
             rg.setOrientation(layoutOrientation);
+            final String value = jsonObject.optString("value");
+            String resolvedValue;
+            if (resolver.isValidExpression(value)) {
+                resolvedValue = resolver.resolveAsString(value, getCurrentValues(context, stepName));
+                if (resolvedValue == null) {
+                    resolvedValue = "";
+                }
+            } else {
+                resolvedValue = value;
+            }
             for (int i = 0; i < optionsLength; i++) {
                 JSONObject item = options.getJSONObject(i);
                 RadioButton radioButton = (RadioButton) LayoutInflater.from(context).inflate(R.layout.item_radiobutton,
@@ -97,8 +108,7 @@ public class RadioButtonFactory implements FormWidgetFactory {
                 radioButton.setTextSize(16);
                 radioButton.setTypeface(Typeface.createFromAsset(context.getAssets(), FONT_REGULAR_PATH));
                 radioButton.setOnCheckedChangeListener(listener);
-                if (!TextUtils.isEmpty(jsonObject.optString("value")) && jsonObject.optString("value").equals(
-                    item.getString("key"))) {
+                if (!TextUtils.isEmpty(resolvedValue) && resolvedValue.equals(item.getString("key"))) {
                     radioButton.setChecked(true);
                 }
                 radioButton.setLayoutParams(getLayoutParams(layoutWidth, WRAP_CONTENT, 0, 0, 0,
@@ -119,18 +129,12 @@ public class RadioButtonFactory implements FormWidgetFactory {
     }
 
     @Nullable
-    private JSONObject getCurrentValues(Context context) throws JSONException {
-        JSONObject currentValues = null;
-        if (context instanceof JsonApi) {
-            String currentJsonState = ((JsonApi) context).currentJsonState();
-            JSONObject currentJsonObject = new JSONObject(currentJsonState);
-            currentValues = JsonFormUtils.extractDataFromForm(currentJsonObject, false);
-        }
-        return currentValues;
+    private JSONObject getCurrentValues(Context context, String stepName) throws JSONException {
+        return ExpressionResolverContextUtils.getCurrentValues(context, stepName);
     }
 
 
-    private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject, JsonFormBundle bundle)
+    private List<View> getReadOnlyViewsFromJson(String stepName, Context context, JSONObject jsonObject, JsonFormBundle bundle, JsonExpressionResolver resolver)
         throws JSONException {
         List<View> views = new ArrayList<>(1);
         MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(R.layout.item_edit_text,
@@ -143,7 +147,16 @@ public class RadioButtonFactory implements FormWidgetFactory {
         editText.setTag(R.id.type, jsonObject.getString("type"));
 
         String value = jsonObject.optString("value");
-        editText.setText(resolveValueText(value, jsonObject, bundle));
+        String resolvedValue;
+        if (resolver.isValidExpression(value)) {
+            resolvedValue = resolver.resolveAsString(value, getCurrentValues(context, stepName));
+            if (resolvedValue == null) {
+                resolvedValue = "";
+            }
+        } else {
+            resolvedValue = value;
+        }
+        editText.setText(resolveValueText(resolvedValue, jsonObject, bundle));
         editText.setEnabled(false);
         views.add(editText);
         return views;
