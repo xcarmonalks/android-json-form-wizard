@@ -1006,7 +1006,7 @@ Step 2. Add the dependency in the form
 
 ```groovy
 dependencies {
-    compile 'com.github.IndabaConsultores:android-json-form-wizard:1.3.8'
+    compile 'com.github.IndabaConsultores:android-json-form-wizard:1.9.0'
 }
 ```
 
@@ -1027,7 +1027,7 @@ Step 2. Add the dependency in the form
 <dependency>
     <groupId>com.github.IndabaConsultores</groupId>
     <artifactId>android-json-form-wizard</artifactId>
-    <version>Tag</version>
+    <version>1.9.0</version>
 </dependency>
 ```
 
