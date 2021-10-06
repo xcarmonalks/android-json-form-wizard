@@ -15,7 +15,7 @@ public class WidgetFactoryRegistry {
     private static final Map<String, FormWidgetFactory> map = new HashMap<>();
 
     static {
-        map.put(JsonFormConstants.EDIT_TEXT, new EditTextFactory());
+        map.put(JsonFormConstants.EDIT_TEXT, new MaterialEditTextFactory());
         map.put(JsonFormConstants.LABEL, new LabelFactory());
         map.put(JsonFormConstants.CHECK_BOX, new CheckBoxFactory());
         map.put(JsonFormConstants.RADIO_BUTTON, new RadioButtonFactory());
