@@ -5,28 +5,27 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
-    <com.rengwuxian.materialedittext.MaterialEditText
-        android:id="@+id/edit_text"
+    <com.vijay.jsonwizard.customviews.MaterialTextInputLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/textField"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textSize="@dimen/default_text_size"
-        app:met_floatingLabel="highlight"
-        app:met_floatingLabelText=""
-        app:met_primaryColor="?colorAccent"
-        app:met_singleLineEllipsis="true"
-        app:met_typeface="font/Roboto-Regular.ttf"/>
-
-
-    <ImageView
-        android:id="@+id/icon"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_gravity="center_vertical"
-        android:layout_weight="0"
-        android:clickable="true"
-        android:paddingLeft="10dp"
-        android:src="@mipmap/barcode_scan_icon"/>
-
+        android:layout_marginTop="10dp"
+        android:orientation="vertical"
+        android:paddingTop="16dp"
+        app:errorEnabled="true"
+        app:endIconMode="custom"
+        app:endIconDrawable="@drawable/ic_barcode_scan_icon"
+        >
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:paddingTop="@dimen/floating_label_top_spacing"
+            android:paddingBottom="@dimen/floating_label_bottom_spacing"
+            android:textSize="@dimen/default_text_size"
+            android:fontFamily=""/>
+    </com.vijay.jsonwizard.customviews.MaterialTextInputLayout>
 
 </LinearLayout>

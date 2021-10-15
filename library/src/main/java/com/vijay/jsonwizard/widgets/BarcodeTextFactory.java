@@ -6,16 +6,20 @@ import android.text.TextUtils;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 
+import com.google.android.material.internal.CheckableImageButton;
+import com.google.android.material.textfield.TextInputEditText;
 import com.rengwuxian.materialedittext.MaterialEditText;
-import com.rengwuxian.materialedittext.validation.RegexpValidator;
+
 import com.rey.material.util.ViewUtil;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.customviews.GenericTextWatcher;
+import com.vijay.jsonwizard.customviews.MaterialTextInputLayout;
 import com.vijay.jsonwizard.demo.resources.ResourceResolver;
 import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
@@ -25,9 +29,10 @@ import com.vijay.jsonwizard.interfaces.JsonApi;
 import com.vijay.jsonwizard.utils.ExpressionResolverContextUtils;
 import com.vijay.jsonwizard.utils.JsonFormUtils;
 import com.vijay.jsonwizard.utils.ValidationStatus;
-import com.vijay.jsonwizard.validators.edittext.MaxLengthValidator;
-import com.vijay.jsonwizard.validators.edittext.MinLengthValidator;
-import com.vijay.jsonwizard.validators.edittext.RequiredValidator;
+import com.vijay.jsonwizard.validators.textinputlayout.MaxLengthValidator;
+import com.vijay.jsonwizard.validators.textinputlayout.MinLengthValidator;
+import com.vijay.jsonwizard.validators.textinputlayout.RequiredValidator;
+import com.vijay.jsonwizard.validators.textinputlayout.RegexpValidator;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,10 +42,10 @@ import java.util.List;
 
 public class BarcodeTextFactory implements FormWidgetFactory {
 
-    public static ValidationStatus validate(MaterialEditText editText) {
-        boolean validate = editText.validate();
+    public static ValidationStatus validate(MaterialTextInputLayout materialTextInputLayout) {
+        boolean validate = materialTextInputLayout.validate();
         if (!validate) {
-            return new ValidationStatus(false, editText.getError().toString());
+            return new ValidationStatus(false, materialTextInputLayout.getError().toString());
         }
         return new ValidationStatus(true, null);
     }
@@ -81,18 +86,22 @@ public class BarcodeTextFactory implements FormWidgetFactory {
         int maxLength;
         List<View> views = new ArrayList<>(1);
         View parentView = LayoutInflater.from(context).inflate(R.layout.item_barcode_edit_text, null);
-        final MaterialEditText editText = parentView.findViewById(R.id.edit_text);
+        final MaterialTextInputLayout textInputLayout = parentView.findViewById(R.id.textField);
+        final EditText editText = textInputLayout.getEditText();
         final String hint = bundle.resolveKey(jsonObject.getString("hint"));
-        editText.setHint(hint);
-        editText.setFloatingLabelText(hint);
-        editText.setId(ViewUtil.generateViewId());
+        textInputLayout.setHint(hint);
+
+        textInputLayout.setTag(R.id.key, jsonObject.getString("key"));
+        textInputLayout.setTag(R.id.type, jsonObject.getString("type"));
         editText.setTag(R.id.key, jsonObject.getString("key"));
         editText.setTag(R.id.type, jsonObject.getString("type"));
 
-        final ImageView imageView = parentView.findViewById(R.id.icon);
-        imageView.setOnClickListener(listener);
-        imageView.setTag(R.id.key, jsonObject.getString("key"));
-        imageView.setTag(R.id.type, jsonObject.getString("type"));
+        CheckableImageButton checkableImageButton = textInputLayout.findViewById(R.id.text_input_end_icon);
+        checkableImageButton.setId(ViewUtil.generateViewId());
+        checkableImageButton.setTag(R.id.key, jsonObject.getString("key"));
+        checkableImageButton.setTag(R.id.type, jsonObject.getString("type"));
+        textInputLayout.setEndIconOnClickListener(listener);
+
 
         final String value = jsonObject.optString("value");
         if (!TextUtils.isEmpty(value)) {
@@ -127,7 +136,7 @@ public class BarcodeTextFactory implements FormWidgetFactory {
                 }
 
                 if (required) {
-                    editText.addValidator(new RequiredValidator(bundle.resolveKey(requiredObject.getString("err"))));
+                    textInputLayout.addValidator(new RequiredValidator(bundle.resolveKey(requiredObject.getString("err"))));
                 }
             }
         }
@@ -137,9 +146,8 @@ public class BarcodeTextFactory implements FormWidgetFactory {
             String minLengthValue = minLengthObject.optString("value");
             if (!TextUtils.isEmpty(minLengthValue)) {
                 minLength = Integer.parseInt(minLengthValue);
-                editText.addValidator(new MinLengthValidator(bundle.resolveKey(minLengthObject.getString("err")),
-                    Integer.parseInt(minLengthValue)));
-                editText.setMinCharacters(minLength);
+                textInputLayout.addValidator(new MinLengthValidator(bundle.resolveKey(minLengthObject.getString("err")),
+                    minLength));
             }
         }
 
@@ -148,9 +156,8 @@ public class BarcodeTextFactory implements FormWidgetFactory {
             String maxLengthValue = maxLengthObject.optString("value");
             if (!TextUtils.isEmpty(maxLengthValue)) {
                 maxLength = Integer.parseInt(maxLengthValue);
-                editText.addValidator(new MaxLengthValidator(bundle.resolveKey(maxLengthObject.getString("err")),
-                    Integer.parseInt(maxLengthValue)));
-                editText.setMaxCharacters(maxLength);
+                textInputLayout.addValidator(new MaxLengthValidator(bundle.resolveKey(maxLengthObject.getString("err")),
+                    maxLength));
             }
         }
 
@@ -158,7 +165,7 @@ public class BarcodeTextFactory implements FormWidgetFactory {
         if (regexObject != null) {
             String regexValue = regexObject.optString("value");
             if (!TextUtils.isEmpty(regexValue)) {
-                editText.addValidator(new RegexpValidator(bundle.resolveKey(regexObject.getString("err")), regexValue));
+                textInputLayout.addValidator(new RegexpValidator(bundle.resolveKey(regexObject.getString("err")), regexValue));
             }
         }
 
@@ -167,7 +174,7 @@ public class BarcodeTextFactory implements FormWidgetFactory {
             String emailValue = emailObject.optString("value");
             if (!TextUtils.isEmpty(emailValue)) {
                 if (Boolean.TRUE.toString().equalsIgnoreCase(emailValue)) {
-                    editText.addValidator(new RegexpValidator(bundle.resolveKey(emailObject.getString("err")),
+                    textInputLayout.addValidator(new RegexpValidator(bundle.resolveKey(emailObject.getString("err")),
                         android.util.Patterns.EMAIL_ADDRESS.toString()));
                 }
             }
@@ -178,7 +185,7 @@ public class BarcodeTextFactory implements FormWidgetFactory {
             String urlValue = urlObject.optString("value");
             if (!TextUtils.isEmpty(urlValue)) {
                 if (Boolean.TRUE.toString().equalsIgnoreCase(urlValue)) {
-                    editText.addValidator(new RegexpValidator(bundle.resolveKey(urlObject.getString("err")),
+                    textInputLayout.addValidator(new RegexpValidator(bundle.resolveKey(urlObject.getString("err")),
                         Patterns.WEB_URL.toString()));
                 }
             }
@@ -189,7 +196,7 @@ public class BarcodeTextFactory implements FormWidgetFactory {
             String numericValue = numericObject.optString("value");
             if (!TextUtils.isEmpty(numericValue)) {
                 if (Boolean.TRUE.toString().equalsIgnoreCase(numericValue)) {
-                    editText.addValidator(
+                    textInputLayout.addValidator(
                         new RegexpValidator(bundle.resolveKey(numericObject.getString("err")), "[0-9]+"));
                 }
             }
@@ -212,13 +219,22 @@ public class BarcodeTextFactory implements FormWidgetFactory {
         throws JSONException {
         List<View> views = new ArrayList<>(1);
         View parentView = LayoutInflater.from(context).inflate(R.layout.item_barcode_edit_text, null);
-        final MaterialEditText editText = parentView.findViewById(R.id.edit_text);
+        final MaterialTextInputLayout textInputLayout = parentView.findViewById(R.id.textField);
+        final TextInputEditText editText = (TextInputEditText) textInputLayout.getEditText();
         editText.setId(ViewUtil.generateViewId());
         final String hint = bundle.resolveKey(jsonObject.getString("hint"));
-        editText.setHint(hint);
-        editText.setFloatingLabelText(hint);
+
+        textInputLayout.setHint(hint);
+        textInputLayout.setTag(R.id.key, jsonObject.getString("key"));
+        textInputLayout.setTag(R.id.type, jsonObject.getString("type"));
         editText.setTag(R.id.key, jsonObject.getString("key"));
         editText.setTag(R.id.type, jsonObject.getString("type"));
+
+        CheckableImageButton checkableImageButton = textInputLayout.findViewById(R.id.text_input_end_icon);
+        checkableImageButton.setId(ViewUtil.generateViewId());
+        checkableImageButton.setTag(R.id.key, jsonObject.getString("key"));
+        checkableImageButton.setTag(R.id.type, jsonObject.getString("type"));
+
         final String value = jsonObject.optString("value");
         if (!TextUtils.isEmpty(value)) {
             editText.setText(value);
@@ -239,11 +255,9 @@ public class BarcodeTextFactory implements FormWidgetFactory {
             editText.setLines(jsonObject.optInt("lines"));
         }
         editText.setEnabled(false);
-
-        final ImageView imageView = parentView.findViewById(R.id.icon);
-        imageView.setClickable(false);
-        imageView.setEnabled(false);
-        imageView.setVisibility(View.GONE);
+        textInputLayout.setHintTextColor(textInputLayout.getCounterTextColor());
+        textInputLayout.setEndIconVisible(false);
+        textInputLayout.setEndIconActivated(false);
 
         views.add(parentView);
         return views;
