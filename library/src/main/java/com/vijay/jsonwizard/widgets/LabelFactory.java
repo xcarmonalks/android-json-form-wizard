@@ -11,12 +11,11 @@ import android.text.Html;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
 
-import com.rengwuxian.materialedittext.MaterialEditText;
-import com.rey.material.util.ViewUtil;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.demo.resources.ResourceResolver;
 import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
@@ -84,12 +83,11 @@ public class LabelFactory implements FormWidgetFactory {
         throws JSONException {
         List<View> views = new ArrayList<>(1);
 
-        MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(R.layout.item_edit_text,
+        EditText editText = (EditText) LayoutInflater.from(context).inflate(R.layout.item_label,
             null);
-        editText.setId(ViewUtil.generateViewId());
+        editText.setId(View.generateViewId());
         final String hint = bundle.resolveKey(jsonObject.getString(HINT_FIELD));
         editText.setHint(hint);
-        editText.setFloatingLabelText(hint);
         editText.setTag(R.id.key, jsonObject.getString(KEY_FIELD));
         editText.setTag(R.id.type, jsonObject.getString(TYPE_FIELD));
 
