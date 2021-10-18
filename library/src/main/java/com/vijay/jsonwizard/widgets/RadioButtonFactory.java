@@ -13,6 +13,7 @@ import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.RadioGroup;
 
 import androidx.annotation.Nullable;
@@ -21,6 +22,7 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rey.material.util.ViewUtil;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
+import com.vijay.jsonwizard.customviews.MaterialTextInputLayout;
 import com.vijay.jsonwizard.customviews.RadioButton;
 import com.vijay.jsonwizard.demo.resources.ResourceResolver;
 import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
@@ -137,12 +139,13 @@ public class RadioButtonFactory implements FormWidgetFactory {
     private List<View> getReadOnlyViewsFromJson(String stepName, Context context, JSONObject jsonObject, JsonFormBundle bundle, JsonExpressionResolver resolver)
         throws JSONException {
         List<View> views = new ArrayList<>(1);
-        MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(R.layout.item_edit_text,
+        MaterialTextInputLayout materialTextInputLayout = (MaterialTextInputLayout) LayoutInflater.from(context).inflate(R.layout.item_material_edit_text,
             null);
+        EditText editText = materialTextInputLayout.getEditText();
+
         editText.setId(ViewUtil.generateViewId());
         final String label = bundle.resolveKey(jsonObject.getString("label"));
-        editText.setHint(label);
-        editText.setFloatingLabelText(label);
+        materialTextInputLayout.setHint(label);
         editText.setTag(R.id.key, jsonObject.getString("key"));
         editText.setTag(R.id.type, jsonObject.getString("type"));
 
@@ -158,7 +161,8 @@ public class RadioButtonFactory implements FormWidgetFactory {
         }
         editText.setText(resolveValueText(resolvedValue, jsonObject, bundle));
         editText.setEnabled(false);
-        views.add(editText);
+        materialTextInputLayout.setHintTextColor(materialTextInputLayout.getCounterTextColor());
+        views.add(materialTextInputLayout);
         return views;
     }
 
