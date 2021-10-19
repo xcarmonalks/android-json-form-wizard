@@ -18,7 +18,6 @@ import android.widget.RadioGroup;
 
 import androidx.annotation.Nullable;
 
-import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rey.material.util.ViewUtil;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;

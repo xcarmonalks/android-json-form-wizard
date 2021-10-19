@@ -5,11 +5,12 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.rengwuxian.materialedittext.MaterialEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.rey.material.util.ViewUtil;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
@@ -55,8 +56,8 @@ public class SpinnerFactory implements FormWidgetFactory {
 
     @Override
     public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener,
-        JsonFormBundle bundle, JsonExpressionResolver resolver, ResourceResolver resourceResolver,
-        int visualizationMode) throws JSONException {
+                                       JsonFormBundle bundle, JsonExpressionResolver resolver, ResourceResolver resourceResolver,
+                                       int visualizationMode) throws JSONException {
         List<View> views = null;
         switch (visualizationMode) {
             case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY:
@@ -69,7 +70,7 @@ public class SpinnerFactory implements FormWidgetFactory {
     }
 
     private List<View> getEditableViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener,
-        JsonFormBundle bundle, JsonExpressionResolver resolver) throws JSONException {
+                                                JsonFormBundle bundle, JsonExpressionResolver resolver) throws JSONException {
         List<View> views = new ArrayList<>(1);
         MaterialSpinner spinner = (MaterialSpinner) LayoutInflater.from(context).inflate(R.layout.item_spinner, null);
 
@@ -175,14 +176,17 @@ public class SpinnerFactory implements FormWidgetFactory {
     }
 
     private List<View> getReadOnlyViewsFromJson(String stepName, Context context, JSONObject jsonObject, JsonFormBundle bundle, JsonExpressionResolver resolver)
-        throws JSONException {
+            throws JSONException {
         List<View> views = new ArrayList<>(1);
-        MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(R.layout.item_edit_text,
-            null);
+        TextInputLayout textInputLayout = (TextInputLayout) LayoutInflater.from(context).inflate(R.layout.item_edit_text,
+                null);
+        EditText editText = textInputLayout.getEditText();
         editText.setId(ViewUtil.generateViewId());
         final String hint = jsonObject.getString("hint");
         editText.setHint(hint);
-        editText.setFloatingLabelText(hint);
+
+        textInputLayout.setTag(R.id.key, jsonObject.getString("key"));
+        textInputLayout.setTag(R.id.type, jsonObject.getString("type"));
         editText.setTag(R.id.key, jsonObject.getString("key"));
         editText.setTag(R.id.type, jsonObject.getString("type"));
 
@@ -205,7 +209,7 @@ public class SpinnerFactory implements FormWidgetFactory {
     }
 
     private JSONArray resolveOptJSONArray(String key, Context context, String stepName, JSONObject jsonObject,
-        JsonExpressionResolver resolver) throws JSONException {
+                                          JsonExpressionResolver resolver) throws JSONException {
 
         String jsonExpression = jsonObject.optString(key);
         JSONArray array;
