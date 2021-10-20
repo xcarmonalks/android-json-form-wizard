@@ -6,24 +6,22 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 
-import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rey.material.app.Dialog;
 import com.rey.material.app.TimePickerDialog;
-import com.rey.material.util.ViewUtil;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
+import com.vijay.jsonwizard.customviews.MaterialTextInputLayout;
 import com.vijay.jsonwizard.demo.resources.ResourceResolver;
 import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
-import com.vijay.jsonwizard.interfaces.JsonApi;
 import com.vijay.jsonwizard.utils.DateUtils;
 import com.vijay.jsonwizard.utils.ExpressionResolverContextUtils;
-import com.vijay.jsonwizard.utils.JsonFormUtils;
 import com.vijay.jsonwizard.utils.ValidationStatus;
-import com.vijay.jsonwizard.validators.edittext.RequiredValidator;
+import com.vijay.jsonwizard.validators.textinputlayout.RequiredValidator;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,10 +39,10 @@ public class TimePickerFactory implements FormWidgetFactory {
 
     private static final String TAG = "TimePickerFactory";
 
-    public static ValidationStatus validate(MaterialEditText editText) {
-        boolean validate = editText.validate();
+    public static ValidationStatus validate(MaterialTextInputLayout materialTextInputLayout) {
+        boolean validate = materialTextInputLayout.validate();
         if (!validate) {
-            return new ValidationStatus(false, editText.getError().toString());
+            return new ValidationStatus(false, materialTextInputLayout.getError().toString());
         }
         return new ValidationStatus(true, null);
     }
@@ -67,18 +65,20 @@ public class TimePickerFactory implements FormWidgetFactory {
     private List<View> getEditableViewsFromJson(String stepName, Context context, JSONObject jsonObject, JsonFormBundle bundle, JsonExpressionResolver resolver)
         throws JSONException {
         List<View> views = new ArrayList<>(1);
-        final MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(
-            R.layout.item_edit_text, null);
+        final MaterialTextInputLayout materialTextInputLayout = (MaterialTextInputLayout) LayoutInflater.from(context).inflate(
+                R.layout.item_material_edit_text, null);
+        final EditText editText = materialTextInputLayout.getEditText();
         final String hint = bundle.resolveKey(jsonObject.getString("hint"));
 
-        editText.setHint(hint);
-        editText.setFloatingLabelText(hint);
-        editText.setId(ViewUtil.generateViewId());
+        materialTextInputLayout.setHint(hint);
+        editText.setId(View.generateViewId());
+        materialTextInputLayout.setTag(R.id.key, jsonObject.getString("key"));
+        materialTextInputLayout.setTag(R.id.type, jsonObject.getString("type"));
         editText.setTag(R.id.key, jsonObject.getString("key"));
         editText.setTag(R.id.type, jsonObject.getString("type"));
         String widgetPattern = bundle.resolveKey(jsonObject.getString("pattern"));
         editText.setTag(R.id.v_pattern, bundle.resolveKey(jsonObject.getString("pattern")));
-
+        materialTextInputLayout.setTag(R.id.v_pattern, bundle.resolveKey(jsonObject.getString("pattern")));
 
         final String value = jsonObject.optString("value");
         if (!TextUtils.isEmpty(value)) {
@@ -105,34 +105,40 @@ public class TimePickerFactory implements FormWidgetFactory {
                 }
 
                 if (required) {
-                    editText.addValidator(new RequiredValidator(bundle.resolveKey(requiredObject.getString("err"))));
+                    materialTextInputLayout.addValidator(new RequiredValidator(bundle.resolveKey(requiredObject.getString("err"))));
                 }
             }
         }
 
-        TimePickerListener timePickerListener = new TimePickerListener(editText, widgetPattern);
+        TimePickerListener timePickerListener = new TimePickerListener(materialTextInputLayout, widgetPattern);
         editText.setOnFocusChangeListener(timePickerListener);
         editText.setOnClickListener(timePickerListener);
         editText.setInputType(InputType.TYPE_NULL);
 
-        views.add(editText);
+        views.add(materialTextInputLayout);
         return views;
     }
 
     private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject, JsonFormBundle bundle)
         throws JSONException {
         List<View> views = new ArrayList<>(1);
-        final MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(
+        final MaterialTextInputLayout textInputLayout = (MaterialTextInputLayout) LayoutInflater.from(context).inflate(
             R.layout.item_edit_text, null);
+        final EditText editText = textInputLayout.getEditText();
         final String hint = bundle.resolveKey(jsonObject.getString("hint"));
 
-        editText.setHint(hint);
-        editText.setFloatingLabelText(hint);
-        editText.setId(ViewUtil.generateViewId());
+        textInputLayout.setHint(hint);
+        textInputLayout.setId(View.generateViewId());
+        textInputLayout.setTag(R.id.key, jsonObject.getString("key"));
+        textInputLayout.setTag(R.id.type, jsonObject.getString("type"));
+        editText.setId(View.generateViewId());
         editText.setTag(R.id.key, jsonObject.getString("key"));
         editText.setTag(R.id.type, jsonObject.getString("type"));
+
         String widgetPattern = bundle.resolveKey(jsonObject.getString("pattern"));
+
         editText.setTag(R.id.v_pattern, widgetPattern);
+        textInputLayout.setTag(R.id.v_pattern, widgetPattern);
 
         final String value = jsonObject.optString("value");
         if (!TextUtils.isEmpty(value)) {
@@ -151,11 +157,11 @@ public class TimePickerFactory implements FormWidgetFactory {
     private class TimePickerListener implements View.OnFocusChangeListener, View.OnClickListener {
 
         private Dialog d;
-        private MaterialEditText timeText;
+        private MaterialTextInputLayout timeText;
         private String formatString;
 
-        public TimePickerListener(MaterialEditText editText, String formatString) {
-            this.timeText = editText;
+        public TimePickerListener(MaterialTextInputLayout materialTextInputLayout, String formatString) {
+            this.timeText = materialTextInputLayout;
             this.formatString = formatString;
         }
 
@@ -174,7 +180,7 @@ public class TimePickerFactory implements FormWidgetFactory {
         private void openTimePicker(View view) {
             int hour = 0;
             int minute = 0;
-            String timeStr = timeText.getText().toString();
+            String timeStr = timeText.getEditText().getText().toString();
             String pattern = (String) timeText.getTag(R.id.v_pattern);
             if (timeStr != null && !"".equals(timeStr)) {
                 try {
@@ -200,7 +206,7 @@ public class TimePickerFactory implements FormWidgetFactory {
             d.positiveActionClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    timeText.setText(((TimePickerDialog) d).getFormattedTime(new SimpleDateFormat(formatString)));
+                    timeText.getEditText().setText(((TimePickerDialog) d).getFormattedTime(new SimpleDateFormat(formatString)));
                     d.hide();
                 }
             });

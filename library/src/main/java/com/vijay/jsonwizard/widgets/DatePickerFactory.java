@@ -6,13 +6,14 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 
-import com.rengwuxian.materialedittext.MaterialEditText;
+import com.google.android.material.textfield.TextInputEditText;
 import com.rey.material.app.DatePickerDialog;
 import com.rey.material.app.Dialog;
-import com.rey.material.util.ViewUtil;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
+import com.vijay.jsonwizard.customviews.MaterialTextInputLayout;
 import com.vijay.jsonwizard.demo.resources.ResourceResolver;
 import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
@@ -39,18 +40,18 @@ public class DatePickerFactory implements FormWidgetFactory {
 
     private static final String TAG = "DatePickerFactory";
 
-    public static ValidationStatus validate(MaterialEditText editText) {
-        boolean validate = editText.validate();
+    public static ValidationStatus validate(MaterialTextInputLayout materialTextInputLayout) {
+        boolean validate = materialTextInputLayout.validate();
         if (!validate) {
-            return new ValidationStatus(false, editText.getError().toString());
+            return new ValidationStatus(false, materialTextInputLayout.getError().toString());
         }
         return new ValidationStatus(true, null);
     }
 
     @Override
     public List<View> getViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener,
-        JsonFormBundle bundle, JsonExpressionResolver resolver, ResourceResolver resourceResolver,
-        int visualizationMode) throws JSONException {
+                                       JsonFormBundle bundle, JsonExpressionResolver resolver, ResourceResolver resourceResolver,
+                                       int visualizationMode) throws JSONException {
         List<View> views = null;
         switch (visualizationMode) {
             case JsonFormConstants.VISUALIZATION_MODE_READ_ONLY:
@@ -63,17 +64,23 @@ public class DatePickerFactory implements FormWidgetFactory {
     }
 
     private List<View> getEditableViewsFromJson(Context context, JSONObject jsonObject, JsonFormBundle bundle)
-        throws JSONException {
+            throws JSONException {
         List<View> views = new ArrayList<>(1);
-        final MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(
-            R.layout.item_edit_text, null);
+        final MaterialTextInputLayout materialTextInputLayout = (MaterialTextInputLayout) LayoutInflater.from(context).inflate(
+                R.layout.item_material_edit_text, null);
+        final EditText editText = materialTextInputLayout.getEditText();
         final String hint = bundle.resolveKey(jsonObject.getString("hint"));
         final String minDate = jsonObject.optString("minDate");
         final String maxDate = jsonObject.optString("maxDate");
 
-        editText.setHint(hint);
-        editText.setFloatingLabelText(hint);
-        editText.setId(ViewUtil.generateViewId());
+        materialTextInputLayout.setHint(hint);
+        materialTextInputLayout.setId(View.generateViewId());
+        materialTextInputLayout.setTag(R.id.key, jsonObject.getString("key"));
+        materialTextInputLayout.setTag(R.id.type, jsonObject.getString("type"));
+        materialTextInputLayout.setTag(R.id.v_pattern, bundle.resolveKey(jsonObject.getString("pattern")));
+        materialTextInputLayout.setTag(R.id.minDate, minDate);
+        materialTextInputLayout.setTag(R.id.maxDate, maxDate);
+
         editText.setTag(R.id.key, jsonObject.getString("key"));
         editText.setTag(R.id.type, jsonObject.getString("type"));
         editText.setTag(R.id.v_pattern, bundle.resolveKey(jsonObject.getString("pattern")));
@@ -86,30 +93,34 @@ public class DatePickerFactory implements FormWidgetFactory {
             editText.setText(SimpleDateFormat.getInstance().format(date));
         }
 
-        DatePickerListener datePickerListener = new DatePickerListener(editText);
+        DatePickerListener datePickerListener = new DatePickerListener(materialTextInputLayout);
         editText.setOnFocusChangeListener(datePickerListener);
         editText.setOnClickListener(datePickerListener);
         editText.setInputType(InputType.TYPE_NULL);
 
-        views.add(editText);
+        views.add(materialTextInputLayout);
         return views;
     }
 
     private List<View> getReadOnlyViewsFromJson(Context context, JSONObject jsonObject, JsonFormBundle bundle)
-        throws JSONException {
+            throws JSONException {
         List<View> views = new ArrayList<>(1);
-        final MaterialEditText editText = (MaterialEditText) LayoutInflater.from(context).inflate(
-            R.layout.item_edit_text, null);
+        final MaterialTextInputLayout textInputLayout = (MaterialTextInputLayout) LayoutInflater.from(context).inflate(
+                R.layout.item_material_edit_text, null);
         final String hint = bundle.resolveKey(jsonObject.getString("hint"));
+        TextInputEditText editText = (TextInputEditText) textInputLayout.getEditText();
 
-        editText.setHint(hint);
-        editText.setFloatingLabelText(hint);
-        editText.setId(ViewUtil.generateViewId());
+        textInputLayout.setHint(hint);
+        editText.setId(View.generateViewId());
         editText.setTag(R.id.key, jsonObject.getString("key"));
         editText.setTag(R.id.type, jsonObject.getString("type"));
+        textInputLayout.setTag(R.id.key, jsonObject.getString("key"));
+        textInputLayout.setTag(R.id.type, jsonObject.getString("type"));
         String widgetPattern = bundle.resolveKey(jsonObject.getString("pattern"));
-        editText.setTag(R.id.v_pattern, widgetPattern);
 
+        editText.setTag(R.id.v_pattern, widgetPattern);
+        textInputLayout.setTag(R.id.v_pattern, widgetPattern);
+        
         final String value = jsonObject.optString("value");
         if (!TextUtils.isEmpty(value)) {
             Date date = DateUtils.parseJSONDate(value);
@@ -118,17 +129,17 @@ public class DatePickerFactory implements FormWidgetFactory {
         }
 
         editText.setEnabled(false);
-        views.add(editText);
+        views.add(textInputLayout);
         return views;
     }
 
     private class DatePickerListener implements View.OnFocusChangeListener, View.OnClickListener {
 
         private Dialog d;
-        private MaterialEditText dateText;
+        private MaterialTextInputLayout dateText;
 
-        public DatePickerListener(MaterialEditText editText) {
-            this.dateText = editText;
+        public DatePickerListener(MaterialTextInputLayout materialEditText) {
+            this.dateText = materialEditText;
         }
 
         @Override
@@ -145,7 +156,7 @@ public class DatePickerFactory implements FormWidgetFactory {
 
         private void openDatePicker(View view) {
             Date date = new Date();
-            String dateStr = dateText.getText().toString();
+            String dateStr = dateText.getEditText().getText().toString();
             if (dateStr != null && !"".equals(dateStr)) {
                 try {
                     date = SimpleDateFormat.getDateInstance().parse(dateStr);
@@ -161,7 +172,7 @@ public class DatePickerFactory implements FormWidgetFactory {
             Date maxDate = resolveDate(maxDateStr, pattern);
 
             DatePickerDialog.Builder builder = new DatePickerDialog.Builder(R.style.Material_App_Dialog_DatePicker)
-                .date(date.getTime());
+                    .date(date.getTime());
             if (minDate != null && maxDate != null) {
                 builder.dateRange(minDate.getTime(), maxDate.getTime());
             }
@@ -171,7 +182,7 @@ public class DatePickerFactory implements FormWidgetFactory {
                 @Override
                 public void onClick(View view) {
                     Date date = new Date(((DatePickerDialog) d).getDate());
-                    dateText.setText(DateUtils.formatDate(date, (String) dateText.getTag(R.id.v_pattern)));
+                    dateText.getEditText().setText(DateUtils.formatDate(date, (String) dateText.getTag(R.id.v_pattern)));
                     d.hide();
                 }
             });

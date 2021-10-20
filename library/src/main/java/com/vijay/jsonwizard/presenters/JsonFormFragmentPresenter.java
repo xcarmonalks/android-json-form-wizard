@@ -289,21 +289,6 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                     } else {
                         getView().writeValue(mStepName, key, editText.getText().toString());
                     }
-                } else if (editText.getTag(R.id.type).equals(JsonFormConstants.DATE_PICKER)) {
-                    ValidationStatus validationStatus = DatePickerFactory.validate(editText);
-                    if (!validationStatus.isValid()) {
-                        return validationStatus;
-                    }
-                    Date date = DateUtils.parseDate(editText.getText().toString(),
-                            (String) editText.getTag(R.id.v_pattern));
-                    if (JsonFormConstants.EDIT_GROUP.equals(type)) {
-                        String parentKey = (String) childAt.getTag(R.id.key);
-                        String childKey = (String) childAt.getTag(R.id.childKey);
-                        getView().writeValue(mStepName, parentKey, JsonFormConstants.FIELDS_FIELD_NAME, childKey,
-                                DateUtils.toJSONDateFormat(date));
-                    } else {
-                        getView().writeValue(mStepName, key, DateUtils.toJSONDateFormat(date));
-                    }
                 } else if (editText.getTag(R.id.type).equals(JsonFormConstants.TIME_PICKER)) {
                     ValidationStatus validationStatus = EditTextFactory.validate(editText);
                     if (!validationStatus.isValid()) {
@@ -373,12 +358,40 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                         getView().writeValue(mStepName, key, editText.getText().toString());
                     }
 
-                }else if(editText.getTag(R.id.type).equals(JsonFormConstants.BARCODE_TEXT)){
+                } else if(editText.getTag(R.id.type).equals(JsonFormConstants.BARCODE_TEXT)){
                     ValidationStatus validationStatus = BarcodeTextFactory.validate(textInputLayout);
                     if(!validationStatus.isValid()){
                         return validationStatus;
                     }
-
+                    if (JsonFormConstants.EDIT_GROUP.equals(type)) {
+                        String parentKey = (String) mainView.getTag(R.id.key);
+                        String childKey = (String) childAt.getTag(R.id.key);
+                        getView().writeValue(mStepName, parentKey, JsonFormConstants.FIELDS_FIELD_NAME, childKey,
+                                editText.getText().toString());
+                    } else {
+                        getView().writeValue(mStepName, key, editText.getText().toString());
+                    }
+                } else if (editText.getTag(R.id.type).equals(JsonFormConstants.DATE_PICKER)) {
+                    editText = textInputLayout.getEditText();
+                    ValidationStatus validationStatus = DatePickerFactory.validate(textInputLayout);
+                    if (!validationStatus.isValid()) {
+                        return validationStatus;
+                    }
+                    Date date = DateUtils.parseDate(editText.getText().toString(),
+                            (String) editText.getTag(R.id.v_pattern));
+                    if (JsonFormConstants.EDIT_GROUP.equals(type)) {
+                        String parentKey = (String) childAt.getTag(R.id.key);
+                        String childKey = (String) childAt.getTag(R.id.childKey);
+                        getView().writeValue(mStepName, parentKey, JsonFormConstants.FIELDS_FIELD_NAME, childKey,
+                                DateUtils.toJSONDateFormat(date));
+                    } else {
+                        getView().writeValue(mStepName, key, DateUtils.toJSONDateFormat(date));
+                    }
+                }  else if (editText.getTag(R.id.type).equals(JsonFormConstants.TIME_PICKER)) {
+                    ValidationStatus validationStatus = MaterialEditTextFactory.validate(textInputLayout);
+                    if (!validationStatus.isValid()) {
+                        return validationStatus;
+                    }
                     if (JsonFormConstants.EDIT_GROUP.equals(type)) {
                         String parentKey = (String) mainView.getTag(R.id.key);
                         String childKey = (String) childAt.getTag(R.id.key);
@@ -388,8 +401,6 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                         getView().writeValue(mStepName, key, editText.getText().toString());
                     }
                 }
-
-
             } else if (childAt instanceof LinearLayout) {
                 if (JsonFormConstants.LOCATION_PICKER.equals(childAt.getTag(R.id.type))) {
                     ValidationStatus validationStatus = writeValuesAndValidateLocationPicker((LinearLayout) childAt, key);
