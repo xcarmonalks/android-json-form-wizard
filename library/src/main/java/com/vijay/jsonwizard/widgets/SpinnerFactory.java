@@ -5,15 +5,19 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.android.material.textfield.MaterialAutoCompleteTextView;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.rey.material.util.ViewUtil;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
+import com.vijay.jsonwizard.customviews.MaterialTextInputLayout;
 import com.vijay.jsonwizard.demo.resources.ResourceResolver;
 import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
@@ -39,7 +43,7 @@ import fr.ganfra.materialspinner.MaterialSpinner;
  */
 public class SpinnerFactory implements FormWidgetFactory {
 
-    public static ValidationStatus validate(MaterialSpinner spinner) {
+    public static ValidationStatus validate(TextInputLayout spinner) {
         if (!(spinner.getTag(R.id.v_required) instanceof String) || !(spinner.getTag(R.id.error) instanceof String)) {
             return new ValidationStatus(true, null);
         }
@@ -47,10 +51,7 @@ public class SpinnerFactory implements FormWidgetFactory {
         if (!isRequired) {
             return new ValidationStatus(true, null);
         }
-        int selectedItemPosition = spinner.getSelectedItemPosition();
-        if (selectedItemPosition > 0) {
-            return new ValidationStatus(true, null);
-        }
+
         return new ValidationStatus(false, (String) spinner.getTag(R.id.error));
     }
 
@@ -72,16 +73,17 @@ public class SpinnerFactory implements FormWidgetFactory {
     private List<View> getEditableViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener,
                                                 JsonFormBundle bundle, JsonExpressionResolver resolver) throws JSONException {
         List<View> views = new ArrayList<>(1);
-        MaterialSpinner spinner = (MaterialSpinner) LayoutInflater.from(context).inflate(R.layout.item_spinner, null);
-
+        MaterialTextInputLayout textInputLayout = (MaterialTextInputLayout) LayoutInflater.from(context).inflate(R.layout.item_spinner,
+                null);
+        MaterialAutoCompleteTextView spinner = (MaterialAutoCompleteTextView) textInputLayout.findViewById(R.id.spinnerMenuList);
         final String hint = bundle.resolveKey(jsonObject.optString("hint"));
         if (!TextUtils.isEmpty(hint)) {
-            spinner.setHint(hint);
-            spinner.setFloatingLabelText(hint);
+            textInputLayout.setHint(hint);
         }
 
-        spinner.setId(ViewUtil.generateViewId());
-
+        spinner.setId(View.generateViewId());
+        textInputLayout.setTag(R.id.key, jsonObject.getString("key"));
+        textInputLayout.setTag(R.id.type, jsonObject.getString("type"));
         spinner.setTag(R.id.key, jsonObject.getString("key"));
         spinner.setTag(R.id.type, jsonObject.getString("type"));
 
@@ -124,10 +126,10 @@ public class SpinnerFactory implements FormWidgetFactory {
 
         if (values != null) {
             spinner.setAdapter(new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, values));
-            spinner.setSelection(indexToSelect + 1, true);
             spinner.setOnItemSelectedListener(listener);
+
         }
-        views.add(spinner);
+        views.add(textInputLayout);
         return views;
     }
 
@@ -164,7 +166,7 @@ public class SpinnerFactory implements FormWidgetFactory {
                 }
             }
         }
-        return indexToSelect;
+        return indexToSelect    ;
     }
 
     private String getValuesAsJsonExpression(JSONObject jsonObject, JsonExpressionResolver resolver) {
@@ -178,7 +180,7 @@ public class SpinnerFactory implements FormWidgetFactory {
     private List<View> getReadOnlyViewsFromJson(String stepName, Context context, JSONObject jsonObject, JsonFormBundle bundle, JsonExpressionResolver resolver)
             throws JSONException {
         List<View> views = new ArrayList<>(1);
-        TextInputLayout textInputLayout = (TextInputLayout) LayoutInflater.from(context).inflate(R.layout.item_edit_text,
+        TextInputLayout textInputLayout = (TextInputLayout) LayoutInflater.from(context).inflate(R.layout.item_material_edit_text,
                 null);
         EditText editText = textInputLayout.getEditText();
         editText.setId(ViewUtil.generateViewId());
@@ -204,7 +206,7 @@ public class SpinnerFactory implements FormWidgetFactory {
         }
 
         editText.setEnabled(false);
-        views.add(editText);
+        views.add(textInputLayout);
         return views;
     }
 

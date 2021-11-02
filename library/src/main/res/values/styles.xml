@@ -1,3 +1,20 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.Material" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+            <item name="colorPrimary">@color/accent</item>
+            <item name="colorPrimaryVariant">@color/accent</item>
+            <item name="colorOnPrimary">@color/white</item>
+            <item name="colorAccent">@color/accent</item>
+            <item name="colorControlActivated">@color/accent</item>
 
+    </style>
+    <style name="Theme.MaterialDropdown" parent="Theme.Material">
+        <item name="boxBackgroundColor">@color/accent</item>
+        <item name="hintTextColor">@color/accent</item>
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:paddingBottom">2dp</item>
+        <item name="minHeight">48dp</item>
+        <item name="android:textSize">16sp</item>
+
+    </style>
 </resources>

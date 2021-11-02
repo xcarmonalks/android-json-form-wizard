@@ -36,6 +36,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
+import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputLayout;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rey.material.widget.Switch;
@@ -289,19 +290,6 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                     } else {
                         getView().writeValue(mStepName, key, editText.getText().toString());
                     }
-                } else if (editText.getTag(R.id.type).equals(JsonFormConstants.TIME_PICKER)) {
-                    ValidationStatus validationStatus = EditTextFactory.validate(editText);
-                    if (!validationStatus.isValid()) {
-                        return validationStatus;
-                    }
-                    if (JsonFormConstants.EDIT_GROUP.equals(type)) {
-                        String parentKey = (String) mainView.getTag(R.id.key);
-                        String childKey = (String) childAt.getTag(R.id.key);
-                        getView().writeValue(mStepName, parentKey, JsonFormConstants.FIELDS_FIELD_NAME, childKey,
-                                editText.getText().toString());
-                    } else {
-                        getView().writeValue(mStepName, key, editText.getText().toString());
-                    }
                 }
 
             } else if (childAt instanceof ImageView) {
@@ -328,7 +316,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                 }
             } else if (childAt instanceof MaterialSpinner) {
                 MaterialSpinner spinner = (MaterialSpinner) childAt;
-                ValidationStatus validationStatus = SpinnerFactory.validate(spinner);
+                ValidationStatus validationStatus = new ValidationStatus(true, "error");
                 if (!validationStatus.isValid()) {
                     spinner.setError(validationStatus.getErrorMessage());
                     return validationStatus;
@@ -400,6 +388,21 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                     } else {
                         getView().writeValue(mStepName, key, editText.getText().toString());
                     }
+                } else if (editText.getTag(R.id.type).equals(JsonFormConstants.SPINNER) ){
+                    ValidationStatus validationStatus = SpinnerFactory.validate(textInputLayout);
+
+                    if(!validationStatus.isValid()){
+                        return validationStatus;
+                    }
+                    if (JsonFormConstants.EDIT_GROUP.equals(type)){
+                        String parentKey = (String) mainView.getTag(R.id.key);
+                        String childKey = (String) childAt.getTag(R.id.key);
+                        getView().writeValue(mStepName, parentKey, JsonFormConstants.FIELDS_FIELD_NAME, childKey,
+                                editText.getText().toString());
+                    }else{
+                        getView().writeValue(mStepName, key, editText.getText().toString());
+                    }
+
                 }
             } else if (childAt instanceof LinearLayout) {
                 if (JsonFormConstants.LOCATION_PICKER.equals(childAt.getTag(R.id.type))) {
