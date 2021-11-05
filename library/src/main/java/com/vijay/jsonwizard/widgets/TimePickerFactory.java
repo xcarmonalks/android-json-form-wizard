@@ -116,6 +116,7 @@ public class TimePickerFactory implements FormWidgetFactory {
         editText.setInputType(InputType.TYPE_NULL);
 
         views.add(materialTextInputLayout);
+        materialTextInputLayout.initTextWatchers();
         return views;
     }
 
@@ -207,14 +208,14 @@ public class TimePickerFactory implements FormWidgetFactory {
                 @Override
                 public void onClick(View view) {
                     timeText.getEditText().setText(((TimePickerDialog) d).getFormattedTime(new SimpleDateFormat(formatString)));
-                    d.hide();
+                    d.dismiss();
                 }
             });
 
             d.negativeActionClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    d.hide();
+                    d.dismiss();
                 }
             });
 

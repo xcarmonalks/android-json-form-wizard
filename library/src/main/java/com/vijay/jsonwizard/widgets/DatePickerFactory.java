@@ -183,14 +183,14 @@ public class DatePickerFactory implements FormWidgetFactory {
                 public void onClick(View view) {
                     Date date = new Date(((DatePickerDialog) d).getDate());
                     dateText.getEditText().setText(DateUtils.formatDate(date, (String) dateText.getTag(R.id.v_pattern)));
-                    d.hide();
+                    d.dismiss();
                 }
             });
 
             d.negativeActionClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    d.hide();
+                    d.dismiss();
                 }
             });
 
