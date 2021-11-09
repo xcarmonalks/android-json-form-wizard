@@ -422,23 +422,23 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
     }
 
     private ValidationStatus writeValuesAndValidateLocationPicker(LinearLayout widget, String key) {
-        MaterialEditText etLatitude = null;
-        MaterialEditText etLongitude = null;
-        MaterialEditText etAccuracy = null;
+        MaterialTextInputLayout etLatitude = null;
+        MaterialTextInputLayout etLongitude = null;
+        MaterialTextInputLayout etAccuracy = null;
         LinearLayout valueContainer = widget.findViewById(R.id.value_container);
         for (int i = 0; i < valueContainer.getChildCount(); i++) {
             View childView = valueContainer.getChildAt(i);
-            if (childView instanceof MaterialEditText) {
+            if (childView instanceof MaterialTextInputLayout) {
                 String childKey = (String) childView.getTag(R.id.key);
-                MaterialEditText met = (MaterialEditText) childView;
+                MaterialTextInputLayout textInputLayout = (MaterialTextInputLayout) childView;
                 if (childKey.endsWith(KEY_SUFFIX_LATITUDE)) {
-                    etLatitude = met;
+                    etLatitude = textInputLayout;
                 } else if (childKey.endsWith(KEY_SUFFIX_LONGITUDE)) {
-                    etLongitude = met;
+                    etLongitude = textInputLayout;
                 } else if (childKey.endsWith(KEY_SUFFIX_ACCURACY)) {
-                    etAccuracy = met;
+                    etAccuracy = textInputLayout;
                 }
-                ValidationStatus validationStatus = LocationPickerFactory.validate(met);
+                ValidationStatus validationStatus = LocationPickerFactory.validate(textInputLayout);
                 if (!validationStatus.isValid()) {
                     return validationStatus;
                 }
@@ -446,12 +446,12 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         }
 
         String value;
-        if (etAccuracy != null && !etAccuracy.getText().toString().isEmpty()) {
-            value = MapsUtils.toString(etLatitude.getText().toString(),
-                    etLongitude.getText().toString(), etAccuracy.getText().toString());
+        if (etAccuracy != null && !etAccuracy.getEditText().getText().toString().isEmpty()) {
+            value = MapsUtils.toString(etLatitude.getEditText().getText().toString(),
+                    etLongitude.getEditText().getText().toString(), etAccuracy.getEditText().getText().toString());
         } else {
-            value = MapsUtils.toString(etLatitude.getText().toString(),
-                    etLongitude.getText().toString());
+            value = MapsUtils.toString(etLatitude.getEditText().getText().toString(),
+                    etLongitude.getEditText().getText().toString());
         }
         getView().writeValue(mStepName, key, value);
         return new ValidationStatus(true, null);
@@ -515,13 +515,13 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
             getView().writeValue(mStepName, mCurrentKey, location);
             String[] parts = location.split(MapsUtils.COORD_SEPARATOR);
             if (parts.length > 0) {
-                getView().updateRelevantEditText(mCurrentKey + KEY_SUFFIX_LATITUDE, parts[0].trim());
+                getView().updateRelevantTextInputLayout(mCurrentKey + KEY_SUFFIX_LATITUDE, parts[0].trim());
             }
             if (parts.length > 1) {
-                getView().updateRelevantEditText(mCurrentKey + KEY_SUFFIX_LONGITUDE, parts[1].trim());
+                getView().updateRelevantTextInputLayout(mCurrentKey + KEY_SUFFIX_LONGITUDE, parts[1].trim());
             }
             if (parts.length > 2) {
-                getView().updateRelevantEditText(mCurrentKey + KEY_SUFFIX_ACCURACY, parts[2].trim());
+                getView().updateRelevantTextInputLayout(mCurrentKey + KEY_SUFFIX_ACCURACY, parts[2].trim());
             }
             getView().updateRelevantMap(mCurrentKey, location);
         }

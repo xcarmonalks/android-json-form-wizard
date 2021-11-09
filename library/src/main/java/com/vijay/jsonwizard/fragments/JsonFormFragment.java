@@ -27,11 +27,14 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rey.material.widget.Switch;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.activities.JsonFormActivity;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
+import com.vijay.jsonwizard.customviews.MaterialTextInputLayout;
 import com.vijay.jsonwizard.customviews.RadioButton;
 import com.vijay.jsonwizard.demo.resources.ResourceResolver;
 import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
@@ -221,6 +224,30 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
 
     }
 
+    private MaterialTextInputLayout findMaterialTextInputLayoutByTag(ViewGroup v, String searchKey) {
+
+        MaterialTextInputLayout found = null;
+
+        for (int i = 0; i < v.getChildCount(); i++) {
+            Object child = v.getChildAt(i);
+            if (child instanceof MaterialTextInputLayout) {
+
+                MaterialTextInputLayout materialTextInputLayout = (MaterialTextInputLayout) child;
+                String key = (String) materialTextInputLayout.getTag(R.id.key);
+                if (key.equals(searchKey)) {
+                    return materialTextInputLayout;
+                }
+            } else if (child instanceof ViewGroup) {
+                found = findMaterialTextInputLayoutByTag((ViewGroup) child, searchKey);
+                if (found != null) {
+                    break;
+                }
+            }
+        }
+        return found;
+    }
+
+
     @Override
     public void updateRelevantEditText(String currentKey, String value) {
 
@@ -244,6 +271,17 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
             }
         }
         // Map will be redrawn by onResume lifecycle method
+    }
+
+    @Override
+    public void updateRelevantTextInputLayout(String currentKey, String value) {
+
+        MaterialTextInputLayout textInputLayout =  (MaterialTextInputLayout) findMaterialTextInputLayoutByTag(mMainView, currentKey);
+
+        if (textInputLayout != null) {
+            TextInputEditText editText = (TextInputEditText) textInputLayout.getEditText();
+            editText.setText(value);
+        }
     }
 
     private void redrawMap(String key, String value) {

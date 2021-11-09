@@ -29,6 +29,7 @@
                 android:layout_gravity="center"
                 android:src="@drawable/ic_map_black_18dp"
                 android:tint="@color/secondary_text" />
+
         </FrameLayout>
     </FrameLayout>
 
@@ -39,47 +40,80 @@
         android:layout_marginTop="8dp"
         android:layout_height="wrap_content">
 
-        <com.rengwuxian.materialedittext.MaterialEditText
+        <com.vijay.jsonwizard.customviews.MaterialTextInputLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/location_latitude"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/default_text_size"
+            android:layout_marginStart="8dp"
             android:layout_weight="4"
-            app:met_floatingLabel="highlight"
-            app:met_floatingLabelText="@string/latitude"
+            android:layout_marginTop="10dp"
             android:hint="@string/latitude"
-            app:met_primaryColor="?colorAccent"
-            app:met_singleLineEllipsis="true"
-            app:met_typeface="font/Roboto-Regular.ttf" />
+            android:orientation="vertical"
+            android:paddingTop="0dp"
+            android:paddingBottom="2dp"
+            app:errorEnabled="true">
 
-        <com.rengwuxian.materialedittext.MaterialEditText
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="4"
+                android:maxLines="1"
+                android:textSize="@dimen/default_text_size"
+                android:gravity="center_vertical"/>
+        </com.vijay.jsonwizard.customviews.MaterialTextInputLayout>
+
+
+        <com.vijay.jsonwizard.customviews.MaterialTextInputLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/location_longitude"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="4"
             android:layout_marginStart="8dp"
-            android:textSize="@dimen/default_text_size"
+            android:layout_weight="4"
+            android:layout_marginTop="10dp"
             android:hint="@string/longitude"
-            app:met_floatingLabel="highlight"
-            app:met_floatingLabelText="@string/longitude"
-            app:met_primaryColor="?colorAccent"
-            app:met_singleLineEllipsis="true"
-            app:met_typeface="font/Roboto-Regular.ttf" />
+            android:orientation="vertical"
+            android:paddingTop="0dp"
+            android:paddingBottom="2dp"
+            app:errorEnabled="true">
 
-        <com.rengwuxian.materialedittext.MaterialEditText
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="4"
+                android:maxLines="1"
+                android:textSize="@dimen/default_text_size"
+                android:gravity="center_vertical"/>
+        </com.vijay.jsonwizard.customviews.MaterialTextInputLayout>
+
+        <com.vijay.jsonwizard.customviews.MaterialTextInputLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/location_accuracy"
             android:layout_width="wrap_content"
-            android:visibility="gone"
-            android:layout_marginStart="8dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textSize="@dimen/default_text_size"
+            android:layout_marginStart="8dp"
+            android:layout_weight="4"
+            android:visibility="gone"
+            android:layout_marginTop="10dp"
             android:hint="@string/accuracy"
-            app:met_floatingLabel="highlight"
-            app:met_floatingLabelText="@string/accuracy"
-            app:met_primaryColor="?colorAccent"
-            app:met_singleLineEllipsis="true"
-            app:met_typeface="font/Roboto-Regular.ttf" />
+            android:orientation="vertical"
+            android:paddingTop="0dp"
+            android:paddingBottom="2dp"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_weight="4"
+                android:lines="1"
+                android:textSize="@dimen/default_text_size"
+                android:gravity="center_vertical"/>
+        </com.vijay.jsonwizard.customviews.MaterialTextInputLayout>
 
 
         <ImageView
@@ -90,7 +124,6 @@
             android:layout_weight="0"
             android:clickable="true"
             android:focusable="true"
-            android:layout_marginStart="12dp"
             android:background="?selectableItemBackgroundBorderless"
             android:src="@drawable/ic_pick_location_18dp"
             android:tint="@color/primary_text" />
