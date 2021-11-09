@@ -494,7 +494,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                 String value = data.getStringExtra(PARAM_BARCODE);
                 mStepName = getView().getArguments().getString("stepName");
                 getView().writeValue(mStepName, mCurrentKey, value);
-                getView().updateRelevantEditText(mCurrentKey, value);
+                getView().updateRelevantTextInputLayout(mCurrentKey, value);
             }
             if (data != null && data.hasExtra(PARAM_ERROR)) {
                 Toast.makeText(getView().getContext(), R.string.mlkit_not_found, Toast.LENGTH_LONG).show();
