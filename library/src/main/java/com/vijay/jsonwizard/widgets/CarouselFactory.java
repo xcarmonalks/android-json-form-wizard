@@ -9,9 +9,6 @@ import android.widget.EditText;
 
 import androidx.annotation.Nullable;
 
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
-import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rey.material.util.ViewUtil;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
@@ -21,11 +18,9 @@ import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
-import com.vijay.jsonwizard.interfaces.JsonApi;
 import com.vijay.jsonwizard.utils.CarouselAdapter;
 import com.vijay.jsonwizard.utils.CarouselItem;
 import com.vijay.jsonwizard.utils.ExpressionResolverContextUtils;
-import com.vijay.jsonwizard.utils.JsonFormUtils;
 import com.vijay.jsonwizard.utils.ValidationStatus;
 import com.yarolegovich.discretescrollview.DSVOrientation;
 import com.yarolegovich.discretescrollview.DiscreteScrollView;

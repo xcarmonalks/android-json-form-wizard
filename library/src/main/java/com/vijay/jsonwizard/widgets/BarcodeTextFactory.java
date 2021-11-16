@@ -13,8 +13,6 @@ import androidx.annotation.Nullable;
 
 import com.google.android.material.internal.CheckableImageButton;
 import com.google.android.material.textfield.TextInputEditText;
-import com.rengwuxian.materialedittext.MaterialEditText;
-
 import com.rey.material.util.ViewUtil;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;

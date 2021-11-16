@@ -28,8 +28,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
-import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rey.material.widget.Switch;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.activities.JsonFormActivity;
@@ -201,29 +199,6 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
         }
     }
 
-    private MaterialEditText findMaterialiEditTextByTag(ViewGroup v, String searchKey) {
-
-        MaterialEditText found = null;
-
-        for (int i = 0; i < v.getChildCount(); i++) {
-            Object child = v.getChildAt(i);
-            if (child instanceof MaterialEditText) {
-                MaterialEditText editText = (MaterialEditText) child;
-                String key = (String) editText.getTag(R.id.key);
-                if (key.equals(searchKey)) {
-                    return editText;
-                }
-            } else if (child instanceof ViewGroup) {
-                found = findMaterialiEditTextByTag((ViewGroup) child, searchKey);
-                if (found != null) {
-                    break;
-                }
-            }
-        }
-        return found;
-
-    }
-
     private MaterialTextInputLayout findMaterialTextInputLayoutByTag(ViewGroup v, String searchKey) {
 
         MaterialTextInputLayout found = null;
@@ -245,16 +220,6 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
             }
         }
         return found;
-    }
-
-
-    @Override
-    public void updateRelevantEditText(String currentKey, String value) {
-
-        MaterialEditText editText = findMaterialiEditTextByTag(mMainView, currentKey);
-        if (editText != null) {
-            editText.setText(value);
-        }
     }
 
     @Override

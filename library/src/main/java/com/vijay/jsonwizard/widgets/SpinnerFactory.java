@@ -36,8 +36,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import fr.ganfra.materialspinner.MaterialSpinner;
-
 /**
  * Created by nipun on 30/05/15.
  */

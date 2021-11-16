@@ -55,8 +55,6 @@ public interface JsonFormFragmentView<VS extends ViewState> extends MvpView {
     void updateRelevantImageView(Bitmap bitmap, String imagePath, String currentKey,
         String stepName);
 
-    void updateRelevantEditText(String currentKey, String value);
-
     void updateRelevantMap(String key, String value);
 
     void updateRelevantTextInputLayout(String key, String value);

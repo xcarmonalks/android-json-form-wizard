@@ -36,9 +36,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
-import com.google.android.material.textfield.MaterialAutoCompleteTextView;
-import com.google.android.material.textfield.TextInputLayout;
-import com.rengwuxian.materialedittext.MaterialEditText;
+
 import com.rey.material.widget.Switch;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.barcode.LivePreviewActivity;
@@ -68,7 +66,6 @@ import com.vijay.jsonwizard.viewstates.JsonFormFragmentViewState;
 import com.vijay.jsonwizard.widgets.BarcodeTextFactory;
 import com.vijay.jsonwizard.widgets.CarouselFactory;
 import com.vijay.jsonwizard.widgets.DatePickerFactory;
-import com.vijay.jsonwizard.widgets.EditTextFactory;
 import com.vijay.jsonwizard.widgets.ImagePickerFactory;
 import com.vijay.jsonwizard.widgets.LocationPickerFactory;
 import com.vijay.jsonwizard.widgets.MaterialEditTextFactory;
@@ -82,8 +79,6 @@ import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import fr.ganfra.materialspinner.MaterialSpinner;
 
 /**
  * Created by vijay on 5/14/15.
@@ -275,24 +270,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         for (int i = 0; i < childCount; i++) {
             View childAt = mainView.getChildAt(i);
             String key = (String) childAt.getTag(R.id.key);
-            if (childAt instanceof MaterialEditText) {
-                MaterialEditText editText = (MaterialEditText) childAt;
-                if (editText.getTag(R.id.type).equals(JsonFormConstants.EDIT_TEXT)) {
-                    ValidationStatus validationStatus = EditTextFactory.validate(editText);
-                    if (!validationStatus.isValid()) {
-                        return validationStatus;
-                    }
-                    if (JsonFormConstants.EDIT_GROUP.equals(type)) {
-                        String parentKey = (String) mainView.getTag(R.id.key);
-                        String childKey = (String) childAt.getTag(R.id.key);
-                        getView().writeValue(mStepName, parentKey, JsonFormConstants.FIELDS_FIELD_NAME, childKey,
-                                editText.getText().toString());
-                    } else {
-                        getView().writeValue(mStepName, key, editText.getText().toString());
-                    }
-                }
-
-            } else if (childAt instanceof ImageView) {
+            if (childAt instanceof ImageView) {
                 ValidationStatus validationStatus = ImagePickerFactory.validate((ImageView) childAt);
                 if (!validationStatus.isValid()) {
                     return validationStatus;
@@ -314,16 +292,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                 if (((RadioButton) childAt).isChecked()) {
                     getView().writeValue(mStepName, parentKey, childKey);
                 }
-            } else if (childAt instanceof MaterialSpinner) {
-                MaterialSpinner spinner = (MaterialSpinner) childAt;
-                ValidationStatus validationStatus = new ValidationStatus(true, "error");
-                if (!validationStatus.isValid()) {
-                    spinner.setError(validationStatus.getErrorMessage());
-                    return validationStatus;
-                } else {
-                    spinner.setError(null);
-                }
-            } else if (childAt instanceof DiscreteScrollView) {
+            }  else if (childAt instanceof DiscreteScrollView) {
                 DiscreteScrollView dsv = (DiscreteScrollView) childAt;
                 ValidationStatus validationStatus = CarouselFactory.validate(dsv);
                 if (!validationStatus.isValid()) {

@@ -12,6 +12,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.rey.material.app.DatePickerDialog;
 import com.rey.material.app.Dialog;
 import com.vijay.jsonwizard.R;
+import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.customviews.MaterialTextInputLayout;
 import com.vijay.jsonwizard.demo.resources.ResourceResolver;
