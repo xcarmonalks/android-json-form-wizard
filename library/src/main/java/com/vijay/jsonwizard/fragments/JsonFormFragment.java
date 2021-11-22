@@ -26,6 +26,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.FragmentManager;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.rey.material.widget.Switch;
@@ -39,6 +40,7 @@ import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.JsonApi;
+import com.vijay.jsonwizard.listeners.DatePickerListener;
 import com.vijay.jsonwizard.maps.MapsUtils;
 import com.vijay.jsonwizard.mvp.MvpFragment;
 import com.vijay.jsonwizard.presenters.JsonFormFragmentPresenter;
@@ -49,7 +51,6 @@ import com.vijay.jsonwizard.viewstates.JsonFormFragmentViewState;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.List;
 import java.util.Locale;
 
@@ -105,12 +106,32 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         presenter.addFormElements();
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+            addDialogPickerListeners(fragmentManager);
+
+    }
+
+    private void addDialogPickerListeners(FragmentManager fragmentManager) {
+        MaterialTextInputLayout materialTextInputLayout ;
+        for(int i = 0; i < mMainView.getChildCount(); i++){
+            View v = mMainView.getChildAt(i);
+            if(v instanceof MaterialTextInputLayout && v.getTag(R.id.type).equals(JsonFormConstants.DATE_PICKER)){
+                materialTextInputLayout = (MaterialTextInputLayout) v;
+                if(!materialTextInputLayout.getEditText().hasOnClickListeners()){
+                    materialTextInputLayout.hasOnClickListeners();
+                    DatePickerListener datePickerListener = new DatePickerListener(materialTextInputLayout, fragmentManager);
+                    materialTextInputLayout.getEditText().setOnClickListener(datePickerListener);
+                    materialTextInputLayout.getEditText().setOnFocusChangeListener(datePickerListener);
+
+                }
+            }
+        }
     }
 
     @Override
     public void onResume() {
-        super.onResume();
 
+        super.onResume();
         int childCount = mMainView.getChildCount();
         for (int i = 0; i < childCount; i++) {
             View view = mMainView.getChildAt(i);

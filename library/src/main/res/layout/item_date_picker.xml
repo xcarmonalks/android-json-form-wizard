@@ -1,0 +1,22 @@
+<com.vijay.jsonwizard.customviews.MaterialTextInputLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/textField"
+    style="@style/widget_material_calendar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:orientation="vertical"
+    android:paddingTop="0dp"
+    android:paddingBottom="2dp"
+    android:minHeight="48dp"
+    app:errorEnabled="true">
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:textSize="@dimen/default_text_size"
+        android:gravity="center_vertical"/>
+</com.vijay.jsonwizard.customviews.MaterialTextInputLayout>

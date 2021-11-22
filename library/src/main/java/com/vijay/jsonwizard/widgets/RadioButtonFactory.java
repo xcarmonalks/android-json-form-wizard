@@ -145,6 +145,8 @@ public class RadioButtonFactory implements FormWidgetFactory {
         editText.setId(ViewUtil.generateViewId());
         final String label = bundle.resolveKey(jsonObject.getString("label"));
         materialTextInputLayout.setHint(label);
+        materialTextInputLayout.setTag(R.id.key, jsonObject.getString("key"));
+        materialTextInputLayout.setTag(R.id.type, jsonObject.getString("type"));
         editText.setTag(R.id.key, jsonObject.getString("key"));
         editText.setTag(R.id.type, jsonObject.getString("type"));
 
