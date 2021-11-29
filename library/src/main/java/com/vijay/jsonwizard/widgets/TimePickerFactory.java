@@ -8,14 +8,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
-import com.rey.material.app.Dialog;
-import com.rey.material.app.TimePickerDialog;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.timepicker.MaterialTimePicker;
+import com.google.android.material.timepicker.TimeFormat;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.customviews.MaterialTextInputLayout;
 import com.vijay.jsonwizard.demo.resources.ResourceResolver;
 import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
+import com.vijay.jsonwizard.fragments.JsonFormFragment;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
+import com.vijay.jsonwizard.interfaces.ClickableFormWidget;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
 import com.vijay.jsonwizard.utils.DateUtils;
@@ -34,8 +37,9 @@ import java.util.Date;
 import java.util.List;
 
 import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentManager;
 
-public class TimePickerFactory implements FormWidgetFactory {
+public class TimePickerFactory implements FormWidgetFactory, ClickableFormWidget {
 
     private static final String TAG = "TimePickerFactory";
 
@@ -57,12 +61,12 @@ public class TimePickerFactory implements FormWidgetFactory {
                 views = getReadOnlyViewsFromJson(context, jsonObject, bundle);
                 break;
             default:
-                views = getEditableViewsFromJson(stepName, context, jsonObject, bundle, resolver);
+                views = getEditableViewsFromJson(stepName, context, jsonObject, bundle, resolver, listener);
         }
         return views;
     }
 
-    private List<View> getEditableViewsFromJson(String stepName, Context context, JSONObject jsonObject, JsonFormBundle bundle, JsonExpressionResolver resolver)
+    private List<View> getEditableViewsFromJson(String stepName, Context context, JSONObject jsonObject, JsonFormBundle bundle, JsonExpressionResolver resolver, CommonListener listener)
         throws JSONException {
         List<View> views = new ArrayList<>(1);
         final MaterialTextInputLayout materialTextInputLayout = (MaterialTextInputLayout) LayoutInflater.from(context).inflate(
@@ -73,9 +77,10 @@ public class TimePickerFactory implements FormWidgetFactory {
         materialTextInputLayout.setHint(hint);
         editText.setId(View.generateViewId());
         materialTextInputLayout.setTag(R.id.key, jsonObject.getString("key"));
-        materialTextInputLayout.setTag(R.id.type, jsonObject.getString("type"));
+        materialTextInputLayout.setTag(R.id.type, JsonFormConstants.TIME_PICKER);
+        materialTextInputLayout.setTag(R.id.v_pattern, bundle.resolveKey(jsonObject.getString("pattern")));
         editText.setTag(R.id.key, jsonObject.getString("key"));
-        editText.setTag(R.id.type, jsonObject.getString("type"));
+        editText.setTag(R.id.type, JsonFormConstants.TIME_PICKER);
         String widgetPattern = bundle.resolveKey(jsonObject.getString("pattern"));
         editText.setTag(R.id.v_pattern, bundle.resolveKey(jsonObject.getString("pattern")));
         materialTextInputLayout.setTag(R.id.v_pattern, bundle.resolveKey(jsonObject.getString("pattern")));
@@ -110,10 +115,9 @@ public class TimePickerFactory implements FormWidgetFactory {
             }
         }
 
-        TimePickerListener timePickerListener = new TimePickerListener(materialTextInputLayout, widgetPattern);
-        editText.setOnFocusChangeListener(timePickerListener);
-        editText.setOnClickListener(timePickerListener);
         editText.setInputType(InputType.TYPE_NULL);
+        editText.setOnClickListener(listener);
+        editText.setOnFocusChangeListener(listener);
 
         views.add(materialTextInputLayout);
         materialTextInputLayout.initTextWatchers();
@@ -155,33 +159,45 @@ public class TimePickerFactory implements FormWidgetFactory {
         return views;
     }
 
-    private class TimePickerListener implements View.OnFocusChangeListener, View.OnClickListener {
+    @Nullable
+    private JSONObject getCurrentValues(Context context, String stepName) throws JSONException {
+        return ExpressionResolverContextUtils.getCurrentValues(context, stepName);
+    }
 
-        private Dialog d;
-        private MaterialTextInputLayout timeText;
+    @Override
+    public void  onClick(JsonFormFragment jsonFormFragment, View v) {
+        jsonFormFragment.hideKeyBoard();
+        TimePickerListener timePickerListener = new TimePickerListener((TextInputEditText) v, (String) v.getTag(R.id.v_pattern), jsonFormFragment.getActivity().getSupportFragmentManager());
+        timePickerListener.openTimePicker(v);
+    }
+
+    @Override
+    public void onFocusChange(JsonFormFragment jsonFormFragment, boolean focus, View v) {
+        if (focus) {
+            jsonFormFragment.hideKeyBoard();
+            TimePickerListener timePickerListener = new TimePickerListener((TextInputEditText) v, (String) v.getTag(R.id.v_pattern), jsonFormFragment.getActivity().getSupportFragmentManager());
+            timePickerListener.openTimePicker(v);
+        }
+    }
+
+    private class TimePickerListener {
+
+        private MaterialTimePicker d;
+        private TextInputEditText timeText;
+        private static final String TAG = "TimePickerListener";
         private String formatString;
+        private FragmentManager fragmentManager;
 
-        public TimePickerListener(MaterialTextInputLayout materialTextInputLayout, String formatString) {
-            this.timeText = materialTextInputLayout;
+        private TimePickerListener(TextInputEditText textInputEditText, String formatString, FragmentManager fragmentManager) {
+            this.timeText = textInputEditText;
             this.formatString = formatString;
+            this.fragmentManager = fragmentManager;
         }
-
-        @Override
-        public void onFocusChange(View view, boolean focus) {
-            if (focus) {
-                openTimePicker(view);
-            }
-        }
-
-        @Override
-        public void onClick(View view) {
-            openTimePicker(view);
-        }
-
+        
         private void openTimePicker(View view) {
             int hour = 0;
             int minute = 0;
-            String timeStr = timeText.getEditText().getText().toString();
+            String timeStr = timeText.getText().toString();
             String pattern = (String) timeText.getTag(R.id.v_pattern);
             if (timeStr != null && !"".equals(timeStr)) {
                 try {
@@ -200,33 +216,20 @@ public class TimePickerFactory implements FormWidgetFactory {
                 minute = c.get(Calendar.MINUTE);
             }
 
-            TimePickerDialog.Builder builder = new TimePickerDialog.Builder(hour, minute);
+            MaterialTimePicker.Builder builder = new MaterialTimePicker.Builder().setTimeFormat(TimeFormat.CLOCK_24H).setHour(hour).setMinute(minute);
+            builder.setTheme(R.style.widget_material_timepicker);
+            d = builder.build();
 
-            d = builder.build(view.getContext());
-
-            d.positiveActionClickListener(new View.OnClickListener() {
+            d.addOnPositiveButtonClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    timeText.getEditText().setText(((TimePickerDialog) d).getFormattedTime(new SimpleDateFormat(formatString)));
+                    timeText.setText(String.format("%02d:%02d", d.getHour(), d.getMinute()));
                     d.dismiss();
                 }
             });
 
-            d.negativeActionClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    d.dismiss();
-                }
-            });
-
-            d.positiveAction("OK").negativeAction("CANCEL");
-            d.show();
+            d.show(this.fragmentManager, TAG);
         }
-    }
-
-    @Nullable
-    private JSONObject getCurrentValues(Context context, String stepName) throws JSONException {
-        return ExpressionResolverContextUtils.getCurrentValues(context, stepName);
     }
 }
 

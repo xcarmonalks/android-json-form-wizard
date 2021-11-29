@@ -37,6 +37,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
 
+import com.google.android.material.textfield.TextInputEditText;
 import com.rey.material.widget.Switch;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.barcode.LivePreviewActivity;
@@ -49,6 +50,8 @@ import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.fragments.JsonFormFragment;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interactors.JsonFormInteractor;
+import com.vijay.jsonwizard.interfaces.ClickableFormWidget;
+import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
 import com.vijay.jsonwizard.maps.MapsActivity;
 import com.vijay.jsonwizard.maps.MapsUtils;
 import com.vijay.jsonwizard.mvp.MvpBasePresenter;
@@ -70,6 +73,8 @@ import com.vijay.jsonwizard.widgets.ImagePickerFactory;
 import com.vijay.jsonwizard.widgets.LocationPickerFactory;
 import com.vijay.jsonwizard.widgets.MaterialEditTextFactory;
 import com.vijay.jsonwizard.widgets.SpinnerFactory;
+import com.vijay.jsonwizard.widgets.TimePickerFactory;
+import com.vijay.jsonwizard.widgets.WidgetFactoryRegistry;
 import com.yarolegovich.discretescrollview.DiscreteScrollView;
 
 import org.json.JSONException;
@@ -500,83 +505,102 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
 
         String key = (String) v.getTag(R.id.key);
         String type = (String) v.getTag(R.id.type);
-        if (checkFormPermissions()) {
+        FormWidgetFactory formWidgetFactory =  WidgetFactoryRegistry.getWidgetFactory(type);
+        if(formWidgetFactory instanceof ClickableFormWidget) {
+            ((ClickableFormWidget) formWidgetFactory).onClick((JsonFormFragment) getView(), v);
+        }else {
             if (JsonFormConstants.CHOOSE_IMAGE.equals(type)) {
-                mCurrentKey = key;
-                if (v.getTag(R.id.btn_clear) != null) {
-                    getView().updateRelevantImageView(null, null, key, mStepName);
-                    v.setVisibility(View.GONE);
+                if (checkFormPermissions()) {
+                    mCurrentKey = key;
+                    if (v.getTag(R.id.btn_clear) != null) {
+                        getView().updateRelevantImageView(null, null, key, mStepName);
+                        v.setVisibility(View.GONE);
+                    } else {
+                        getView().hideKeyBoard();
+                        Intent pickerIntent = ImagePicker.getPickImageIntent(v.getContext());
+                        getView().startActivityForResult(pickerIntent, RESULT_LOAD_IMG);
+                    }
                 } else {
-                    getView().hideKeyBoard();
-                    Intent pickerIntent = ImagePicker.getPickImageIntent(v.getContext());
-                    getView().startActivityForResult(pickerIntent, RESULT_LOAD_IMG);
+                    Log.w(TAG, "CAMERA and STORAGE permissions required to use IMAGE widget");
                 }
             }
 
             if (JsonFormConstants.BARCODE_TEXT.equals(type)) {
-                Log.d(TAG, "onClick: barcode");
+                if (checkFormPermissions()) {
+                    Log.d(TAG, "onClick: barcode");
+                    getView().hideKeyBoard();
+                    Intent barcodeIntent = new Intent(v.getContext(), LivePreviewActivity.class);
+                    mCurrentKey = key;
+                    getView().startActivityForResult(barcodeIntent, RESULT_LOAD_BARCODE);
+
+                } else {
+                    Log.w(TAG, "CAMERA and STORAGE permissions required to use BARCODE widgets");
+                }
+            }
+
+            if (JsonFormConstants.LOCATION_PICKER.equals(type)) {
+                Log.d(TAG, "onClick: location");
                 getView().hideKeyBoard();
-                Intent barcodeIntent = new Intent(v.getContext(), LivePreviewActivity.class);
+                Intent intent = new Intent(v.getContext(), MapsActivity.class);
+                String value = (String) v.getTag(R.id.value);
+                boolean useAccuracy = (boolean) v.getTag(R.id.accuracy);
+                if (value != null && MapsUtils.isValidPositionString(value)) {
+                    intent.putExtra(EXTRA_INITIAL_LOCATION, value);
+                }
+                String customIcon = (String) v.getTag(R.id.custom_icon);
+                if (customIcon != null) {
+                    intent.putExtra(EXTRA_CUSTOM_MARKER_ICON, customIcon);
+                }
+                intent.putExtra(EXTRA_USE_ACCURACY, useAccuracy);
+                intent.putExtra(EXTRA_CONFIG_MIN_ZOOM, (Double) v.getTag(R.id.map_min_zoom));
+                intent.putExtra(EXTRA_CONFIG_MAX_ZOOM, (Double) v.getTag(R.id.map_max_zoom));
+                Double defaultZoom = (Double) v.getTag(R.id.map_default_zoom);
+                if (defaultZoom != null && !defaultZoom.isNaN()) {
+                    intent.putExtra(EXTRA_CONFIG_DEFAULT_ZOOM, defaultZoom);
+                }
                 mCurrentKey = key;
-                getView().startActivityForResult(barcodeIntent, RESULT_LOAD_BARCODE);
+                getView().startActivityForResult(intent, RESULT_LOAD_LOCATION);
             }
-        } else {
-            Log.w(TAG, "CAMERA and STORAGE permissions required to use IMAGE or BARCODE widgets");
-        }
-
-        if (JsonFormConstants.LOCATION_PICKER.equals(type)) {
-            Log.d(TAG, "onClick: location");
-            getView().hideKeyBoard();
-            Intent intent = new Intent(v.getContext(), MapsActivity.class);
-            String value = (String) v.getTag(R.id.value);
-            boolean useAccuracy = (boolean) v.getTag(R.id.accuracy);
-            if (value != null && MapsUtils.isValidPositionString(value)) {
-                intent.putExtra(EXTRA_INITIAL_LOCATION, value);
-            }
-            String customIcon = (String) v.getTag(R.id.custom_icon);
-            if (customIcon != null) {
-                intent.putExtra(EXTRA_CUSTOM_MARKER_ICON, customIcon);
-            }
-            intent.putExtra(EXTRA_USE_ACCURACY, useAccuracy);
-            intent.putExtra(EXTRA_CONFIG_MIN_ZOOM, (Double) v.getTag(R.id.map_min_zoom));
-            intent.putExtra(EXTRA_CONFIG_MAX_ZOOM, (Double) v.getTag(R.id.map_max_zoom));
-            Double defaultZoom = (Double) v.getTag(R.id.map_default_zoom);
-            if (defaultZoom != null && !defaultZoom.isNaN()) {
-                intent.putExtra(EXTRA_CONFIG_DEFAULT_ZOOM, defaultZoom);
-            }
-            mCurrentKey = key;
-            getView().startActivityForResult(intent, RESULT_LOAD_LOCATION);
-        }
-
-        if (JsonFormConstants.RESOURCE_VIEWER.equals(type)) {
-            mCurrentKey = key;
-            getView().hideKeyBoard();
-            String resource = (String) v.getTag(R.id.value);
-            if (resource.endsWith(".html") || resource.endsWith(".htm")) {
-                Intent intent = new Intent(v.getContext(), WebViewActivity.class);
-                String title = (String) v.getTag(R.id.label);
-                intent.putExtra(EXTRA_TITLE, title);
-                intent.putExtra(EXTRA_RESOURCE, resource);
-                getView().startActivityForResult(intent, RESULT_RESOURCE_VIEW);
-            } else if (new File(resource).exists()) {
-                // Attempt to launch open file intent
-                Intent intent = ResourceViewer.getOpenFileIntent(getView().getContext(), resource);
-                getView().startActivityForResult(intent, RESULT_RESOURCE_VIEW);
-            } else if (INTENT_PATTERN.matcher(resource).matches()) {
-                Uri uri = Uri.parse(resource);
-                Intent intent = ResourceViewer.getCustomUriIntent(v.getContext(), uri);
-                if (intent != null) {
+            
+            if (JsonFormConstants.RESOURCE_VIEWER.equals(type)) {
+                mCurrentKey = key;
+                getView().hideKeyBoard();
+                String resource = (String) v.getTag(R.id.value);
+                if (resource.endsWith(".html") || resource.endsWith(".htm")) {
+                    Intent intent = new Intent(v.getContext(), WebViewActivity.class);
+                    String title = (String) v.getTag(R.id.label);
+                    intent.putExtra(EXTRA_TITLE, title);
+                    intent.putExtra(EXTRA_RESOURCE, resource);
+                    getView().startActivityForResult(intent, RESULT_RESOURCE_VIEW);
+                } else if (new File(resource).exists()) {
+                    // Attempt to launch open file intent
+                    Intent intent = ResourceViewer.getOpenFileIntent(getView().getContext(), resource);
+                    getView().startActivityForResult(intent, RESULT_RESOURCE_VIEW);
+                } else if (INTENT_PATTERN.matcher(resource).matches()) {
+                    Uri uri = Uri.parse(resource);
+                    Intent intent = ResourceViewer.getCustomUriIntent(v.getContext(), uri);
+                    if (intent != null) {
+                        getView().startActivityForResult(intent, RESULT_RESOURCE_VIEW);
+                    } else {
+                        Log.w(TAG, "Cannot launch intent: " + resource);
+                    }
+                } else if (URI_PATTERN.matcher(resource).matches()) {
+                    Uri uri = Uri.parse(resource);
+                    Intent intent = ResourceViewer.getOpenUriIntent(uri);
                     getView().startActivityForResult(intent, RESULT_RESOURCE_VIEW);
                 } else {
-                    Log.w(TAG, "Cannot launch intent: " + resource);
+                    Log.w(TAG, "Unsupported resource: " + resource);
                 }
-            } else if (URI_PATTERN.matcher(resource).matches()) {
-                Uri uri = Uri.parse(resource);
-                Intent intent = ResourceViewer.getOpenUriIntent(uri);
-                getView().startActivityForResult(intent, RESULT_RESOURCE_VIEW);
-            } else {
-                Log.w(TAG, "Unsupported resource: " + resource);
             }
+        }
+    }
+
+    public void onFocusChange(View v, boolean focus){
+        String key = (String) v.getTag(R.id.key);
+        String type = (String) v.getTag(R.id.type);
+        FormWidgetFactory formWidgetFactory =  WidgetFactoryRegistry.getWidgetFactory(type);
+        if(formWidgetFactory instanceof ClickableFormWidget) {
+            ((ClickableFormWidget) formWidgetFactory).onFocusChange((JsonFormFragment) getView(), focus, v);
         }
     }
 

@@ -13,7 +13,7 @@ import com.yarolegovich.discretescrollview.DiscreteScrollView;
  */
 public interface CommonListener
     extends View.OnClickListener, CompoundButton.OnCheckedChangeListener, Spinner.OnItemSelectedListener,
-    Switch.OnCheckedChangeListener, OnFieldStateChangeListener,
+    Switch.OnCheckedChangeListener, OnFieldStateChangeListener, View.OnFocusChangeListener,
     DiscreteScrollView.ScrollStateChangeListener<CarouselAdapter.ViewHolder>,
     DiscreteScrollView.OnItemChangedListener<CarouselAdapter.ViewHolder> {
 }
