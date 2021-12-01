@@ -9,7 +9,7 @@ import android.widget.EditText;
 
 import androidx.annotation.Nullable;
 
-import com.rey.material.util.ViewUtil;
+
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.customviews.MaterialTextInputLayout;
@@ -79,7 +79,7 @@ public class CarouselFactory implements FormWidgetFactory {
         DiscreteScrollView scrollView = (DiscreteScrollView) LayoutInflater.from(context).inflate(
             R.layout.item_carousel, null);
 
-        scrollView.setId(ViewUtil.generateViewId());
+        scrollView.setId(View.generateViewId());
 
         scrollView.setTag(R.id.key, jsonObject.getString("key"));
         scrollView.setTag(R.id.type, jsonObject.getString("type"));
@@ -224,7 +224,7 @@ public class CarouselFactory implements FormWidgetFactory {
         MaterialTextInputLayout textInputLayout = (MaterialTextInputLayout) LayoutInflater.from(context).inflate(R.layout.item_material_edit_text,
                 null);
         EditText editText = textInputLayout.getEditText();
-        editText.setId(ViewUtil.generateViewId());
+        editText.setId(View.generateViewId());
         textInputLayout.setTag(R.id.key, jsonObject.getString("key"));
         textInputLayout.setTag(R.id.type, jsonObject.getString("type"));
         editText.setTag(R.id.key, jsonObject.getString("key"));

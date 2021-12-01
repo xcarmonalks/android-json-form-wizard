@@ -12,8 +12,6 @@ import androidx.annotation.Nullable;
 
 import com.google.android.material.textfield.TextInputEditText;
 
-
-import com.rey.material.util.ViewUtil;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.customviews.GenericTextWatcher;
@@ -214,7 +212,7 @@ public class MaterialEditTextFactory implements FormWidgetFactory {
         MaterialTextInputLayout materialTextInputLayout = (MaterialTextInputLayout) LayoutInflater.from(context).inflate(R.layout.item_material_edit_text,
                 null);
         EditText editText = materialTextInputLayout.getEditText();
-        editText.setId(ViewUtil.generateViewId());
+        editText.setId(View.generateViewId());
         final String hint = bundle.resolveKey(jsonObject.getString("hint"));
         materialTextInputLayout.setHint(hint);
         materialTextInputLayout.setTag(R.id.key, jsonObject.getString("key"));

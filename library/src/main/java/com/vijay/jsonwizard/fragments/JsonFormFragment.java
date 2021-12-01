@@ -28,13 +28,12 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 
+import com.google.android.material.radiobutton.MaterialRadioButton;
 import com.google.android.material.textfield.TextInputEditText;
-import com.rey.material.widget.Switch;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.activities.JsonFormActivity;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.customviews.MaterialTextInputLayout;
-import com.vijay.jsonwizard.customviews.RadioButton;
 import com.vijay.jsonwizard.demo.resources.ResourceResolver;
 import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
@@ -371,7 +370,7 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
             if (view instanceof RadioGroup) {
                 RadioGroup rg = (RadioGroup) view;
                 for (int j = 0; j < rg.getChildCount(); j++) {
-                    RadioButton child = (RadioButton) rg.getChildAt(j);
+                    MaterialRadioButton child = (MaterialRadioButton) rg.getChildAt(j);
                     String parentKeyAtIndex = (String) child.getTag(R.id.key);
                     String childKeyAtIndex = (String) child.getTag(R.id.childKey);
                     if (parentKeyAtIndex.equals(parentKey) && !childKeyAtIndex.equals(childKey)) {
@@ -418,11 +417,6 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
         // Not implementation needed
-    }
-
-    @Override
-    public void onCheckedChanged(Switch view, boolean checked) {
-        presenter.onSwitchOnOrOff(view, checked);
     }
 
     public LinearLayout getMainView() {

@@ -13,7 +13,7 @@ import androidx.annotation.Nullable;
 
 import com.google.android.material.internal.CheckableImageButton;
 import com.google.android.material.textfield.TextInputEditText;
-import com.rey.material.util.ViewUtil;
+
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.customviews.GenericTextWatcher;
@@ -95,7 +95,7 @@ public class BarcodeTextFactory implements FormWidgetFactory {
         editText.setTag(R.id.type, jsonObject.getString("type"));
 
         CheckableImageButton checkableImageButton = textInputLayout.findViewById(R.id.text_input_end_icon);
-        checkableImageButton.setId(ViewUtil.generateViewId());
+        checkableImageButton.setId(View.generateViewId());
         checkableImageButton.setTag(R.id.key, jsonObject.getString("key"));
         checkableImageButton.setTag(R.id.type, jsonObject.getString("type"));
         textInputLayout.setEndIconOnClickListener(listener);
@@ -219,7 +219,7 @@ public class BarcodeTextFactory implements FormWidgetFactory {
         View parentView = LayoutInflater.from(context).inflate(R.layout.item_barcode_edit_text, null);
         final MaterialTextInputLayout textInputLayout = parentView.findViewById(R.id.textField);
         final TextInputEditText editText = (TextInputEditText) textInputLayout.getEditText();
-        editText.setId(ViewUtil.generateViewId());
+        editText.setId(View.generateViewId());
         final String hint = bundle.resolveKey(jsonObject.getString("hint"));
 
         textInputLayout.setHint(hint);
@@ -229,7 +229,7 @@ public class BarcodeTextFactory implements FormWidgetFactory {
         editText.setTag(R.id.type, jsonObject.getString("type"));
 
         CheckableImageButton checkableImageButton = textInputLayout.findViewById(R.id.text_input_end_icon);
-        checkableImageButton.setId(ViewUtil.generateViewId());
+        checkableImageButton.setId(View.generateViewId());
         checkableImageButton.setTag(R.id.key, jsonObject.getString("key"));
         checkableImageButton.setTag(R.id.type, jsonObject.getString("type"));
 

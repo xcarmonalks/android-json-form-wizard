@@ -14,7 +14,7 @@ import androidx.annotation.Nullable;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-import com.rey.material.util.ViewUtil;
+
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.customviews.MaterialTextInputLayout;
@@ -181,7 +181,7 @@ public class SpinnerFactory implements FormWidgetFactory {
         TextInputLayout textInputLayout = (TextInputLayout) LayoutInflater.from(context).inflate(R.layout.item_material_edit_text,
                 null);
         EditText editText = textInputLayout.getEditText();
-        editText.setId(ViewUtil.generateViewId());
+        editText.setId(View.generateViewId());
         final String hint = jsonObject.getString("hint");
         editText.setHint(hint);
 

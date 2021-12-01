@@ -5,7 +5,7 @@
     android:orientation="vertical">
 
 
-    <com.rey.material.widget.TextView
+    <TextView
         android:id="@+id/location_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -28,7 +28,7 @@
                 android:layout_height="72dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_map_black_18dp"
-                android:tint="@color/secondary_text" />
+                app:tint="@color/secondary_text" />
 
         </FrameLayout>
     </FrameLayout>

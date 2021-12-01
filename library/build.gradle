@@ -33,11 +33,6 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-
-    implementation 'com.github.rey5137:material:1.2.5'
-    implementation('com.github.ganfra:material-spinner:1.1.0') {
-        exclude group: 'com.nineoldandroids', module: 'library'
-    }
     implementation 'com.jayway.jsonpath:json-path:2.3.0'
     implementation 'com.yarolegovich:discrete-scrollview:1.4.7'
     implementation 'com.github.bumptech.glide:glide:3.7.0'

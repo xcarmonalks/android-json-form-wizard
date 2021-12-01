@@ -3,10 +3,11 @@ package com.vijay.jsonwizard.utils;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.text.Spanned;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.rey.material.util.ViewUtil;
+
 import com.vijay.jsonwizard.R;
 
 /**
@@ -31,7 +32,7 @@ public class FormUtils {
         textView.setText(text);
         textView.setTag(R.id.key, key);
         textView.setTag(R.id.type, type);
-        textView.setId(ViewUtil.generateViewId());
+        textView.setId(View.generateViewId());
         textView.setTextSize(textSizeInSp);
         textView.setLayoutParams(layoutParams);
         textView.setTypeface(Typeface.createFromAsset(context.getAssets(), fontPath));
@@ -44,7 +45,7 @@ public class FormUtils {
         textView.setText(text);
         textView.setTag(R.id.key, key);
         textView.setTag(R.id.type, type);
-        textView.setId(ViewUtil.generateViewId());
+        textView.setId(View.generateViewId());
         textView.setTextSize(textSizeInSp);
         textView.setLayoutParams(layoutParams);
         textView.setTypeface(Typeface.createFromAsset(context.getAssets(), fontPath));

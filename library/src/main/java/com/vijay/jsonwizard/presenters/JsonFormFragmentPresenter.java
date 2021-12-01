@@ -37,14 +37,12 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
 
-import com.google.android.material.textfield.TextInputEditText;
-import com.rey.material.widget.Switch;
+import com.google.android.material.checkbox.MaterialCheckBox;
+import com.google.android.material.radiobutton.MaterialRadioButton;
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.barcode.LivePreviewActivity;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
-import com.vijay.jsonwizard.customviews.CheckBox;
 import com.vijay.jsonwizard.customviews.MaterialTextInputLayout;
-import com.vijay.jsonwizard.customviews.RadioButton;
 import com.vijay.jsonwizard.demo.resources.ResourceResolver;
 import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.fragments.JsonFormFragment;
@@ -73,7 +71,6 @@ import com.vijay.jsonwizard.widgets.ImagePickerFactory;
 import com.vijay.jsonwizard.widgets.LocationPickerFactory;
 import com.vijay.jsonwizard.widgets.MaterialEditTextFactory;
 import com.vijay.jsonwizard.widgets.SpinnerFactory;
-import com.vijay.jsonwizard.widgets.TimePickerFactory;
 import com.vijay.jsonwizard.widgets.WidgetFactoryRegistry;
 import com.yarolegovich.discretescrollview.DiscreteScrollView;
 
@@ -286,15 +283,15 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                 } else {
                     getView().writeValue(mStepName, key, null);
                 }
-            } else if (childAt instanceof CheckBox) {
+            } else if (childAt instanceof MaterialCheckBox) {
                 String parentKey = (String) childAt.getTag(R.id.key);
                 String childKey = (String) childAt.getTag(R.id.childKey);
                 getView().writeValue(mStepName, parentKey, JsonFormConstants.OPTIONS_FIELD_NAME, childKey,
-                        String.valueOf(((CheckBox) childAt).isChecked()));
-            } else if (childAt instanceof RadioButton) {
+                        String.valueOf(((MaterialCheckBox) childAt).isChecked()));
+            } else if (childAt instanceof MaterialRadioButton) {
                 String parentKey = (String) childAt.getTag(R.id.key);
                 String childKey = (String) childAt.getTag(R.id.childKey);
-                if (((RadioButton) childAt).isChecked()) {
+                if (((MaterialRadioButton) childAt).isChecked()) {
                     getView().writeValue(mStepName, parentKey, childKey);
                 }
             }  else if (childAt instanceof DiscreteScrollView) {
@@ -605,12 +602,12 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
     }
 
     public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-        if (compoundButton instanceof CheckBox) {
+        if (compoundButton instanceof MaterialCheckBox) {
             String parentKey = (String) compoundButton.getTag(R.id.key);
             String childKey = (String) compoundButton.getTag(R.id.childKey);
             getView().writeValue(mStepName, parentKey, JsonFormConstants.OPTIONS_FIELD_NAME, childKey,
-                    String.valueOf(((CheckBox) compoundButton).isChecked()));
-        } else if (compoundButton instanceof RadioButton) {
+                    String.valueOf(((MaterialCheckBox) compoundButton).isChecked()));
+        } else if (compoundButton instanceof MaterialRadioButton) {
             if (isChecked) {
                 String parentKey = (String) compoundButton.getTag(R.id.key);
                 String childKey = (String) compoundButton.getTag(R.id.childKey);
@@ -650,11 +647,6 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                 }
             }
         }
-    }
-
-    public void onSwitchOnOrOff(Switch v, boolean checked) {
-        String key = (String) v.getTag(R.id.key);
-        getView().writeValue(mStepName, key, String.valueOf(checked));
     }
 
     public String getCurrentKey() {

@@ -8,7 +8,7 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
-import com.rey.material.util.ViewUtil;
+
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.demo.resources.ResourceResolver;
 import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
@@ -50,7 +50,7 @@ public class ExtendedLabelFactory implements FormWidgetFactory {
         List<View> views = new ArrayList<>(1);
 
         HtmlTextView textView = (HtmlTextView) LayoutInflater.from(context).inflate(R.layout.item_extended_label, null);
-        textView.setId(ViewUtil.generateViewId());
+        textView.setId(View.generateViewId());
 
 
         String valuesExpression = getValuesAsJsonExpression(jsonObject, resolver);

@@ -19,12 +19,12 @@
         android:gravity="center"
         android:layout_marginBottom="@dimen/default_bottom_margin">
 
-        <com.rey.material.widget.Button
+        <Button
             android:id="@+id/btn_upload"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
-        <com.rey.material.widget.Button
+        <Button
             android:id="@+id/btn_clear"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -1,6 +1,5 @@
-<com.vijay.jsonwizard.customviews.CheckBox
+<com.google.android.material.checkbox.MaterialCheckBox
     xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/Material.Drawable.CheckBox"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:focusable="true"
