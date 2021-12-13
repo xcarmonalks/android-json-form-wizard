@@ -11,21 +11,14 @@
         android:id="@+id/textField"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
         android:orientation="vertical"
-        android:paddingTop="16dp"
         app:errorEnabled="true"
         app:endIconMode="custom"
         app:endIconDrawable="@drawable/ic_barcode_scan_icon"
         >
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:textSize="@dimen/default_text_size"
-            android:paddingTop="4dp"
-            android:paddingBottom="8dp"
-            android:fontFamily=""/>
+            android:layout_height="wrap_content"/>
     </com.vijay.jsonwizard.customviews.MaterialTextInputLayout>
 
 </LinearLayout>

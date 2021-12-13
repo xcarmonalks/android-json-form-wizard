@@ -1,7 +1,8 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Define Material Theme colors-->
         <!-- colorPrimary is used for the default action bar background -->
         <item name="colorPrimary">@color/primary</item>
 
@@ -15,7 +16,8 @@
              colorControlHighlight, and colorSwitchThumbNormal. -->
     </style>
 
-    <style name="AppTheme.DarkToolbar" parent="AppTheme">
+    <style name="AppTheme.DarkTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Define Material Dark Theme colors-->
         <item name="android:textColorSecondary">@color/white</item>
         <item name="android:actionMenuTextColor">#FFFFFF</item>
         <item name="actionMenuTextColor">#FFFFFF</item>
