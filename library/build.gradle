@@ -33,10 +33,10 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.jayway.jsonpath:json-path:2.3.0'
-    implementation 'com.yarolegovich:discrete-scrollview:1.4.7'
-    implementation 'com.github.bumptech.glide:glide:3.7.0'
-    implementation 'org.sufficientlysecure:html-textview:3.6'
+    implementation 'com.jayway.jsonpath:json-path:2.6.0'
+    implementation 'com.yarolegovich:discrete-scrollview:1.5.1'
+    implementation 'com.github.bumptech.glide:glide:4.12.0'
+    implementation 'org.sufficientlysecure:html-textview:4.0'
 
     implementation 'com.google.firebase:firebase-ml-vision:24.0.0'
     implementation 'androidx.camera:camera-camera2:1.0.0-alpha02'
