@@ -23,7 +23,8 @@
         <activity
             android:name=".activities.MainActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
-            android:label="@string/library_name">
+            android:label="@string/library_name"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -34,7 +35,8 @@
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:label="@string/library_name" />
 
-        <receiver android:name="com.vijay.jsonwizard.demo.receivers.FormPausedReceiver">
+        <receiver android:name="com.vijay.jsonwizard.demo.receivers.FormPausedReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="jsonFormPaused"/>
             </intent-filter>

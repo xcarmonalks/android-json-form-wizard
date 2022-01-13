@@ -1,6 +1,6 @@
 apply plugin: 'org.sonarqube'
 apply plugin: 'com.android.library'
-
+apply plugin: 'maven-publish'
 
 android {
     compileSdkVersion 31
@@ -58,5 +58,21 @@ sonarqube {
         property "sonar.projectName", "Android JSON FORM Wizard"
         property "sonar.projectKey", "es.indaba.android-json-form-wizard"
         property "sonar.java.test.binaries", "$projectDir/build/intermediates/classes/androidTest/debug"
+    }
+}
+
+task androidSourcesJar(type: Jar) {
+    classifier 'sources'
+    from android.sourceSets.main.java.srcDirs
+}
+
+project.afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                artifact androidSourcesJar // optional sources
+            }
+        }
     }
 }
