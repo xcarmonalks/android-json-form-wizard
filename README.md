@@ -1010,6 +1010,13 @@ dependencies {
 }
 ```
 
+Step3. Add Android Material dependency
+
+```
+dependencies{
+ implementation 'com.google.android.material:material:1.4.0'
+}
+```
 maven:
 
 Step 1. Add the JitPack repository to your build file
@@ -1028,6 +1035,18 @@ Step 2. Add the dependency in the form
     <groupId>com.github.IndabaConsultores</groupId>
     <artifactId>android-json-form-wizard</artifactId>
     <version>1.9.0</version>
+</dependency>
+```
+
+Step 3. Add Android Material dependency
+```
+<!-- 
+https://mvnrepository.com/artifact/com.google.android.material/material -->
+<dependency>
+    <groupId>com.google.android.material</groupId>
+    <artifactId>material</artifactId>
+    <version>1.4.0</version>
+    <scope>runtime</scope>
 </dependency>
 ```
 
@@ -1059,6 +1078,7 @@ Contributions welcome via Github pull requests.
 
 # Credits
 
+- [Android Material Components] (https://github.com/material-components/material-components-android)
 - [material](https://github.com/rey5137/material)
 - [MaterialEditText](https://github.com/rengwuxian/MaterialEditText)
 - [MaterialSpinner](https://github.com/ganfra/MaterialSpinner)
