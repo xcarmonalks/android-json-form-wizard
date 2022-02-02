@@ -72,7 +72,4 @@ project.afterEvaluate {
         }
     }
 }
-<<<<<<< HEAD
 
-=======
->>>>>>> feature/android_12
