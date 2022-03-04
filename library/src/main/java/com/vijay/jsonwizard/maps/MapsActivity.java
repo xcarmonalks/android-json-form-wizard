@@ -37,6 +37,7 @@ import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -82,7 +83,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         Toolbar toolbar = findViewById(R.id.tb_top);
         setSupportActionBar(toolbar);
-
+        MapsInitializer.initialize(getApplicationContext(), MapsInitializer.Renderer.LATEST, null);
         getSupportActionBar().setTitle(R.string.choose_a_location);
 
         // Load extra datas
