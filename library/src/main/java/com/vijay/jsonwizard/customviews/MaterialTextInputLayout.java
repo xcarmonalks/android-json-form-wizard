@@ -6,6 +6,8 @@
 package com.vijay.jsonwizard.customviews;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
@@ -14,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.validators.textinputlayout.TILValidator;
 
 import java.util.ArrayList;
@@ -60,6 +63,7 @@ public class MaterialTextInputLayout extends TextInputLayout  {
                 isValid = isValid && validator.isValid(text, isEmpty);
                 if(!isValid) {
                     this.setError(validator.getErrorMessage());
+                    this.setErrorTextColor(getErrorColorStateList());
                     break;
                 }
             }
@@ -71,6 +75,16 @@ public class MaterialTextInputLayout extends TextInputLayout  {
         }else{
             return true;
         }
+    }
+
+    private ColorStateList getErrorColorStateList() {
+        int[][] states = new int[][] {
+            new int[] {-android.R.attr.state_enabled}, // disabled
+        };
+        int[] colors = new int[] {
+            Color.RED,
+        };
+        return new ColorStateList(states, colors);
     }
 
     public boolean hasValidators() {
