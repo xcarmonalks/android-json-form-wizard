@@ -399,6 +399,10 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         LinearLayout valueContainer = widget.findViewById(R.id.value_container);
         for (int i = 0; i < valueContainer.getChildCount(); i++) {
             View childView = valueContainer.getChildAt(i);
+            //Latitude child management
+            if(!(childView instanceof MaterialTextInputLayout) && (childView instanceof LinearLayout)){
+                childView = ((LinearLayout) childView).getChildAt(0);
+            }
             if (childView instanceof MaterialTextInputLayout) {
                 String childKey = (String) childView.getTag(R.id.key);
                 MaterialTextInputLayout textInputLayout = (MaterialTextInputLayout) childView;
@@ -427,6 +431,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         getView().writeValue(mStepName, key, value);
         return new ValidationStatus(true, null);
     }
+
 
     public void onSaveClick(LinearLayout mainView) {
         ValidationStatus validationStatus = writeValuesAndValidate(mainView);
