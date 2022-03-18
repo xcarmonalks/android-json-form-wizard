@@ -1,16 +1,15 @@
-<com.vijay.jsonwizard.customviews.MaterialTextInputLayout
+<fr.ganfra.materialspinner.MaterialSpinner
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/spinnerMenu"
-    style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu">
-
-    <com.google.android.material.textfield.MaterialAutoCompleteTextView
-        android:id="@+id/spinnerMenuList"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        />
-</com.vijay.jsonwizard.customviews.MaterialTextInputLayout>
+    app:ms_alignLabels="true"
+    app:ms_arrowSize="16dp"
+    app:ms_floatingLabelColor="@color/secondary_text"
+    app:ms_multiline="false"
+    app:ms_typeface="font/Roboto-Regular.ttf"
+    app:ms_baseColor="?attr/colorSecondaryVariant"
+    />
 
 
 

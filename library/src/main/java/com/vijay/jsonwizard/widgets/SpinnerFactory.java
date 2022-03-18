@@ -36,17 +36,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import fr.ganfra.materialspinner.MaterialSpinner;
+
 /**
  * Created by nipun on 30/05/15.
  */
 public class SpinnerFactory implements FormWidgetFactory {
 
-    public static ValidationStatus validate(TextInputLayout spinner) {
+    public static ValidationStatus validate(MaterialSpinner spinner) {
         if (!(spinner.getTag(R.id.v_required) instanceof String) || !(spinner.getTag(R.id.error) instanceof String)) {
             return new ValidationStatus(true, null);
         }
         Boolean isRequired = Boolean.valueOf((String) spinner.getTag(R.id.v_required));
         if (!isRequired) {
+            return new ValidationStatus(true, null);
+        }
+        int selectedItemPosition = spinner.getSelectedItemPosition();
+        if (selectedItemPosition > 0) {
             return new ValidationStatus(true, null);
         }
 
@@ -71,17 +77,14 @@ public class SpinnerFactory implements FormWidgetFactory {
     private List<View> getEditableViewsFromJson(String stepName, Context context, JSONObject jsonObject, CommonListener listener,
                                                 JsonFormBundle bundle, JsonExpressionResolver resolver) throws JSONException {
         List<View> views = new ArrayList<>(1);
-        MaterialTextInputLayout textInputLayout = (MaterialTextInputLayout) LayoutInflater.from(context).inflate(R.layout.item_spinner,
-                null);
-        MaterialAutoCompleteTextView spinner = (MaterialAutoCompleteTextView) textInputLayout.findViewById(R.id.spinnerMenuList);
+        MaterialSpinner spinner = (MaterialSpinner) LayoutInflater.from(context).inflate(R.layout.item_spinner, null);
         final String hint = bundle.resolveKey(jsonObject.optString("hint"));
         if (!TextUtils.isEmpty(hint)) {
-            textInputLayout.setHint(hint);
+            spinner.setHint(hint);
+            spinner.setFloatingLabelText(hint);
         }
 
         spinner.setId(View.generateViewId());
-        textInputLayout.setTag(R.id.key, jsonObject.getString("key"));
-        textInputLayout.setTag(R.id.type, jsonObject.getString("type"));
         spinner.setTag(R.id.key, jsonObject.getString("key"));
         spinner.setTag(R.id.type, jsonObject.getString("type"));
 
@@ -124,10 +127,11 @@ public class SpinnerFactory implements FormWidgetFactory {
 
         if (values != null) {
             spinner.setAdapter(new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, values));
+            spinner.setSelection(indexToSelect + 1, true);
             spinner.setOnItemSelectedListener(listener);
 
         }
-        views.add(textInputLayout);
+        views.add(spinner);
         return views;
     }
 

@@ -359,7 +359,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                     } else {
                         getView().writeValue(mStepName, key, editText.getText().toString());
                     }
-                } else if (editText.getTag(R.id.type).equals(JsonFormConstants.SPINNER) ){
+                } /*else if (editText.getTag(R.id.type).equals(JsonFormConstants.SPINNER) ){
                     ValidationStatus validationStatus = SpinnerFactory.validate(textInputLayout);
 
                     if(!validationStatus.isValid()){
@@ -374,7 +374,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                         getView().writeValue(mStepName, key, editText.getText().toString());
                     }
 
-                }
+                }*/
             } else if (childAt instanceof LinearLayout) {
                 if (JsonFormConstants.LOCATION_PICKER.equals(childAt.getTag(R.id.type))) {
                     ValidationStatus validationStatus = writeValuesAndValidateLocationPicker((LinearLayout) childAt, key);
@@ -565,7 +565,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         String parentKey = (String) parent.getTag(R.id.key);
         if (position >= 0) {
-            Object value = parent.getItemAtPosition(position + 1);
+            Object value = parent.getItemAtPosition(position);
             if (value instanceof SpinnerFactory.ValueLabelPair) {
                 getView().writeValue(mStepName, parentKey,
                         ((SpinnerFactory.ValueLabelPair) value).getValue());
