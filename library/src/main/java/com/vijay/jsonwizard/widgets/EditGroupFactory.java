@@ -40,6 +40,8 @@ public class EditGroupFactory implements FormWidgetFactory {
     public List<View> getViewsFromJson(String stepName, Context context, JSONObject parentJson, CommonListener listener,
         JsonFormBundle bundle, JsonExpressionResolver resolver, ResourceResolver resourceResolver,
         int visualizationMode) throws JSONException {
+
+
         List<View> viewsFromJson = new ArrayList<>();
 
         LinearLayout linearLayout = new LinearLayout(context);
@@ -56,35 +58,65 @@ public class EditGroupFactory implements FormWidgetFactory {
                 getTextViewWith(context, 16, groupTitle, parentJson.getString("key"), parentJson.getString("type"),
                     getLayoutParams(MATCH_PARENT, WRAP_CONTENT, 0, 0, 0, 0), FONT_BOLD_PATH));
         }
-
-        try {
-            JSONArray fields = parentJson.getJSONArray(JsonFormConstants.FIELDS_FIELD_NAME);
-            long optNumber = parentJson.getLong("optNumber");
-            linearLayout.setWeightSum(optNumber);
-            for (int i = 0; i < optNumber; i++) {
-                JSONObject childJson = fields.getJSONObject(i);
-                try {
-                    List<View> views = WidgetFactoryRegistry.getWidgetFactory(childJson.getString("type"))
-                                                            .getViewsFromJson(stepName, context, childJson, listener,
-                                                                bundle, resolver, resourceResolver, visualizationMode);
-                    for (View v: views) {
-                        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(0,
-                            LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
-                        layoutParams.setMargins(0, 0, 10, 0);
-                        v.setLayoutParams(layoutParams);
-                        linearLayout.addView(v);
-                    }
-                } catch (Exception e) {
-                    Log.e(TAG, "Exception occurred in making child view at index : " + i + " : Exception is : " + e
-                        .getMessage());
+        long optNumber = parentJson.getLong("optNumber");
+        long childrenPerLine = prepareChildrenPerLine(parentJson,optNumber);
+        int childrenIndex = 0;
+        while(childrenIndex <  optNumber){
+            try {
+                if(childrenIndex>0){
+                    linearLayout = new LinearLayout(context);
+                    linearLayout.setLayoutParams(
+                        new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                    linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+                    linearLayout.setTag(R.id.key, parentJson.getString("key"));
+                    linearLayout.setTag(R.id.type, JsonFormConstants.EDIT_GROUP);
                 }
+
+                JSONArray fields = parentJson.getJSONArray(JsonFormConstants.FIELDS_FIELD_NAME);
+
+                linearLayout.setWeightSum(childrenPerLine);
+                int lineIndex = 0;
+                while ( lineIndex < childrenPerLine && childrenIndex <  optNumber) {
+                    JSONObject childJson = fields.getJSONObject(childrenIndex);
+                    try {
+                        List<View> views = WidgetFactoryRegistry.getWidgetFactory(childJson.getString("type"))
+                                                                .getViewsFromJson(stepName, context, childJson, listener,
+                                                                    bundle, resolver, resourceResolver, visualizationMode);
+                        for (View v: views) {
+                            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(0,
+                                LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+                            layoutParams.setMargins(0, 0, 10, 0);
+                            v.setLayoutParams(layoutParams);
+                            linearLayout.addView(v);
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, "Exception occurred in making child view at index : " + childrenIndex + " : Exception is : " + e
+                            .getMessage());
+                    }
+                    lineIndex++;
+                    childrenIndex++;
+                }
+            } catch (JSONException e) {
+                Log.e(TAG, "Json exception occurred : " + e.getMessage());
             }
-        } catch (JSONException e) {
-            Log.e(TAG, "Json exception occurred : " + e.getMessage());
+            if (linearLayout.getChildCount() > 0) {
+                viewsFromJson.add(linearLayout);
+            }
         }
-        if (linearLayout.getChildCount() > 0) {
-            viewsFromJson.add(linearLayout);
-        }
+
         return viewsFromJson;
+    }
+
+    private long prepareChildrenPerLine(JSONObject parentJson, long optNumber) {
+        if(parentJson.has("childrenPerLine")){
+            try {
+                return parentJson.getLong("childrenPerLine");
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return optNumber;
+            }
+        }else{
+            return optNumber;
+        }
     }
 }
