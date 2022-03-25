@@ -7,8 +7,9 @@
     app:ms_arrowSize="16dp"
     app:ms_floatingLabelColor="@color/secondary_text"
     app:ms_multiline="false"
-    app:ms_typeface="font/Roboto-Regular.ttf"
+    app:ms_hintColor="@color/secondary_text"
     app:ms_baseColor="?attr/colorSecondaryVariant"
+
     />
 
 

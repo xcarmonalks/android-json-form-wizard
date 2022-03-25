@@ -1,13 +1,12 @@
 <com.vijay.jsonwizard.customviews.MaterialTextInputLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/textField"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     app:errorEnabled="true"
-    style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox">
+    >
 
     <com.google.android.material.textfield.TextInputEditText
         android:layout_width="match_parent"
