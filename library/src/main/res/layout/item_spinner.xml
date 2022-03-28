@@ -5,7 +5,6 @@
     android:layout_height="wrap_content"
     app:ms_alignLabels="true"
     app:ms_arrowSize="16dp"
-    app:ms_floatingLabelColor="@color/secondary_text"
     app:ms_multiline="false"
     app:ms_baseColor="?attr/colorSecondaryVariant"
 
