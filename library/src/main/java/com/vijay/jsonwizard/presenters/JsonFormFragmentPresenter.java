@@ -82,6 +82,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import fr.ganfra.materialspinner.MaterialSpinner;
+
 /**
  * Created by vijay on 5/14/15.
  */
@@ -297,6 +299,12 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
             }  else if (childAt instanceof DiscreteScrollView) {
                 DiscreteScrollView dsv = (DiscreteScrollView) childAt;
                 ValidationStatus validationStatus = CarouselFactory.validate(dsv);
+                if (!validationStatus.isValid()) {
+                    return validationStatus;
+                }
+            }  else if (childAt instanceof MaterialSpinner) {
+                MaterialSpinner ms = (MaterialSpinner) childAt;
+                ValidationStatus validationStatus = SpinnerFactory.validate(ms);
                 if (!validationStatus.isValid()) {
                     return validationStatus;
                 }
