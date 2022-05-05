@@ -27,6 +27,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.radiobutton.MaterialRadioButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -399,9 +400,12 @@ public class JsonFormFragment extends MvpFragment<JsonFormFragmentPresenter, Jso
 
     @Override
     public void transactThis(JsonFormFragment next) {
-        getActivity().getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.enter_from_right,
-            R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right).replace(R.id.container, next)
-                     .addToBackStack(next.getClass().getSimpleName()).commit();
+        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+        transaction.add(((ViewGroup) getView().getParent()).getId(), next);
+        transaction.hide(this);
+        transaction.addToBackStack(next.getClass().getSimpleName());
+        transaction.commit();
+
     }
 
     @Override
