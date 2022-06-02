@@ -209,7 +209,7 @@ public class DatePickerFactory implements FormWidgetFactory, ClickableFormWidget
                 public void onPositiveButtonClick(Object selection) {
                     Calendar utc = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
                     utc.setTimeInMillis((long) selection);
-                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                    SimpleDateFormat format = new SimpleDateFormat(dateText.getTag(R.id.v_pattern).toString());
                     String formatted = format.format(utc.getTime());
                     dateText.setText(formatted);
                     d.dismiss();
