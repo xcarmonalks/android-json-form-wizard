@@ -102,7 +102,7 @@ public class DatePickerFactory implements FormWidgetFactory, ClickableFormWidget
         final String value = jsonObject.optString("value");
         if (!TextUtils.isEmpty(value)) {
             Date date = DateUtils.parseJSONDate(value);
-            editText.setText(SimpleDateFormat.getInstance().format(date));
+            editText.setText(new SimpleDateFormat((String)editText.getTag(R.id.v_pattern)).format(date));
         }
 
         views.add(materialTextInputLayout);
