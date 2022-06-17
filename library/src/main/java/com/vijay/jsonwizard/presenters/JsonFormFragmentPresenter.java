@@ -497,17 +497,19 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
             Log.i(TAG, "LOCATION RESULT: " + location);
             mStepName = getView().getArguments().getString("stepName");
             getView().writeValue(mStepName, mCurrentKey, location);
-            String[] parts = location.split(MapsUtils.COORD_SEPARATOR);
-            if (parts.length > 0) {
-                getView().updateRelevantTextInputLayout(mCurrentKey + KEY_SUFFIX_LATITUDE, parts[0].trim());
+            if(location != null && !location.isEmpty()){
+                String[] parts = location.split(MapsUtils.COORD_SEPARATOR);
+                if (parts.length > 0) {
+                    getView().updateRelevantTextInputLayout(mCurrentKey + KEY_SUFFIX_LATITUDE, parts[0].trim());
+                }
+                if (parts.length > 1) {
+                    getView().updateRelevantTextInputLayout(mCurrentKey + KEY_SUFFIX_LONGITUDE, parts[1].trim());
+                }
+                if (parts.length > 2) {
+                    getView().updateRelevantTextInputLayout(mCurrentKey + KEY_SUFFIX_ACCURACY, parts[2].trim());
+                }
+                getView().updateRelevantMap(mCurrentKey, location);
             }
-            if (parts.length > 1) {
-                getView().updateRelevantTextInputLayout(mCurrentKey + KEY_SUFFIX_LONGITUDE, parts[1].trim());
-            }
-            if (parts.length > 2) {
-                getView().updateRelevantTextInputLayout(mCurrentKey + KEY_SUFFIX_ACCURACY, parts[2].trim());
-            }
-            getView().updateRelevantMap(mCurrentKey, location);
         }
     }
 
