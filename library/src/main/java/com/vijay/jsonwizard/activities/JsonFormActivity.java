@@ -29,6 +29,7 @@ import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.JsonApi;
 import com.vijay.jsonwizard.state.StateProvider;
 import com.vijay.jsonwizard.utils.ExpressionResolverContextUtils;
+import com.vijay.jsonwizard.utils.FormUtils;
 import com.vijay.jsonwizard.utils.JsonFormUtils;
 import com.vijay.jsonwizard.utils.PropertiesUtils;
 
@@ -144,7 +145,7 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
             }
         } else {
             mTrackHistory = savedInstanceState.getBoolean("trackHistory");
-            init(savedInstanceState.getString("jsonState"),
+            init(JsonFormUtils.readTempFormFromDisk(this),
                     savedInstanceState.getInt(JsonFormConstants.VISUALIZATION_MODE_EXTRA),
                     savedInstanceState.getString("resolver"), savedInstanceState.getString("resourceResolver"));
         }
