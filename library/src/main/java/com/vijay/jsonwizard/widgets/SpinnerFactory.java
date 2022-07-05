@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -56,6 +57,9 @@ public class SpinnerFactory implements FormWidgetFactory {
             return new ValidationStatus(true, null);
         }
 
+        if((spinner.getTag(R.id.error) instanceof String)){
+            ((TextView)spinner.getSelectedView()).setError((String) spinner.getTag(R.id.error));
+        }
         return new ValidationStatus(false, (String) spinner.getTag(R.id.error));
     }
 
