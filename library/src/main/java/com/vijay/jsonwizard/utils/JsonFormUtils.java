@@ -88,16 +88,18 @@ public class JsonFormUtils {
 
     private static JSONObject findInJSON(JSONObject root, String key) throws JSONException {
         JSONArray fields = root.getJSONArray("fields");
-        for (int i = 0; i < fields.length(); i++) {
-            JSONObject field = (JSONObject) fields.get(i);
-            if (isContainer(field)) {
-                field = findInJSON(field, key);
-            } else if (isCheckbox(field)) {
-                JSONArray options = field.getJSONArray("options");
-                field = findInJSONOptions(options, key);
-            }
-            if (field != null && field.has("key") && field.getString("key").equals(key)) {
-                return field;
+        if(fields!=null){
+            for (int i = 0; i < fields.length(); i++) {
+                JSONObject field = (JSONObject) fields.get(i);
+                if (isContainer(field)) {
+                    field = findInJSON(field, key);
+                } else if (isCheckbox(field)) {
+                    JSONArray options = field.getJSONArray("options");
+                    field = findInJSONOptions(options, key);
+                }
+                if (field != null && field.has("key") && field.getString("key").equals(key)) {
+                    return field;
+                }
             }
         }
         return null;
