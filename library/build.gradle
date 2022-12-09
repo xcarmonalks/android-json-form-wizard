@@ -6,11 +6,16 @@ android {
     compileSdkVersion 33
     buildToolsVersion '33.0.0'
 
+    publishing {
+        singleVariant('release') {
+            withSourcesJar()
+            withJavadocJar()
+        }
+    }
+
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 33
-        versionCode 18
-        versionName "1.9.12"
     }
     buildTypes {
         release {
@@ -18,9 +23,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    lintOptions {
+    lint {
         abortOnError false
     }
+    namespace 'com.vijay.jsonwizard'
 
     configurations.all {
         resolutionStrategy.force "com.android.support:support-v4:$supportLibVersion"
@@ -66,14 +72,4 @@ task androidSourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
 }
 
-project.afterEvaluate {
-    publishing {
-        publications {
-            release(MavenPublication) {
-                from components.release
-                artifact androidSourcesJar // optional sources
-            }
-        }
-    }
-}
 

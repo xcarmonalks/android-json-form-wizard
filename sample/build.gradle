@@ -20,9 +20,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    lintOptions {
+    lint {
         abortOnError false
     }
+    namespace 'com.vijay.jsonwizard.demo'
 }
 
 dependencies {
