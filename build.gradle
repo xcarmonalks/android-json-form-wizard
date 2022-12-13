@@ -22,6 +22,4 @@ allprojects {
     }
 }
 
-ext {
-    supportLibVersion = '33.0.0'
-}
+
