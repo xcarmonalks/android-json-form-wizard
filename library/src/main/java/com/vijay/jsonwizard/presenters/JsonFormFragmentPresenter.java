@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewParent;
@@ -623,7 +624,13 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
     public boolean checkFormPermissions() {
 
         int PERMISSION_ALL = 1;
-        String[] PERMISSIONS = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA};
+        String[] PERMISSIONS;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            //No need to check for READ/WRITE permissions on devices with SDK 33 or above
+            PERMISSIONS = new String[]{Manifest.permission.CAMERA};
+        }else{
+            PERMISSIONS = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA};
+        }
 
         if (!hasPermissions(getView().getContext(), PERMISSIONS)) {
             JsonFormFragment formFragment = (JsonFormFragment) getView();
