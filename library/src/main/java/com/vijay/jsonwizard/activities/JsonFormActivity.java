@@ -266,7 +266,11 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
     private String findValue(JSONObject jsonObject, String key) {
         try {
             JSONObject field = JsonFormUtils.findFieldInJSON(jsonObject, key);
-            return field.optString("value");
+            if(field!=null){
+                return field.optString("value");
+            }else{
+                return null;
+            }
         } catch (JSONException e) {
             Log.e(TAG, "No value found", e);
         }
