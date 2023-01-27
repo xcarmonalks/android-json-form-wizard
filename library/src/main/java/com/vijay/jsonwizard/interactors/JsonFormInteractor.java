@@ -12,6 +12,7 @@ import com.vijay.jsonwizard.expressions.JsonExpressionResolver;
 import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.JsonApi;
+import com.vijay.jsonwizard.utils.ExpressionResolverContextUtils;
 import com.vijay.jsonwizard.utils.JsonFormUtils;
 import com.vijay.jsonwizard.widgets.WidgetFactoryRegistry;
 
@@ -46,7 +47,7 @@ public class JsonFormInteractor {
             JSONArray fields = parentJson.getJSONArray("fields");
             for (int i = 0; i < fields.length(); i++) {
                 JSONObject childJson = fields.getJSONObject(i);
-                if (isVisible(childJson, context, resolver)) {
+                if (isVisible(stepName,childJson, context, resolver)) {
                     try {
                         List<View> views = WidgetFactoryRegistry.getWidgetFactory(childJson.getString("type")).
                             getViewsFromJson(stepName, context, childJson, listener, bundle, resolver, resourceResolver,
@@ -66,13 +67,13 @@ public class JsonFormInteractor {
         return viewsFromJson;
     }
 
-    private boolean isVisible(JSONObject jsonObject, Context context, JsonExpressionResolver resolver) {
+    private boolean isVisible(String stepName, JSONObject jsonObject, Context context, JsonExpressionResolver resolver) {
 
         final String showExpression = jsonObject.optString("show");
         if (!TextUtils.isEmpty(showExpression)) {
             if (resolver.isValidExpression(showExpression)) {
                 try {
-                    JSONObject currentValues = getCurrentValues(context);
+                    JSONObject currentValues = ExpressionResolverContextUtils.getCurrentValues(context,stepName);
                     return resolver.existsExpression(showExpression, currentValues);
                 } catch (JSONException e) {
                     Log.e(TAG, "isVisible: Error evaluating expression " + showExpression, e);
@@ -87,7 +88,7 @@ public class JsonFormInteractor {
         if (!TextUtils.isEmpty(hideExpression)) {
             if (resolver.isValidExpression(hideExpression)) {
                 try {
-                    JSONObject currentValues = getCurrentValues(context);
+                    JSONObject currentValues = ExpressionResolverContextUtils.getCurrentValues(context,stepName);
                     return !resolver.existsExpression(hideExpression, currentValues);
                 } catch (JSONException e) {
                     Log.e(TAG, "isVisible: Error evaluating expression " + showExpression, e);
