@@ -27,6 +27,8 @@
 
         <activity android:name=".resourceviewer.WebViewActivity" android:exported="true" />
 
+        <activity android:name=".activities.SignatureActivity" android:exported="true" />
+
     </application>
 
     <queries>

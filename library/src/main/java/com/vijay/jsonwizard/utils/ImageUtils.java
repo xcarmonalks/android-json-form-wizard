@@ -3,6 +3,9 @@ package com.vijay.jsonwizard.utils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
@@ -87,5 +90,87 @@ public class ImageUtils {
             Log.e(TAG, "Error compressing bitmap", e);
         }
         return false;
+    }
+
+    public static boolean compressAndSave(Bitmap uncompressedBitmap, int compressionRatio, String filePath) {
+
+        try {
+            if (compressionRatio > 0 && compressionRatio <= 100) {
+                // Create folder if doesn't exist
+                File file = new File(filePath);
+                File folder = new File(file.getParent());
+                if (!folder.exists()) {
+                    folder.mkdirs();
+                }
+
+                FileOutputStream fos = new FileOutputStream(file);
+                uncompressedBitmap.compress(Bitmap.CompressFormat.JPEG, compressionRatio, fos);
+                fos.flush();
+                fos.close();
+
+                return true;
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error compressing bitmap", e);
+        }
+        return false;
+    }
+
+    public static Bitmap scaleToFit(Bitmap unscaledBitmap, int maxSize) {
+
+        Bitmap scaledBitmap = null;
+        // Only scale if necessary
+        if ((unscaledBitmap.getWidth() > maxSize) || (unscaledBitmap.getHeight() > maxSize)) {
+
+            Rect srcRect = calculateSrcRect(unscaledBitmap.getWidth(), unscaledBitmap.getHeight(), maxSize, maxSize,
+                ScalingLogic.FIT);
+            Rect destRect = calculateDestRect(unscaledBitmap.getWidth(), unscaledBitmap.getHeight(), maxSize, maxSize,
+                ScalingLogic.FIT);
+            scaledBitmap = Bitmap.createBitmap(destRect.width(), destRect.height(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(scaledBitmap);
+            canvas.drawBitmap(unscaledBitmap, srcRect, destRect, new Paint(Paint.FILTER_BITMAP_FLAG));
+        } else {
+            scaledBitmap = unscaledBitmap;
+        }
+        return scaledBitmap;
+    }
+
+    public static Rect calculateSrcRect(int srcWidth, int srcHeight, int dstWidth, int dstHeight,
+        ScalingLogic scalingLogic) {
+        if (scalingLogic == ScalingLogic.CROP) {
+            final float srcAspect = (float) srcWidth / (float) srcHeight;
+            final float dstAspect = (float) dstWidth / (float) dstHeight;
+
+            if (srcAspect > dstAspect) {
+                final int srcRectWidth = (int) (srcHeight * dstAspect);
+                final int srcRectLeft = (srcWidth - srcRectWidth) / 2;
+                return new Rect(srcRectLeft, 0, srcRectLeft + srcRectWidth, srcHeight);
+            } else {
+                final int srcRectHeight = (int) (srcWidth / dstAspect);
+                final int scrRectTop = (int) (srcHeight - srcRectHeight) / 2;
+                return new Rect(0, scrRectTop, srcWidth, scrRectTop + srcRectHeight);
+            }
+        } else {
+            return new Rect(0, 0, srcWidth, srcHeight);
+        }
+    }
+
+    public static Rect calculateDestRect(int srcWidth, int srcHeight, int dstWidth, int dstHeight, ScalingLogic logic) {
+        if (logic == ScalingLogic.FIT) {
+            final float srcAspect = (float) srcWidth / (float) srcHeight;
+            final float dstAspect = (float) dstWidth / (float) dstHeight;
+
+            if (srcAspect > dstAspect) {
+                return new Rect(0, 0, dstWidth, (int) (dstWidth / srcAspect));
+            } else {
+                return new Rect(0, 0, (int) (dstHeight * srcAspect), dstHeight);
+            }
+        } else {
+            return new Rect(0, 0, dstWidth, dstHeight);
+        }
+    }
+
+    public static enum ScalingLogic {
+        CROP, FIT
     }
 }

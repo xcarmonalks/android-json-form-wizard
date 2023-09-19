@@ -30,6 +30,7 @@ public class WidgetFactoryRegistry {
         map.put(JsonFormConstants.BARCODE_TEXT, new BarcodeTextFactory());
         map.put(JsonFormConstants.LOCATION_PICKER, new LocationPickerFactory());
         map.put(JsonFormConstants.RESOURCE_VIEWER, new ResourceViewerFactory());
+        map.put(JsonFormConstants.SIGNATURE, new SignatureFactory());
     }
 
     public static FormWidgetFactory getWidgetFactory(String type) {
