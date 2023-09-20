@@ -90,6 +90,7 @@ public class SignatureFactory implements FormWidgetFactory {
         imageView.setTag(R.id.key, jsonObject.getString("key"));
         imageView.setTag(R.id.type, jsonObject.getString("type"));
 
+
         JSONObject requiredObject = jsonObject.optJSONObject("v_required");
         if (requiredObject != null) {
             String requiredValue = requiredObject.getString("value");
@@ -99,13 +100,10 @@ public class SignatureFactory implements FormWidgetFactory {
             }
         }
         final Button clearBtn = rootView.findViewById(R.id.btn_clear);
-        clearBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                imageView.setImageResource(R.mipmap.grey_bg);
-                imageView.setTag(R.id.imagePath, null);
-                clearBtn.setVisibility(View.GONE);
-            }
+        clearBtn.setOnClickListener(v -> {
+            imageView.setImageResource(R.mipmap.grey_bg);
+            imageView.setTag(R.id.imagePath, null);
+            clearBtn.setVisibility(View.GONE);
         });
 
         String imagePath = jsonObject.optString("value");
@@ -121,6 +119,7 @@ public class SignatureFactory implements FormWidgetFactory {
         uploadButton.setOnClickListener(listener);
         uploadButton.setTag(R.id.key, jsonObject.getString("key"));
         uploadButton.setTag(R.id.type, jsonObject.getString("type"));
+        uploadButton.setTag (R.id.timestamp,jsonObject.getString("timestamp"));
 
         views.add(rootView);
         return views;

@@ -45,14 +45,21 @@ public class SignatureActivity extends AppCompatActivity{
     private View view;
     private View deleteButton;
     private View saveButton;
+    private Boolean isTimestampVisible;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getExtras();
         setupView();
         setupButtons();
+
     }
 
+    private void getExtras() {
+        Bundle extras = getIntent().getExtras();
+        isTimestampVisible = extras.getBoolean("timestamp");
+    }
 
 
     private void setupView() {
@@ -61,7 +68,17 @@ public class SignatureActivity extends AppCompatActivity{
         mContent = findViewById(R.id.mysignature);
         mSignature = new Signature(this, null);
         mContent.addView(mSignature);
+        setTimestampVisibility();
         view = mysignatureContainer;
+    }
+
+    private void setTimestampVisibility() {
+        View timestamp = findViewById(R.id.timestampTv);
+        if(isTimestampVisible){
+            timestamp.setVisibility(View.VISIBLE);
+        }else{
+            timestamp.setVisibility(View.GONE);
+        }
     }
 
     private void setupButtons(){
@@ -79,14 +96,6 @@ public class SignatureActivity extends AppCompatActivity{
     }
 
     private void saveImage() {
-/*        bitmap = Bitmap.createBitmap(mContent.getWidth(), mContent.getHeight(), Bitmap.Config.RGB_565);
-        File file = new File(getExternalCacheDir(), System.currentTimeMillis() + ".jpg");
-        bitmap = ImageUtils.scaleToFit(bitmap, BuildConfig.IMAGE_MAX_SIZE);
-        result = ImageUtils.compressAndSave(bitmap, BuildConfig.IMAGE_COMPRESSION_RATIO, storedPath);
-
-
-
-        ImageUtils.saveToFile(bitmap,file);*/
         //Todo cambiar este nombre
         File file = new File(getExternalCacheDir(), "firma" + ".jpg");
         bitmap = Bitmap.createBitmap(mContent.getWidth(), mContent.getHeight(), Bitmap.Config.RGB_565);

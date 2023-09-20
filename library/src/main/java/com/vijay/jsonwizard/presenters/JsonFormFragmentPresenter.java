@@ -532,6 +532,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
     public void onClick(View v) {
         String key = (String) v.getTag(R.id.key);
         String type = (String) v.getTag(R.id.type);
+
         FormWidgetFactory formWidgetFactory =  WidgetFactoryRegistry.getWidgetFactory(type);
         if(formWidgetFactory instanceof ClickableFormWidget) {
             if (JsonFormConstants.BARCODE_TEXT.equals(type)){
@@ -560,6 +561,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                     Log.w(TAG, "CAMERA and STORAGE permissions required to use IMAGE widget");
                 }
             }else if (JsonFormConstants.SIGNATURE.equals(type)) {
+                String uploadButtonText = (String) v.getTag(R.id.timestamp);
                 mCurrentKey = key;
                 if (v.getTag(R.id.btn_clear) != null) {
                     getView().updateRelevantImageView(null, null, key, mStepName);
@@ -567,11 +569,16 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                 }else{
                     getView().hideKeyBoard();
                     Intent signatureIntent = new Intent(getView().getContext(), SignatureActivity.class);
+                    signatureIntent.putExtra("timestamp",getTimestampVisibilityBoolean(uploadButtonText));
                     getView().startActivityForResult(signatureIntent, RESULT_LOAD_SIGNATURE);
                 }
             }
         }
     }
+
+    private boolean getTimestampVisibilityBoolean(String uploadButtonText) {
+            return uploadButtonText!=null && ("true").equals(uploadButtonText);
+   }
 
     public void onFocusChange(View v, boolean focus){
         String key = (String) v.getTag(R.id.key);

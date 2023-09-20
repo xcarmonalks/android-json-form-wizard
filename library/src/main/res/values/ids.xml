@@ -10,6 +10,7 @@
     <item name="v_pattern" type="id"/>
     <item name="minDate" type="id"/>
     <item name="maxDate" type="id"/>
+    <item name="timestamp" type="id"/>
 
     <!-- signle, multiple -->
     <item name="valueType" type="id"/>
