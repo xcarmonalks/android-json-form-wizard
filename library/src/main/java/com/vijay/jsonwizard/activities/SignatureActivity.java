@@ -87,6 +87,7 @@ public class SignatureActivity extends AppCompatActivity{
 
 
         ImageUtils.saveToFile(bitmap,file);*/
+        //Todo cambiar este nombre
         File file = new File(getExternalCacheDir(), "firma" + ".jpg");
         bitmap = Bitmap.createBitmap(mContent.getWidth(), mContent.getHeight(), Bitmap.Config.RGB_565);
         final Canvas canvas = new Canvas(bitmap);

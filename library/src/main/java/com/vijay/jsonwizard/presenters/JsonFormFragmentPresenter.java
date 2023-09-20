@@ -479,23 +479,11 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
 
         if (requestCode == RESULT_LOAD_SIGNATURE) {
             Context context = getView().getContext();
+            //Todo cambiar este nombre
             File image = new File(context.getExternalCacheDir(), "firma" + ".jpg");
-            //File image = new File(context.getExternalCacheDir(), System.currentTimeMillis() + ".jpg");
-            //ImageUtils.saveToFile(bitmap, image);
             String filePath = image.getAbsolutePath();
             Bitmap bitmap = BitmapFactory.decodeFile(filePath);
             getView().updateRelevantImageView(bitmap, image.getAbsolutePath(), mCurrentKey,mStepName);
-
-
-
-/*            Bitmap bitmap = SignatureItem.getImageFromResult(context, resultCode, data);
-            //
-            if (bitmap != null) {
-                File image = new File(context.getExternalCacheDir(), "firma" + ".jpg");
-                //File image = new File(context.getExternalCacheDir(), System.currentTimeMillis() + ".jpg");
-                //ImageUtils.saveToFile(bitmap, image);
-                getView().updateRelevantImageView(bitmap, image.getAbsolutePath(), mCurrentKey,mStepName);
-            }*/
         }
 
         if (requestCode == RESULT_LOAD_BARCODE) {

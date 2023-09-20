@@ -27,7 +27,9 @@
 
         <activity android:name=".resourceviewer.WebViewActivity" android:exported="true" />
 
-        <activity android:name=".activities.SignatureActivity" android:exported="true" />
+        <activity android:name=".activities.SignatureActivity"
+            android:screenOrientation="landscape"
+            android:exported="true" />
 
     </application>
 

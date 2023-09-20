@@ -3,7 +3,7 @@
     <string name="next">Next</string>
     <string name="save">Save</string>
     <string name="delete">Delete</string>
-    <string name="signature_empty">Debes de firmar para poder guardar</string>
+    <string name="signature_empty">Debes firmar para poder guardar</string>
     <string name="summary">Summary</string>
     <string name="image_picker">Choose image</string>
     <string name="mlkit_not_found">Module MLkit manquant. Attendez que le téléchargement soit terminé</string>
