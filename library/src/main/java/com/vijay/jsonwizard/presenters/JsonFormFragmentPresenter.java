@@ -479,10 +479,11 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
 
         if (requestCode == RESULT_LOAD_SIGNATURE) {
             Context context = getView().getContext();
-            //Todo cambiar este nombre
-            File image = new File(context.getExternalCacheDir(), "firma" + ".jpg");
+            String fileName = data.getStringExtra("signatureFileName");
+            File image = new File(context.getExternalCacheDir(), fileName + ".jpg");
             String filePath = image.getAbsolutePath();
             Bitmap bitmap = BitmapFactory.decodeFile(filePath);
+            ImageUtils.saveToFile(bitmap, image);
             getView().updateRelevantImageView(bitmap, image.getAbsolutePath(), mCurrentKey,mStepName);
         }
 

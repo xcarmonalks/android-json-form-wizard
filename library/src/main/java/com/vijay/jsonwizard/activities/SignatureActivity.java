@@ -96,13 +96,17 @@ public class SignatureActivity extends AppCompatActivity{
     }
 
     private void saveImage() {
-        //Todo cambiar este nombre
-        File file = new File(getExternalCacheDir(), "firma" + ".jpg");
+        String fileName = String.valueOf(System.currentTimeMillis());
+        File file = new File(getExternalCacheDir(), fileName + ".jpg");
         bitmap = Bitmap.createBitmap(mContent.getWidth(), mContent.getHeight(), Bitmap.Config.RGB_565);
         final Canvas canvas = new Canvas(bitmap);
         view.draw(canvas);
         bitmap = ImageUtils.scaleToFit(bitmap, 1600);
-        ImageUtils.compressAndSave(bitmap, 80, file.getAbsolutePath());
+        //ImageUtils.compressAndSave(bitmap, 80, file.getAbsolutePath());
+        ImageUtils.saveToFile(bitmap, file);
+        Intent intent = new Intent();
+        intent.putExtra("signatureFileName",fileName);
+        setResult(100,intent);
         finish();
     }
 
