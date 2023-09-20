@@ -128,7 +128,7 @@ public class JsonFormUtils {
                 } else {
                     if (isCheckbox(field)) {
                         processCheckbox(field, dataMap);
-                    } else if (isImageChooser(field)) {
+                    } else if (isImageChooser(field) || isSignatureImage(field)) {
                         processImageChooser(field, dataMap, incluideBase64);
                     } else if (field.has("key") && field.has("value")) {
                         dataMap.put(field.getString("key"), field.get("value"));
@@ -137,6 +137,8 @@ public class JsonFormUtils {
             }
         }
     }
+
+
 
     private static void processImageChooser(JSONObject field, Map<String, Object> dataMap, boolean includeBase64)
             throws JSONException {
@@ -174,6 +176,10 @@ public class JsonFormUtils {
 
     private static boolean isImageChooser(JSONObject field) throws JSONException {
         return "choose_image".equals(field.getString("type"));
+    }
+
+    private static boolean isSignatureImage(JSONObject field) throws JSONException{
+        return "signature".equals(field.getString("type"));
     }
 
     public static String resolveNextStep(JSONObject mStepDetails, JsonExpressionResolver resolver, JSONObject completeDoc) {
