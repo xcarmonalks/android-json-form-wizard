@@ -23,7 +23,7 @@
                 android:layout_marginLeft="24sp"
                 android:layout_marginTop="16sp"
                 tools:text="20/09/2023 - 09:33:50"
-                android:textColor="@color/blue"
+                android:textColor="@color/timestamp_blue"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 android:textSize="20sp" />

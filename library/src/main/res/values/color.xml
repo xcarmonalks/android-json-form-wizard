@@ -12,5 +12,5 @@
     <color name="grey">#87A0AA</color>
     <color name="save_button_green">#00A532</color>
     <color name="clear_button_red">#D1524F</color>
-    <color name="blue">#003264</color>
+    <color name="timestamp_blue">#003264</color>
 </resources>
