@@ -72,7 +72,7 @@ public class SignatureFactory implements FormWidgetFactory {
             }
             Button btn = rootView.findViewById(R.id.btn_upload);
             btn.setEnabled(false);
-            btn.setText(bundle.resolveKey(jsonObject.getString("uploadButtonText")));
+            btn.setText(bundle.resolveKey(jsonObject.getString("signButtonText")));
             views.add(rootView);
             return views;
         } else {
@@ -115,7 +115,7 @@ public class SignatureFactory implements FormWidgetFactory {
             clearBtn.setVisibility(View.VISIBLE);
         }
         Button uploadButton = rootView.findViewById(R.id.btn_upload);
-        uploadButton.setText(bundle.resolveKey(jsonObject.getString("uploadButtonText")));
+        uploadButton.setText(bundle.resolveKey(jsonObject.getString("signButtonText")));
         uploadButton.setOnClickListener(listener);
         uploadButton.setTag(R.id.key, jsonObject.getString("key"));
         uploadButton.setTag(R.id.type, jsonObject.getString("type"));

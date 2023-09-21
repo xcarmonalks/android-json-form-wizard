@@ -477,7 +477,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
             }
         }
 
-        if (requestCode == RESULT_LOAD_SIGNATURE) {
+        if (requestCode == RESULT_LOAD_SIGNATURE && resultCode == SignatureActivity.RESULT_OK) {
             Context context = getView().getContext();
             String fileName = data.getStringExtra("signatureFileName");
             File image = new File(context.getExternalCacheDir(), fileName + ".jpg");
@@ -562,7 +562,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                     Log.w(TAG, "CAMERA and STORAGE permissions required to use IMAGE widget");
                 }
             }else if (JsonFormConstants.SIGNATURE.equals(type)) {
-                String uploadButtonText = (String) v.getTag(R.id.timestamp);
+                String timeStampVisibility = (String) v.getTag(R.id.timestamp);
                 mCurrentKey = key;
                 if (v.getTag(R.id.btn_clear) != null) {
                     getView().updateRelevantImageView(null, null, key, mStepName);
@@ -570,15 +570,15 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                 }else{
                     getView().hideKeyBoard();
                     Intent signatureIntent = new Intent(getView().getContext(), SignatureActivity.class);
-                    signatureIntent.putExtra("timestamp",getTimestampVisibilityBoolean(uploadButtonText));
+                    signatureIntent.putExtra("timestamp",getTimestampVisibilityBoolean(timeStampVisibility));
                     getView().startActivityForResult(signatureIntent, RESULT_LOAD_SIGNATURE);
                 }
             }
         }
     }
 
-    private boolean getTimestampVisibilityBoolean(String uploadButtonText) {
-            return uploadButtonText!=null && ("true").equals(uploadButtonText);
+    private boolean getTimestampVisibilityBoolean(String timeStampVisibility) {
+            return timeStampVisibility!=null && ("true").equals(timeStampVisibility);
    }
 
     public void onFocusChange(View v, boolean focus){

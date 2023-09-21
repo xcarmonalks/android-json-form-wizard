@@ -28,24 +28,31 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 
 import com.vijay.jsonwizard.R;
 import com.vijay.jsonwizard.utils.ImageUtils;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 
 public class SignatureActivity extends AppCompatActivity{
 
     private Signature mSignature;
     private Bitmap bitmap;
-    private LinearLayout mContent;
-    private RelativeLayout mysignatureContainer;
+    private ConstraintLayout mContent;
+    private ConstraintLayout signatureContainer;
     private View view;
     private View deleteButton;
     private View saveButton;
     private Boolean isTimestampVisible;
+
+    public static int RESULT_OK = 200;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -64,17 +71,20 @@ public class SignatureActivity extends AppCompatActivity{
 
     private void setupView() {
         setContentView(R.layout.activity_signature);
-        mysignatureContainer = findViewById(R.id.mysignatureContainer);
-        mContent = findViewById(R.id.mysignature);
+        signatureContainer = findViewById(R.id.signatureContainer);
+        mContent = findViewById(R.id.signature);
         mSignature = new Signature(this, null);
         mContent.addView(mSignature);
-        setTimestampVisibility();
-        view = mysignatureContainer;
+        setTimestamp();
+        view = signatureContainer;
     }
 
-    private void setTimestampVisibility() {
-        View timestamp = findViewById(R.id.timestampTv);
+    private void setTimestamp() {
+        TextView timestamp = findViewById(R.id.timestampTv);
         if(isTimestampVisible){
+            Date date = new Date(System.currentTimeMillis());
+            DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy - HH:mm:ss");
+            timestamp.setText(formatter.format(date));
             timestamp.setVisibility(View.VISIBLE);
         }else{
             timestamp.setVisibility(View.GONE);
@@ -106,7 +116,7 @@ public class SignatureActivity extends AppCompatActivity{
         ImageUtils.saveToFile(bitmap, file);
         Intent intent = new Intent();
         intent.putExtra("signatureFileName",fileName);
-        setResult(100,intent);
+        setResult(RESULT_OK,intent);
         finish();
     }
 

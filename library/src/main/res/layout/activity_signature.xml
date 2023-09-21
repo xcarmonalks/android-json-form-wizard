@@ -1,76 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/signatureContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="20dp"
-        android:weightSum="4">
-
-        <RelativeLayout
+        android:background="@color/white"
+        >
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/signature"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/white"
-            android:orientation="vertical">
-
-
-            <RelativeLayout
-                android:id="@+id/mysignatureContainer"
+            android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/timestampTv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/white">
+                android:layout_marginLeft="24sp"
+                android:layout_marginTop="16sp"
+                tools:text="20/09/2023 - 09:33:50"
+                android:textColor="@color/blue"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:textSize="20sp" />
 
-                <LinearLayout
-                    android:id="@+id/mysignature"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    ></LinearLayout>
-
-                <TextView
-                    android:id="@+id/timestampTv"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
-                    android:text="20/09/2023"
-                    android:textColor="@color/grey"
-                    android:textSize="28sp" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-            </RelativeLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:weightSum="1">
+    <ImageButton
+        android:id = "@+id/saveBt"
+        android:layout_width="48sp"
+        android:layout_height="48sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/bg_rounded_green"
+        android:layout_marginEnd="16sp"
+        android:layout_marginTop="16sp"
+        android:backgroundTint="@color/green"
+        android:src="@drawable/ic_done"
+        android:foreground="?android:attr/selectableItemBackground"
+        />
 
-                <Button
-                    android:id="@+id/cleanBt"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginRight="10dp"
-                    android:layout_weight="0.5"
-                    android:padding="10dp"
-                    android:text="@string/delete" />
+    <ImageButton
+        android:id = "@+id/cleanBt"
+        android:layout_width="48sp"
+        android:layout_height="48sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/bg_rounded_red"
+        android:layout_marginEnd="16sp"
+        android:layout_marginTop="16sp"
+        app:layout_constraintEnd_toStartOf="@id/saveBt"
+        android:src="@drawable/ic_delete"
+        android:foreground="?android:attr/selectableItemBackground"
+        />
 
-                <Button
-                    android:id="@+id/saveBt"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="10dp"
-                    android:layout_weight="0.5"
-                    android:padding="10dp"
-                    android:text="@string/save" />
-            </LinearLayout>
-
-
-        </RelativeLayout>
-
-    </LinearLayout>
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
