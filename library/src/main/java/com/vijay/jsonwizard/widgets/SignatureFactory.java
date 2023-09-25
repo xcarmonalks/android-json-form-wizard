@@ -83,7 +83,7 @@ public class SignatureFactory implements FormWidgetFactory {
     private List<View> getEditableViews(final Context context, JSONObject jsonObject, CommonListener listener,
                                         JsonFormBundle bundle) throws JSONException {
         List<View> views = new ArrayList<>(1);
-        View rootView = LayoutInflater.from(context).inflate(R.layout.item_image_picker, null);
+        View rootView = LayoutInflater.from(context).inflate(R.layout.item_signature, null);
         rootView.setTag(R.id.type, jsonObject.getString("type"));
 
         final ImageView imageView = rootView.findViewById(R.id.image_preview);
