@@ -127,7 +127,7 @@ public class SignatureActivity extends AppCompatActivity{
 
 
     public class Signature extends View {
-        private static final float STROKE_WIDTH = 3f;
+        private static final float STROKE_WIDTH = 10f;
         private static final float HALF_STROKE_WIDTH = STROKE_WIDTH / 2;
         private static final String TAG = "Signature";
         private final RectF dirtyRect = new RectF();
