@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
@@ -41,6 +42,7 @@ import androidx.core.app.ActivityCompat;
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.radiobutton.MaterialRadioButton;
 import com.vijay.jsonwizard.R;
+import com.vijay.jsonwizard.activities.SignatureActivity;
 import com.vijay.jsonwizard.barcode.LivePreviewActivity;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.customviews.MaterialTextInputLayout;
@@ -62,6 +64,7 @@ import com.vijay.jsonwizard.utils.ImagePicker;
 import com.vijay.jsonwizard.utils.ImageUtils;
 import com.vijay.jsonwizard.utils.JsonFormUtils;
 import com.vijay.jsonwizard.utils.ResourceViewer;
+import com.vijay.jsonwizard.utils.SignatureItem;
 import com.vijay.jsonwizard.utils.ValidationStatus;
 import com.vijay.jsonwizard.views.JsonFormFragmentView;
 import com.vijay.jsonwizard.viewstates.JsonFormFragmentViewState;
@@ -94,6 +97,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
     private static final int RESULT_LOAD_BARCODE = 2;
     private static final int RESULT_LOAD_LOCATION = 3;
     private static final int RESULT_RESOURCE_VIEW = 4;
+    private static final int RESULT_LOAD_SIGNATURE = 5;
 
     private static final String PARAM_BARCODE = "barcode";
     private static final String PARAM_ERROR = "error";
@@ -473,6 +477,16 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
             }
         }
 
+        if (requestCode == RESULT_LOAD_SIGNATURE && resultCode == SignatureActivity.RESULT_OK) {
+            Context context = getView().getContext();
+            String fileName = data.getStringExtra("signatureFileName");
+            File image = new File(context.getExternalCacheDir(), fileName + ".jpg");
+            String filePath = image.getAbsolutePath();
+            Bitmap bitmap = BitmapFactory.decodeFile(filePath);
+            ImageUtils.saveToFile(bitmap, image);
+            getView().updateRelevantImageView(bitmap, image.getAbsolutePath(), mCurrentKey,mStepName);
+        }
+
         if (requestCode == RESULT_LOAD_BARCODE) {
             if (data != null && data.hasExtra(PARAM_BARCODE)) {
 
@@ -489,6 +503,8 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
         if (requestCode == RESULT_LOAD_LOCATION) {
             handleResultLocation(resultCode, data);
         }
+
+
     }
 
     private void handleResultLocation(int resultCode, Intent data) {
@@ -517,6 +533,7 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
     public void onClick(View v) {
         String key = (String) v.getTag(R.id.key);
         String type = (String) v.getTag(R.id.type);
+
         FormWidgetFactory formWidgetFactory =  WidgetFactoryRegistry.getWidgetFactory(type);
         if(formWidgetFactory instanceof ClickableFormWidget) {
             if (JsonFormConstants.BARCODE_TEXT.equals(type)){
@@ -544,9 +561,25 @@ public class JsonFormFragmentPresenter extends MvpBasePresenter<JsonFormFragment
                 } else {
                     Log.w(TAG, "CAMERA and STORAGE permissions required to use IMAGE widget");
                 }
+            }else if (JsonFormConstants.SIGNATURE.equals(type)) {
+                String timeStampVisibility = (String) v.getTag(R.id.timestamp);
+                mCurrentKey = key;
+                if (v.getTag(R.id.btn_clear) != null) {
+                    getView().updateRelevantImageView(null, null, key, mStepName);
+                    v.setVisibility(View.GONE);
+                }else{
+                    getView().hideKeyBoard();
+                    Intent signatureIntent = new Intent(getView().getContext(), SignatureActivity.class);
+                    signatureIntent.putExtra("timestamp",getTimestampVisibilityBoolean(timeStampVisibility));
+                    getView().startActivityForResult(signatureIntent, RESULT_LOAD_SIGNATURE);
+                }
             }
         }
     }
+
+    private boolean getTimestampVisibilityBoolean(String timeStampVisibility) {
+            return timeStampVisibility!=null && ("true").equals(timeStampVisibility);
+   }
 
     public void onFocusChange(View v, boolean focus){
         String key = (String) v.getTag(R.id.key);

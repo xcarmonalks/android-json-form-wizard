@@ -24,7 +24,7 @@ public class JsonFormConstants {
     public static final String CAROUSEL = "carousel";
     public static final String LOCATION_PICKER = "location";
     public static final String RESOURCE_VIEWER = "resource_view";
-
+    public static final String SIGNATURE = "signature";
     public static final String ORIENTATION_EXTRA = "screen_orientation";
     public static final String CURRENT_ORIENTATION_EXTRA = "current_orientation";
     public static final int ORIENTATION_LANDSCAPE = 2;

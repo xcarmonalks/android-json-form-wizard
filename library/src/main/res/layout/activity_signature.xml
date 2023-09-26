@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/signatureContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        >
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/signature"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/timestampTv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="24sp"
+                android:layout_marginTop="16sp"
+                tools:text="20/09/2023 - 09:33:50"
+                android:textColor="@color/timestamp_blue"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:textSize="20sp" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ImageButton
+        android:id = "@+id/saveBt"
+        android:layout_width="48sp"
+        android:layout_height="48sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/bg_rounded_green"
+        android:layout_marginEnd="16sp"
+        android:layout_marginTop="16sp"
+        android:src="@drawable/ic_done"
+        android:foreground="?android:attr/selectableItemBackground"
+        />
+
+    <ImageButton
+        android:id = "@+id/cleanBt"
+        android:layout_width="48sp"
+        android:layout_height="48sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/bg_rounded_red"
+        android:layout_marginEnd="16sp"
+        android:layout_marginTop="16sp"
+        app:layout_constraintEnd_toStartOf="@id/saveBt"
+        android:src="@drawable/ic_delete"
+        android:foreground="?android:attr/selectableItemBackground"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
