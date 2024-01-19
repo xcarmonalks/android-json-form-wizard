@@ -7,7 +7,7 @@ android {
     buildToolsVersion '33.0.0'
 
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion 24
         targetSdkVersion 33
         versionCode 22
         versionName "1.10.0"
@@ -52,6 +52,8 @@ dependencies {
     implementation 'com.gu.android:toolargetool:0.3.0'
 
     implementation 'com.google.android.material:material:1.4.0'
+
+    implementation 'com.google.code.gson:gson:2.8.0'
 }
 sonarqube {
     properties {
