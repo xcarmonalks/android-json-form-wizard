@@ -68,21 +68,6 @@ public class JsonFormBundle {
         return key;
     }
 
-/*    private void loadBundle(JSONObject bundle, String country) throws JSONException {
-        String lang = country;
-        if (!bundle.has(lang)) {
-            lang = getDefaultLang(bundle);
-        }
-        if (!"".equals(lang)) {
-            JSONObject translations = bundle.getJSONObject(lang);
-            Iterator<String> transIter = translations.keys();
-            while (transIter.hasNext()) {
-                String key = transIter.next();
-                mBundle.put(key, translations.getString(key));
-            }
-        }
-    }*/
-
     private void loadBundleTest(Map<String, Map<String, String>> bundle, String deviceLang) {
         String lang = "";
         //Primero revisamos si el bundle contiene nuestro idioma
