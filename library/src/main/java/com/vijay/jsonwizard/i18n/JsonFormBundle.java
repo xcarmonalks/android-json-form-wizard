@@ -40,7 +40,7 @@ public class JsonFormBundle {
                 FormUtils.parseChecklistBundle(bundleJson.toString()) :
                 null;
             twoLevelLocale = hasTwoLevelLocale(bundleHasMap);
-            loadBundleTest(bundleHasMap, getLocale(locale));
+            loadBundle(bundleHasMap, getLocale(locale));
         }
     }
 
@@ -68,7 +68,7 @@ public class JsonFormBundle {
         return key;
     }
 
-    private void loadBundleTest(Map<String, Map<String, String>> bundle, String deviceLang) {
+    private void loadBundle(Map<String, Map<String, String>> bundle, String deviceLang) {
         String lang = "";
         //Primero revisamos si el bundle contiene nuestro idioma
         if(bundle.containsKey(deviceLang)){
