@@ -8,7 +8,16 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
+import androidx.annotation.NonNull;
+
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.vijay.jsonwizard.R;
+
+import java.lang.reflect.Type;
+import java.util.Map;
 
 /**
  * Created by vijay on 24-05-2015.
@@ -55,5 +64,11 @@ public class FormUtils {
     public static int dpToPixels(Context context, float dps) {
         final double scale = context.getResources().getDisplayMetrics().density;
         return (int) (dps * scale + 0.5d);
+    }
+
+    public static Map<String, Map<String, String>> parseChecklistBundle(@NonNull String json) {
+        Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES).create();
+        Type typeOfBundle = new TypeToken<Map<String, Map<String, String>>>() {}.getType();
+        return gson.fromJson(json, typeOfBundle);
     }
 }
