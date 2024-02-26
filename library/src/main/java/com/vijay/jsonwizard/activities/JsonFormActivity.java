@@ -576,6 +576,7 @@ public class JsonFormActivity extends AppCompatActivity implements JsonApi {
         super.onPause();
         if (mVisualizationMode != JsonFormConstants.VISUALIZATION_MODE_READ_ONLY) {
             Intent intent = new Intent("jsonFormPaused");
+            intent.setPackage(this.getPackageName());
             String json = mJSONObject.toString();
             // Avoid sending more than 200Kb as intent extra
             if (json != null && json.length() >= MAX_PARCEL_SIZE) {

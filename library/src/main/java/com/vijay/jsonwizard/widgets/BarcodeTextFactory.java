@@ -1,6 +1,5 @@
 package com.vijay.jsonwizard.widgets;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.text.InputType;
@@ -10,10 +9,8 @@ import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 
 import com.google.android.material.internal.CheckableImageButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -30,10 +27,7 @@ import com.vijay.jsonwizard.i18n.JsonFormBundle;
 import com.vijay.jsonwizard.interfaces.ClickableFormWidget;
 import com.vijay.jsonwizard.interfaces.CommonListener;
 import com.vijay.jsonwizard.interfaces.FormWidgetFactory;
-import com.vijay.jsonwizard.interfaces.JsonApi;
-import com.vijay.jsonwizard.presenters.JsonFormFragmentPresenter;
 import com.vijay.jsonwizard.utils.ExpressionResolverContextUtils;
-import com.vijay.jsonwizard.utils.JsonFormUtils;
 import com.vijay.jsonwizard.utils.ValidationStatus;
 import com.vijay.jsonwizard.validators.textinputlayout.MaxLengthValidator;
 import com.vijay.jsonwizard.validators.textinputlayout.MinLengthValidator;
@@ -105,7 +99,7 @@ public class BarcodeTextFactory implements FormWidgetFactory, ClickableFormWidge
         editText.setTag(R.id.key, jsonObject.getString("key"));
         editText.setTag(R.id.type, jsonObject.getString("type"));
 
-        CheckableImageButton checkableImageButton = textInputLayout.findViewById(R.id.text_input_end_icon);
+        CheckableImageButton checkableImageButton = textInputLayout.findViewById(com.google.android.material.R.id.text_input_end_icon);
         checkableImageButton.setId(View.generateViewId());
         checkableImageButton.setTag(R.id.key, jsonObject.getString("key"));
         checkableImageButton.setTag(R.id.type, jsonObject.getString("type"));
@@ -239,7 +233,7 @@ public class BarcodeTextFactory implements FormWidgetFactory, ClickableFormWidge
         editText.setTag(R.id.key, jsonObject.getString("key"));
         editText.setTag(R.id.type, jsonObject.getString("type"));
 
-        CheckableImageButton checkableImageButton = textInputLayout.findViewById(R.id.text_input_end_icon);
+        CheckableImageButton checkableImageButton = textInputLayout.findViewById(com.google.android.material.R.id.text_input_end_icon);
         checkableImageButton.setId(View.generateViewId());
         checkableImageButton.setTag(R.id.key, jsonObject.getString("key"));
         checkableImageButton.setTag(R.id.type, jsonObject.getString("type"));
