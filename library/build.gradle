@@ -30,6 +30,14 @@ android {
         resolutionStrategy.force "com.android.support:cardview-v7:$supportLibVersion"
         resolutionStrategy.force "com.android.support:support-annotations:$supportLibVersion"*/
     }
+
+    publishing {
+        singleVariant("release") {
+            // if you don't want sources/javadoc, remove these lines
+            withSourcesJar()
+            withJavadocJar()
+        }
+    }
 }
 
 dependencies {
@@ -71,18 +79,14 @@ tasks.register('sourceJar', Jar) {
     archiveClassifier.set("sources")
 }
 
-tasks.withType(PublishToMavenRepository) { task ->
-    def match = task.name =~ '^publish(.*)AarPublicationTo(.*)$'
-    dependsOn("assemble${match[0][1]}")
-}
-
 
 project.afterEvaluate {
     publishing {
         publications {
             release(MavenPublication) {
-                from components.findByName('release')
+                //from components.findByName('release')
                 artifact sourceJar // optional sources
+                artifact bundleReleaseAar
             }
         }
     }
