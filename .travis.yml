@@ -22,10 +22,10 @@ android:
     - platform-tools
 
     # The BuildTools version used by your project
-    - build-tools-34.0.0
+    - build-tools-26.0.2
 
     # The SDK version used to compile your project
-    - android-34
+    - android-26
 
     # Additional components
     #- extra-google-google_play_services
